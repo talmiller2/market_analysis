@@ -12,6 +12,7 @@ matplotlib.rcParams.update({'axes.prop_cycle': cycler(color='bgrcmyk')})
 
 plt.close('all')
 
+# date_start = '1929-01-01'
 date_start = '1989-01-01'
 # date_start = '2000-01-01'
 date_end = '2020-09-30'

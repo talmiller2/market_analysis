@@ -12,7 +12,8 @@ matplotlib.rcParams.update({'axes.prop_cycle': cycler(color='bgrcmyk')})
 
 plt.close('all')
 
-date_start = '1986-01-01'
+date_start = '1980-01-01'
+# date_start = '1986-01-01'
 date_end = '2020-09-30'
 
 index_name_list = []
@@ -20,8 +21,7 @@ index_name_list += ['SP500']
 index_name_list += ['NDX100']
 
 for index_name in index_name_list:
-    dates, index_values = load_stock_data(index_name, date_start, date_end)
-    # index_values /= index_values[0]
+    dates, _ = load_stock_data(index_name, date_start, date_end)
     inds_years, label_years = get_year_labels(dates)
     dividends = get_dividend_yield(dates, index_name=index_name)
 

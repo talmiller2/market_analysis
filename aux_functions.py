@@ -22,11 +22,11 @@ def load_stock_data(stock_name, date_start=None, date_end=None, normalize=True, 
 
     # check if requested time interval is contained within the data
     if date_start is not None:
-        if get_number_of_days_between_dates(dates[0], date_start, keep_sign=True) > 0:
+        if get_number_of_days_between_dates(dates[0], date_start) > 0:
             raise ValueError('data for stock ' + str(stock_name) + ' begins at ' + dates[0]
                              + ', but requested date_start is ' + str(date_start))
     if date_end is not None:
-        if get_number_of_days_between_dates(dates[-1], date_end, keep_sign=True) < 0:
+        if get_number_of_days_between_dates(dates[-1], date_end) < 0:
             raise ValueError('data for stock ' + str(stock_name) + ' ends at ' + dates[-1]
                              + ', but requested date_end is ' + str(date_end))
 
@@ -86,7 +86,7 @@ def get_inds_between_dates(dates, date_start=None, date_end=None):
     return inds_restricted
 
 
-def get_number_of_days_between_dates(date1, date2, keep_sign=False):
+def get_number_of_days_between_dates(date1, date2):
     """
     Count the number of days between two dates, assuming 365 days in a year with equally sized months
     """
@@ -95,8 +95,6 @@ def get_number_of_days_between_dates(date1, date2, keep_sign=False):
     num_days1 = year1 * 365.0 + month1 * 365.0 / 12 + day1
     num_days2 = year2 * 365.0 + month2 * 365.0 / 12 + day2
     dist = num_days1 - num_days2
-    if keep_sign == False:
-        dist = abs(dist)
     return dist
 
 
@@ -108,7 +106,7 @@ def transform_to_days_array(dates, date_reference=None):
         date_reference = dates[0]
     days_array = []
     for date in dates:
-        days_array += [get_number_of_days_between_dates(date_reference, date, keep_sign=True)]
+        days_array += [get_number_of_days_between_dates(date, date_reference)]
     return days_array
 
 
@@ -179,23 +177,32 @@ def get_dividend_yield(dates_to_interpolate, index_name='SP500'):
     dividends_interpolated = interp_fun(days_to_interpolate)
     return dividends_interpolated
 
-# def load_loan_rates(data):
-#     # data from https://www.macrotrends.net/1433/historical-libor-rates-chart
-#     loan_rates_data = pd.read_csv('data/historical-libor-rates-chart.csv')
-#     dates = loan_rates_data['date']
-#     loan_rate = loan_rates_data['libor-1-month']
-#     data['loan_rates_dates'] = dates
-#     data['loan_rates_values'] = loan_rate
-#     return data
 
-# def get_loan_rate(date):
-#     dates = data['loan_rates_dates']
-#     loan_rate = data['loan_rates_values']
-#
-#     # find where the requested day lies in the load rate data
-#     ind_below =
-#
-#     # interpolate the loan rate for the current date
-#     interp_fun = interp1d()
-#
-#     return loan_rate
+def load_libor_rates():
+    # data from https://www.macrotrends.net/1433/historical-libor-rates-chart
+    loan_rates_data = pd.read_csv('data/historical-libor-rates-chart.csv')
+    dates = [x for x in loan_rates_data['date']]
+    libor_rate = [x for x in loan_rates_data['libor-1-month']]
+    return dates, libor_rate
+
+
+def get_libor_rate(dates_to_interpolate):
+    dates_data, libor_rate_data = load_libor_rates()
+    days_to_interpolate = transform_to_days_array(dates_to_interpolate)
+    days_data_array = transform_to_days_array(dates_data, date_reference=dates_to_interpolate[0])
+
+    # check if requested time interval is contained within the data
+    date_start = dates_to_interpolate[0]
+    if get_number_of_days_between_dates(dates_data[0], date_start) > 0:
+        raise ValueError('data for libor rates begins at ' + dates_data[0]
+                         + ', but requested date_start is ' + str(date_start))
+
+    date_end = dates_to_interpolate[-1]
+    if get_number_of_days_between_dates(dates_data[-1], date_end) < 0:
+        raise ValueError('data for  libor rate ends at ' + dates_data[-1]
+                         + ', but requested date_end is ' + str(date_end))
+
+    # interpolate
+    interp_fun = interp1d(days_data_array, libor_rate_data)
+    libor_rate_interpolated = interp_fun(days_to_interpolate)
+    return libor_rate_interpolated
