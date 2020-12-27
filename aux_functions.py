@@ -4,7 +4,7 @@ import copy
 from scipy.interpolate import interp1d
 
 
-def load_stock_data(stock_name, date_start=None, date_end=None):
+def load_stock_data(stock_name, date_start=None, date_end=None, normalize=True, close_type='Close'):
     """
     Load stock time evolution data.
     If date for start/end is given, restrict the output by those dates.
@@ -14,13 +14,30 @@ def load_stock_data(stock_name, date_start=None, date_end=None):
         data_file_name = '^NDX'
     elif stock_name == 'SP500':
         data_file_name = '^GSPC'
+    elif stock_name == 'SP500TR':
+        data_file_name = '^SP500TR'
     data = pd.read_csv('data/' + data_file_name + '.csv')
     dates = [x for x in data['Date']]
-    values = [x for x in data['Close']]
+    values = np.array([x for x in data[close_type]])
 
+    # check if requested time interval is contained within the data
+    if date_start is not None:
+        if get_number_of_days_between_dates(dates[0], date_start, keep_sign=True) > 0:
+            raise ValueError('data for stock ' + str(stock_name) + ' begins at ' + dates[0]
+                             + ', but requested date_start is ' + str(date_start))
+    if date_end is not None:
+        if get_number_of_days_between_dates(dates[-1], date_end, keep_sign=True) < 0:
+            raise ValueError('data for stock ' + str(stock_name) + ' ends at ' + dates[-1]
+                             + ', but requested date_end is ' + str(date_end))
+
+    # pick only a specific time interval
     inds_restricted = get_inds_between_dates(dates, date_start, date_end)
     dates = [dates[i] for i in inds_restricted]
     values = [values[i] for i in inds_restricted]
+
+    # normalize to initial date
+    if normalize:
+        values /= values[0]
 
     return dates, values
 
@@ -116,20 +133,22 @@ def interpolate_between_dates(dates, values, date_to_interpolate):
     return value_interp
 
 
-def get_year_labels(dates):
+def get_year_labels(dates, num_ticks=40):
     """
     find indices where years start, for plot's x-asis
     """
     day_start, month_start, year_start = get_date(dates[0])
     day_end, month_end, year_end = get_date(dates[-1])
-    label_years = [i for i in range(year_start + 1, year_end + 1)]
+    skip_years = int(np.ceil(1.0 * (year_end - year_start) / num_ticks))
+    if skip_years < 1: skip_years = 1
+    label_years = [i for i in range(year_start + 1, year_end + 1, skip_years)]
     inds_years = []
     year_cnt = year_start
     for i, date in enumerate(dates):
         curr_year = int(date.split('-')[0])
         if curr_year > year_cnt:
             inds_years += [i]
-            year_cnt += 1
+            year_cnt += skip_years
     return inds_years, label_years
 
 

@@ -1,9 +1,6 @@
-import pandas as pd
-import numpy as np
-import copy
-from market_functions import get_date, is_date_between_dates
+
 import matplotlib
-from aux_functions import load_dividend_data, get_dividend_yield, load_stock_data, get_year_labels
+from aux_functions import get_dividend_yield, load_stock_data, get_year_labels
 from cycler import cycler
 
 import matplotlib.pyplot as plt
@@ -22,10 +19,10 @@ index_name_list = []
 index_name_list += ['SP500']
 index_name_list += ['NDX100']
 
-for index_name in index_name_list:# index_name = 'SP500'
-    dates, _ = load_stock_data(index_name, date_start, date_end)
+for index_name in index_name_list:
+    dates, index_values = load_stock_data(index_name, date_start, date_end)
+    # index_values /= index_values[0]
     inds_years, label_years = get_year_labels(dates)
-
     dividends = get_dividend_yield(dates, index_name=index_name)
 
     # plots
@@ -37,3 +34,4 @@ for index_name in index_name_list:# index_name = 'SP500'
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
+
