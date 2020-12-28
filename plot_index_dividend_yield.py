@@ -1,6 +1,7 @@
-
 import matplotlib
-from aux_functions import get_dividend_yield, load_stock_data, get_year_labels
+from data_functions import load_stock_data, get_dividend_yield
+from aux_functions import get_year_labels
+
 from cycler import cycler
 
 import matplotlib.pyplot as plt
@@ -12,8 +13,8 @@ matplotlib.rcParams.update({'axes.prop_cycle': cycler(color='bgrcmyk')})
 
 plt.close('all')
 
-date_start = '1980-01-01'
-# date_start = '1986-01-01'
+# date_start = '1980-01-01'
+date_start = '1986-01-01'
 date_end = '2020-09-30'
 
 index_name_list = []
@@ -34,4 +35,3 @@ for index_name in index_name_list:
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-

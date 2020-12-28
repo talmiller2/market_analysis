@@ -1,6 +1,6 @@
-
 import matplotlib
-from aux_functions import load_stock_data, get_libor_rate, get_year_labels
+from data_functions import load_stock_data, get_libor_rate
+from aux_functions import get_year_labels
 from cycler import cycler
 
 import matplotlib.pyplot as plt
@@ -28,4 +28,3 @@ plt.ylabel('libor rate %')
 plt.title('LIBOR 1-month loan rate')
 plt.grid(True)
 plt.tight_layout()
-
