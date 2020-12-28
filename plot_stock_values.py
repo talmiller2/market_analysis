@@ -10,32 +10,42 @@ import matplotlib.pyplot as plt
 plt.rcParams.update({'font.size': 12})
 matplotlib.rcParams.update({'axes.prop_cycle': cycler(color='bgrcmyk')})
 
-plt.close('all')
+# plt.close('all')
 
 # date_start = '1929-01-01'
-date_start = '1989-01-01'
+# date_start = '1989-01-01'
 # date_start = '2000-01-01'
+date_start = '2003-01-01'
 date_end = '2020-09-30'
 
-index_name_list = []
-index_name_list += ['SP500']
-index_name_list += ['SP500TR']
-# index_name_list += ['SPY']
-index_name_list += ['NDX100']
-# index_name_list += ['QQQ']
+stock_name_list = []
+# stock_name_list += ['SP500']
+# stock_name_list += ['SP500TR']
+# stock_name_list += ['SPY']
+stock_name_list += ['NDX100']
+stock_name_list += ['NDX100TR']
+stock_name_list += ['QQQ']
+# stock_name_list += ['TLT']
+# stock_name_list += ['VFINX']
 
-for index_name in index_name_list:
-    dates, index_values = load_stock_data(index_name, date_start, date_end)
-    # dates, index_values = load_stock_data(index_name, date_start, date_end, close_type='Adj Close')
+# plot_close_adjusted = False
+plot_close_adjusted = True
+
+for stock_name in stock_name_list:
+    dates, index_values = load_stock_data(stock_name, date_start, date_end)
+    if plot_close_adjusted:
+        _, index_adjusted_values = load_stock_data(stock_name, date_start, date_end, close_type='Adj Close')
     inds_years, label_years = get_year_labels(dates)
 
     # plots
     plt.figure(1)
-    plt.plot(index_values, label=index_name, linewidth=2)
-    plt.yscale('log')
+    plt.plot(index_values, label=stock_name, linewidth=2)
+    if plot_close_adjusted and stock_name not in ['SP500', 'SP500TR', 'NDX100', 'NDX100TR']:
+        plt.plot(index_adjusted_values, label=stock_name + ' (TR)', linewidth=2)
+    # plt.yscale('log')
     plt.xticks(inds_years, label_years, rotation='vertical')
-    plt.ylabel('index yield %')
-    plt.title('Index Data')
+    plt.ylabel('yield')
+    plt.title('Stock Data')
     plt.legend()
     plt.grid(True)
     plt.tight_layout()

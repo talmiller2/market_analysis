@@ -4,21 +4,36 @@ import copy
 from scipy.interpolate import interp1d
 
 
-def load_stock_data(stock_name, date_start=None, date_end=None, normalize=True, close_type='Close'):
+def load_stock_data(stock_name, date_start=None, date_end=None, normalize=True, close_type='Close',
+                    data_format='Yahoo'):
     """
     Load stock time evolution data.
     If date for start/end is given, restrict the output by those dates.
+    Most data is from Yahoo finance.
     """
     data_file_name = stock_name
-    if stock_name == 'NDX100':
-        data_file_name = '^NDX'
-    elif stock_name == 'SP500':
+    if stock_name == 'SP500':
         data_file_name = '^GSPC'
     elif stock_name == 'SP500TR':
         data_file_name = '^SP500TR'
+    elif stock_name == 'NDX100':
+        data_file_name = '^NDX'
+    elif stock_name == 'NDX100TR':
+        # date from https://www.investing.com/indices/nasdaq-100-tr-historical-data
+        data_file_name = 'Nasdaq 100 TR Historical Data'
+        data_format = 'Investing.com'
+
     data = pd.read_csv('data/' + data_file_name + '.csv')
-    dates = [x for x in data['Date']]
-    values = np.array([x for x in data[close_type]])
+
+    if data_format == 'Yahoo':
+        dates = [x for x in data['Date']]
+        values = np.array([x for x in data[close_type]])
+    else:
+        dates = [change_date_format_investingcom_to_yahoo(x) for x in data['Date']]
+        values = np.array([float(x.replace(',', '')) for x in data['Price']])
+        # date is "future to past" so reverse it
+        dates = dates[::-1]
+        values = values[::-1]
 
     # check if requested time interval is contained within the data
     if date_start is not None:
@@ -51,6 +66,31 @@ def get_date(date_string):
     month = int(date_list[1])
     day = int(date_list[2])
     return day, month, year
+
+def change_date_format_investingcom_to_yahoo(date_string):
+    """
+    Change date format of "Investing.com" to "Yahoo finance"
+    """
+    month_string = date_string[0:3]
+    day_string = date_string[4:6]
+    year_string = date_string[8::]
+
+    if month_string == 'Jan': month_string_mod = '01'
+    elif month_string == 'Feb': month_string_mod = '02'
+    elif month_string == 'Mar': month_string_mod = '03'
+    elif month_string == 'Apr': month_string_mod = '04'
+    elif month_string == 'May': month_string_mod = '05'
+    elif month_string == 'Jun': month_string_mod = '06'
+    elif month_string == 'Jul': month_string_mod = '07'
+    elif month_string == 'Aug': month_string_mod = '08'
+    elif month_string == 'Sep': month_string_mod = '09'
+    elif month_string == 'Oct': month_string_mod = '10'
+    elif month_string == 'Nov': month_string_mod = '11'
+    elif month_string == 'Dec': month_string_mod = '12'
+
+    date_string_mod = year_string + '-' + month_string_mod + '-' + day_string
+
+    return date_string_mod
 
 
 def is_date_between_dates(date, date_start=None, date_end=None):
