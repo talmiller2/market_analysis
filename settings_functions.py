@@ -47,13 +47,24 @@ def define_default_settings(settings=None):
         # settings['leverage_factor'] = 2
         settings['leverage_factor'] = 3
 
+    if 'tax_scheme' not in settings:
+        settings['tax_scheme'] = 'FIFO'
+        # settings['tax_scheme'] = 'LIFO'
+        # settings['tax_scheme'] = 'optimized'
+
     if 'capital_gains_tax_percents' not in settings:
         settings['capital_gains_tax_percents'] = 25
+        # settings['capital_gains_tax_percents'] = 0
+
+    if 'transaction_fee_percents' not in settings:
+        settings['transaction_fee_percents'] = 0.1
+        # settings['transaction_fee_percents'] = 0
 
     if 'num_days_in_year' not in settings:
         settings['num_days_in_year'] = 365
 
     if 'num_trading_days_in_year' not in settings:
         settings['num_trading_days_in_year'] = 252
+
 
     return settings
