@@ -43,6 +43,15 @@ def define_default_settings(settings=None):
         # settings['periodic_investment_interval'] = 'quarterly'
         # settings['periodic_investment_interval'] = 'yearly'
 
+    if 'rebalance_criterion' not in settings:
+        settings['rebalance_criterion'] = 'percent_deviation'
+        # settings['rebalance_criterion'] = 'quarterly'
+        # settings['rebalance_criterion'] = 'yearly'
+        # settings['rebalance_criterion'] = 'yearly'
+
+    if 'rebalance_percent_deviation' not in settings:
+        settings['rebalance_percent_deviation'] = 10.0
+
     if 'leverage_factor' not in settings:
         # settings['leverage_factor'] = 2
         settings['leverage_factor'] = 3
