@@ -14,24 +14,24 @@ def define_stock_parameters():
 
     # indices
     expense_ratios['SP500'] = 0
-    leverage_factors['SP500'] = None
+    leverage_factors['SP500'] = 1.0
     underlying_index['SP500'] = 'SP500'
     div_SP500 = 2.0
     dividend_yield['SP500'] = div_SP500
 
     expense_ratios['SP500TR'] = 0
-    leverage_factors['SP500TR'] = None
+    leverage_factors['SP500TR'] = 1.0
     underlying_index['SP500TR'] = 'SP500TR'
     dividend_yield['SP500TR'] = 0
 
     expense_ratios['NDX100'] = 0
-    leverage_factors['NDX100'] = None
+    leverage_factors['NDX100'] = 1.0
     underlying_index['NDX100'] = 'NDX100'
     div_NDX100 = 0.7
     dividend_yield['NDX100'] = div_NDX100
 
     expense_ratios['NDX100TR'] = 0
-    leverage_factors['NDX100TR'] = None
+    leverage_factors['NDX100TR'] = 1.0
     underlying_index['NDX100TR'] = 'NDX100TR'
     dividend_yield['NDX100TR'] = 0
 
@@ -133,14 +133,14 @@ def define_stock_parameters():
 
     # actively managed etf
     expense_ratios['ARKK'] = 0.75
-    leverage_factors['ARKK'] = None
+    leverage_factors['ARKK'] = 1.0
     underlying_index['ARKK'] = 'ARKK'
     dividend_yield['ARKK'] = 0
 
     return expense_ratios, leverage_factors, underlying_index, dividend_yield
 
 
-def load_stock_data(stock_name, date_start=None, date_end=None, normalize=True, close_type='Close',
+def load_stock_data(stock_name, date_start=1.0, date_end=1.0, normalize=True, close_type='Close',
                     data_format='Yahoo'):
     """
     Load stock time evolution data.
@@ -175,11 +175,11 @@ def load_stock_data(stock_name, date_start=None, date_end=None, normalize=True, 
         values = values[::-1]
 
     # check if requested time interval is contained within the data
-    if date_start is not None:
+    if date_start is not 1.0:
         if get_number_of_days_between_dates(dates[0], date_start) > 0:
             raise ValueError('data for stock ' + str(stock_name) + ' begins at ' + dates[0]
                              + ', but requested date_start is ' + str(date_start))
-    if date_end is not None:
+    if date_end is not 1.0:
         if get_number_of_days_between_dates(dates[-1], date_end) < 0:
             raise ValueError('data for stock ' + str(stock_name) + ' ends at ' + dates[-1]
                              + ', but requested date_end is ' + str(date_end))

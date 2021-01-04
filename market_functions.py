@@ -140,20 +140,25 @@ def initialize_portfolio(settings, data):
 def evolve_portfolio_single_day(settings, data, ind_date):
     """
     evolve each portfolio asset according to the stock it tracks
-    TODO: evolve the leveraged assets, after taking the cut of expense-ratio and loan-rate (LIBOR).
+    evolve the leveraged assets, after taking the cut of expense-ratio and loan-rate (LIBOR).
     """
 
     papers_dict = data['papers_dict']
     expense_ratios = data['expense_ratios']
-    leverage_factors = data['leverage_factors']  # TODO: use
+    leverage_factors = data['leverage_factors']
     dividend_yield = data['dividend_yield']
     data['cash_in_account'][ind_date] = data['cash_in_account'][ind_date - 1]
     data['total_investment'][ind_date] = data['total_investment'][ind_date - 1]
 
     for stock_name in papers_dict.keys():
-        market_factor = data[stock_name][ind_date] / data[stock_name][ind_date - 1]
-        expense_ratio_factor = 1.0 - expense_ratios[stock_name] / 100.0 / settings['num_trading_days_in_year']
-        paper_factor = market_factor * expense_ratio_factor
+        leverage_factor = leverage_factors[stock_name]
+        stock_change_percents = 100 * (data[stock_name][ind_date] / data[stock_name][ind_date - 1] - 1)
+        leverage_change_percents = leverage_factor * stock_change_percents
+        expense_ratio_daily_percents = expense_ratios[stock_name] / settings['num_trading_days_in_year']
+        libor_rate_daily_percents = (leverage_factor - 1) \
+                                    * data['libor_rate'][ind_date] / settings['num_trading_days_in_year']
+        paper_change_percents = leverage_change_percents - expense_ratio_daily_percents - libor_rate_daily_percents
+        paper_factor = 1 + paper_change_percents / 100.0
 
         papers = papers_dict[stock_name]
         for ind_paper, paper in enumerate(papers):
@@ -220,14 +225,15 @@ def add_cash_to_portfolio(settings, data, ind_date):
     # buy new papers with the cash
     papers_dict = data['papers_dict']
     for stock_name, cash_portion in zip(stock_names, cash_list):
-        paper = {}
-        paper['id'] = len(papers_dict[stock_name]) + 1
-        paper['value_at_buy'] = cash_portion
-        paper['value_current'] = paper['value_at_buy']
-        paper['date'] = data['dates'][ind_date]
-        paper['ind_day_at_buy'] = ind_date
-        paper['status'] = 'open'
-        papers_dict[stock_name] += [paper]
+        if cash_portion > 0:
+            paper = {}
+            paper['id'] = len(papers_dict[stock_name]) + 1
+            paper['value_at_buy'] = cash_portion
+            paper['value_current'] = paper['value_at_buy']
+            paper['date'] = data['dates'][ind_date]
+            paper['ind_day_at_buy'] = ind_date
+            paper['status'] = 'open'
+            papers_dict[stock_name] += [paper]
     data['papers_dict'] = papers_dict
 
     # cash was used in total
