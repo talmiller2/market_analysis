@@ -26,9 +26,9 @@ def define_default_settings(settings=None):
     #     # settings['solid_stock_type'] = 'TLT'
     #     # settings['solid_stock_type'] = 'TMF'
 
-    if 'portfolio_fractions' not in settings:
-        settings['portfolio_fractions'] = {}
-        settings['portfolio_fractions']['SP500'] = 1.0
+    if 'ideal_portfolio_fractions' not in settings:
+        settings['ideal_portfolio_fractions'] = {}
+        settings['ideal_portfolio_fractions']['SP500'] = 1.0
 
     if 'initial_investment' not in settings:
         settings['initial_investment'] = 1
@@ -51,6 +51,7 @@ def define_default_settings(settings=None):
 
     if 'rebalance_percent_deviation' not in settings:
         settings['rebalance_percent_deviation'] = 10.0
+        # settings['rebalance_percent_deviation'] = 5.0
 
     if 'leverage_factor' not in settings:
         # settings['leverage_factor'] = 2
@@ -66,6 +67,7 @@ def define_default_settings(settings=None):
         # settings['capital_gains_tax_percents'] = 0
 
     if 'transaction_fee_percents' not in settings:
+        # settings['transaction_fee_percents'] = 1.0
         settings['transaction_fee_percents'] = 0.1
         # settings['transaction_fee_percents'] = 0
 

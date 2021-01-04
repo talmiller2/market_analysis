@@ -81,8 +81,8 @@ if plot_sim:
     settings['date_start'] = date_start
     settings['date_end'] = date_end
     stock_name = 'VOO'
-    # settings['portfolio_fractions'] = {stock_name_list[0]: 1.0}
-    settings['portfolio_fractions'] = {stock_name: 1.0}
+    # settings['ideal_portfolio_fractions'] = {stock_name_list[0]: 1.0}
+    settings['ideal_portfolio_fractions'] = {stock_name: 1.0}
     # settings['periodic_investment_interval'] = 'yearly'
     # settings['periodic_investment_interval'] = 'quarterly'
     # settings['capital_gains_tax_percents'] = 0

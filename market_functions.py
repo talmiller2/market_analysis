@@ -1,8 +1,7 @@
 import pandas as pd
 import numpy as np
 import copy
-from scipy.interpolate import interp1d
-from data_functions import load_stock_data, get_dividend_yield, get_libor_rate, define_stock_parameters
+from data_functions import load_stock_data, get_libor_rate, define_stock_parameters
 from aux_functions import get_year_labels
 
 
@@ -16,10 +15,15 @@ def simulate_portfolio_evolution(settings):
 
     # initialize portfolio
     data = initialize_portfolio(settings, data)
+    data = calculate_portfolio_fractions(settings, data, 0)
 
     # loop over days of simulation
     for ind_date, date in enumerate(data['dates']):
         if ind_date > 0:
+
+            # calculate fractions of the total portfolio components
+            data = calculate_portfolio_fractions(settings, data, ind_date)
+
             # evolve the portfolio elements with the passing day stock changes
             data = evolve_portfolio_single_day(settings, data, ind_date)
 
@@ -31,7 +35,7 @@ def simulate_portfolio_evolution(settings):
             # check if rebalancing criterion reached
             # buy/sell according to strategy and update the portfolio
             # save date of operation to calculate statistics of operations frequency
-            if check_rebalancing_criterion_reached(settings, data):
+            if check_rebalancing_criterion_reached(settings, data, ind_date):
                 data = rebalance_portfolio(settings, data, ind_date)
 
             # check if tax criterion reached (end of year), sell some to withdraw for tax
@@ -39,14 +43,11 @@ def simulate_portfolio_evolution(settings):
             if check_tax_criterion_reached(settings, data):
                 data = sell_papers_for_tax(settings, data)
 
-        # calculate leveraged/solid portions of the total portfolio components
-        data = calculate_portfolio_fractions(settings, data, ind_date)
-
     # track the open/closed papers for visualization
     data = track_paper_status(settings, data)
 
     # end of simulation period reached, calculate profit if entire portfolio sold now
-    data = calculate_total_portfolio_profit(settings, data)
+    data = calculate_total_portfolio_yield(settings, data)
 
     return data
 
@@ -75,7 +76,7 @@ def load_data(settings):
     data['libor_rate'] = libor_rate
 
     # stocks to be a part of the portfolio
-    stock_names = settings['portfolio_fractions'].keys()
+    stock_names = settings['ideal_portfolio_fractions'].keys()
     for stock_name in stock_names:
         index_name = underlying_index[stock_name]
         _, stock_values = load_stock_data(index_name, date_start, date_end)
@@ -88,11 +89,11 @@ def initialize_portfolio(settings, data):
     """
     first purchase of stocks according to the required fractions
     """
-    portfolio_fractions = settings['portfolio_fractions']
-    stock_names = portfolio_fractions.keys()
+    ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
+    stock_names = ideal_portfolio_fractions.keys()
 
     # check fraction add up to 100%
-    if sum([portfolio_fractions[stock_name] for stock_name in stock_names]) != 1.0:
+    if sum([ideal_portfolio_fractions[stock_name] for stock_name in stock_names]) != 1.0:
         raise ValueError('portfolio_fractions do not add up to 100%')
 
     # buy the initial papers for the portfolio
@@ -101,7 +102,7 @@ def initialize_portfolio(settings, data):
         papers = []
         paper = {}
         paper['id'] = len(papers)
-        paper['value_at_buy'] = portfolio_fractions[stock_name] * settings['initial_investment'] \
+        paper['value_at_buy'] = ideal_portfolio_fractions[stock_name] * settings['initial_investment'] \
                                 * (1 - settings['transaction_fee_percents'] / 100.0)
         paper['value_current'] = paper['value_at_buy']
         paper['date'] = data['dates'][0]
@@ -112,6 +113,12 @@ def initialize_portfolio(settings, data):
     data['papers_dict'] = papers_dict
     data['total_portfolio_value'] = np.nan * np.zeros(len(data['dates']))
     data['total_portfolio_value'][0] = settings['initial_investment']
+    data['total_investment'] = np.nan * np.zeros(len(data['dates']))
+    data['total_investment'][0] = settings['initial_investment']
+
+    data['portfolio_fractions'] = {}
+    for stock_name in stock_names:
+        data['portfolio_fractions'][stock_name] = np.nan * np.zeros(len(data['dates']))
 
     # initialize the yearly gains that need to be tracked for taxes
     data['yearly_gains'] = 0
@@ -138,9 +145,10 @@ def evolve_portfolio_single_day(settings, data, ind_date):
 
     papers_dict = data['papers_dict']
     expense_ratios = data['expense_ratios']
-    leverage_factors = data['leverage_factors']
+    leverage_factors = data['leverage_factors']  # TODO: use
     dividend_yield = data['dividend_yield']
     data['cash_in_account'][ind_date] = data['cash_in_account'][ind_date - 1]
+    data['total_investment'][ind_date] = data['total_investment'][ind_date - 1]
 
     for stock_name in papers_dict.keys():
         market_factor = data[stock_name][ind_date] / data[stock_name][ind_date - 1]
@@ -193,16 +201,17 @@ def add_cash_to_portfolio(settings, data, ind_date):
     data['days_since_invest'] = 0
     data['number_of_buy_days'] += 1
     data['cash_in_account'][ind_date] += settings['periodic_investment']
+    data['total_investment'][ind_date] += settings['periodic_investment']
 
     # invest the cash to buy new papers, while trying to rebalance the portfolio as much as possible
-    portfolio_fractions = settings['portfolio_fractions']
-    portfolio_fractions_current = data['portfolio_fractions_current']
-    stock_names = portfolio_fractions.keys()
+    ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
+    portfolio_fractions = data['portfolio_fractions']
+    stock_names = ideal_portfolio_fractions.keys()
     cash_list = []
     for stock_name in stock_names:
         # using imperfect but simple heuristic that adds cash to all stocks,
         # but with greater weight to those that are under the wanted portfolio fraction.
-        weight = portfolio_fractions[stock_name] / portfolio_fractions_current[stock_name]
+        weight = ideal_portfolio_fractions[stock_name] / portfolio_fractions[stock_name][ind_date]
         cash_list += [weight]
     cash_list = np.array(cash_list)
     cash_list *= data['cash_in_account'][ind_date] / sum(cash_list)
@@ -227,20 +236,19 @@ def add_cash_to_portfolio(settings, data, ind_date):
     return data
 
 
-def check_rebalancing_criterion_reached(settings, data):
+def check_rebalancing_criterion_reached(settings, data, ind_date):
     """
     check if it is time to rebalance
     """
-    data['days_since_rebalance'] += 1
 
     if settings['rebalance_criterion'] == 'percent_deviation':
         deviation_frac = settings['rebalance_percent_deviation'] / 100.0
-        portfolio_fractions = settings['portfolio_fractions']
-        portfolio_fractions_current = data['portfolio_fractions_current']
+        ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
+        portfolio_fractions = data['portfolio_fractions']
         stock_names = portfolio_fractions.keys()
         for stock_name in stock_names:
-            frac = portfolio_fractions[stock_name]
-            frac_curr = portfolio_fractions_current[stock_name]
+            frac = ideal_portfolio_fractions[stock_name]
+            frac_curr = portfolio_fractions[stock_name][ind_date]
             if abs(frac_curr - frac) > deviation_frac:
                 return True
         return False
@@ -255,7 +263,6 @@ def check_rebalancing_criterion_reached(settings, data):
         raise ValueError('invalid rebalance_criterion: ' + str(settings['rebalance_criterion']))
 
     if data['days_since_rebalance'] >= days_between_rebalances:
-        data['days_since_rebalance'] = 0
         return True
     else:
         return False
@@ -267,18 +274,19 @@ def rebalance_portfolio(settings, data, ind_date):
     """
     data['number_of_buy_days'] += 1
     data['number_of_sell_days'] += 1
+    data['days_since_rebalance'] = 0
 
     # calculate how much needs to be bought or sold from each stock type
     papers_dict = data['papers_dict']
-    portfolio_fractions = settings['portfolio_fractions']
-    portfolio_fractions_current = data['portfolio_fractions_current']
+    ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
+    portfolio_fractions = data['portfolio_fractions']
     total_portfolio_value = data['total_portfolio_value'][ind_date]
     transfers = {}
     stock_names = portfolio_fractions.keys()
     for stock_name in stock_names:
         # the algebraic solution below assumes perfect sum-zero transfers between the stocks, neglecting transaction fee.
         transfers[stock_name] = total_portfolio_value \
-                                * (portfolio_fractions[stock_name] - portfolio_fractions_current[stock_name])
+                                * (ideal_portfolio_fractions[stock_name] - portfolio_fractions[stock_name][ind_date])
 
     # negative transfers are positions that need to be reduced in size, so sell papers
     for stock_name in stock_names:
@@ -298,7 +306,7 @@ def rebalance_portfolio(settings, data, ind_date):
                 if papers[ind_paper]['status'] == 'open':
 
                     # sell papers, but if the current paper is profitable, will be added to this year's gains
-                    paper_profit = paper['value_current'] > paper['value_at_buy']
+                    paper_profit = paper['value_current'] - paper['value_at_buy']
                     if paper_profit > 0:
                         data['yearly_gains'] += paper_profit
 
@@ -368,12 +376,13 @@ def sell_papers_for_tax(settings, data):
         stock_tax_left_to_pay = 0
 
         papers_dict = data['papers_dict']
-        portfolio_fractions = settings['portfolio_fractions']
-        stock_names = portfolio_fractions.keys()
+        ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
+
+        stock_names = ideal_portfolio_fractions.keys()
         for stock_name in stock_names:
 
             # amount of tax to be paid from a specific stock type
-            stock_tax_left_to_pay += tax_to_pay * portfolio_fractions[stock_name]
+            stock_tax_left_to_pay += tax_to_pay * ideal_portfolio_fractions[stock_name]
 
             # sort the papers in the order dictated by tax scheme
             papers = papers_dict[stock_name]
@@ -440,22 +449,22 @@ def calculate_portfolio_fractions(settings, data, ind_date):
     add end of trading day, sum up the current fractions and total value
     """
     papers_dict = data['papers_dict']
-    portfolio_fractions = settings['portfolio_fractions']
-    stock_names = portfolio_fractions.keys()
+    ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
+    stock_names = ideal_portfolio_fractions.keys()
     curr_total_portfolio_value = 0
-    portfolio_fractions_current = {}
+    portfolio_fractions = {}
     for stock_name in stock_names:
-        portfolio_fractions_current[stock_name] = 0
+        portfolio_fractions[stock_name] = 0
         papers = papers_dict[stock_name]
         for paper in papers:
-            portfolio_fractions_current[stock_name] += paper['value_current']
-        curr_total_portfolio_value += portfolio_fractions_current[stock_name]
+            portfolio_fractions[stock_name] += paper['value_current']
+        curr_total_portfolio_value += portfolio_fractions[stock_name]
 
     data['total_portfolio_value'][ind_date] = curr_total_portfolio_value
     # normalize portfolio_fractions_current to get fraction that sum up to one
     for stock_name in stock_names:
-        portfolio_fractions_current[stock_name] /= curr_total_portfolio_value
-    data['portfolio_fractions_current'] = portfolio_fractions_current
+        portfolio_fractions[stock_name] /= curr_total_portfolio_value
+        data['portfolio_fractions'][stock_name][ind_date] = portfolio_fractions[stock_name]
 
     return data
 
@@ -489,7 +498,26 @@ def track_paper_status(settings, data):
     return data
 
 
-def calculate_total_portfolio_profit(settings, data):
-    # TODO
+def calculate_total_portfolio_yield(settings, data):
+    """
+    at end of simulation, calculate profit if entire portfolio is sold (taking into account taxes and fees)
+    """
+    total_profit = 0
+
+    papers_dict = data['papers_dict']
+    for stock_name in papers_dict.keys():
+        papers = papers_dict[stock_name]
+        for paper in papers:
+            if paper['status'] == 'open':
+                paper_profit = paper['value_current'] - paper['value_at_buy']
+                if paper_profit > 0:
+                    total_profit += paper_profit
+
+    total_portfolio_after_sell = data['total_portfolio_value'][-1] * (1 - settings['transaction_fee_percents'] / 100.0)
+    capital_gains_tax_to_pay = total_profit * settings['capital_gains_tax_percents'] / 100.0
+
+    data['total_yield'] = (total_portfolio_after_sell - capital_gains_tax_to_pay) / data['total_investment'][-1]
+    data['total_yield_tax_free'] = total_portfolio_after_sell / data['total_investment'][-1]
+    data['total_sell_tax_loss_percents'] = 100.0 * (1 - data['total_yield'] / data['total_yield_tax_free'])
 
     return data

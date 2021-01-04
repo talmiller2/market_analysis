@@ -25,18 +25,20 @@ date_start = '1999-12-30'
 # date_start = '2001-01-01'
 # date_start = '2002-01-01'
 # date_start = '2003-01-01'
+
+# date_end = '2001-01-01'
 date_end = '2020-09-30'
 # date_end = '1996-09-30'
 
 ### plot data section
 
 stock_name_list = []
-stock_name_list += ['SP500']
+# stock_name_list += ['SP500']
 stock_name_list += ['SP500TR']
 # stock_name_list += ['SPY']
 # stock_name_list += ['VOO']
 # stock_name_list += ['IVV']
-stock_name_list += ['NDX100']
+# stock_name_list += ['NDX100']
 stock_name_list += ['NDX100TR']
 # stock_name_list += ['QQQ']
 # stock_name_list += ['TLT']
@@ -80,11 +82,9 @@ if plot_sim:
     settings = define_default_settings()
     settings['date_start'] = date_start
     settings['date_end'] = date_end
-    stock_name = 'VOO'
-    # settings['portfolio_fractions'] = {stock_name_list[0]: 1.0}
-    # settings['portfolio_fractions'] = {'VOO': 1.0}
-    # settings['portfolio_fractions'] = {'QQQ': 1.0}
-    settings['portfolio_fractions'] = {'VOO': 0.5, 'QQQ': 0.5}
+    # settings['ideal_portfolio_fractions'] = {'VOO': 1.0}
+    # settings['ideal_portfolio_fractions'] = {'QQQ': 1.0}
+    settings['ideal_portfolio_fractions'] = {'VOO': 0.5, 'QQQ': 0.5}
     # settings['periodic_investment_interval'] = 'yearly'
     # settings['periodic_investment_interval'] = 'quarterly'
     # settings['capital_gains_tax_percents'] = 0
@@ -97,12 +97,12 @@ if plot_sim:
 
     # plots
     plt.figure(1)
-    # label = stock_name + ' sim'
-    label = stock_name + ' sim tax ' + settings['tax_scheme']
+    # label = 'sim tax ' + settings['tax_scheme']
+    label = 'sim tax ' + settings['tax_scheme'] + ' (total sell tax loss ' + '{:0.2f}'.format(data['total_sell_tax_loss_percents']) + '%)'
     # plt.plot(data['total_portfolio_value'], label=label, linewidth=2)
-    plt.plot(data['total_portfolio_value'], label=label, linewidth=2, color='k', zorder=1)
-    plt.scatter(data['papers_buy_days'], data['portfolio_values_at_buy_days'], s=2, color=data['papers_status_colors'], zorder=2)
-
+    # plt.plot(data['total_portfolio_value'], label=label, linewidth=2, color='k', zorder=1)
+    plt.plot(data['total_portfolio_value'] / data['total_investment'], label=label, linewidth=2, color='k', zorder=1)
+    # plt.scatter(data['papers_buy_days'], data['portfolio_values_at_buy_days'], s=2, color=data['papers_status_colors'], zorder=2)
     # plt.plot(data['total_portfolio_value'] + data['cash_in_account'], label=label + ' + divs not reinvested', linewidth=2)
     # plt.plot(data['cash_in_account'], label='cash_in_account', linewidth=2)
     # plt.yscale('log')
@@ -112,3 +112,13 @@ if plot_sim:
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
+
+    plt.figure(2)
+    for stock_name in data['portfolio_fractions'].keys():
+        plt.plot(data['portfolio_fractions'][stock_name], label=stock_name, linewidth=2)
+    plt.xticks(inds_years, label_years, rotation='vertical')
+    plt.title('portfolio fractions')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+
