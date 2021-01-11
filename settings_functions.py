@@ -77,5 +77,16 @@ def define_default_settings(settings=None):
     if 'num_trading_days_in_year' not in settings:
         settings['num_trading_days_in_year'] = 252
 
+    # monte carlo related settings
+
+    if 'perform_bootstrap' not in settings:
+        settings['perform_bootstrap'] = False
+
+    if 'num_correlation_days' not in settings:
+        settings['num_correlation_days'] = 5
+
+    if 'synthetic_period_years' not in settings:
+        # settings['synthetic_period_years'] = 10
+        settings['synthetic_period_years'] = 35
 
     return settings

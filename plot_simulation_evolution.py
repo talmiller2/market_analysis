@@ -17,10 +17,10 @@ matplotlib.rcParams.update({'axes.prop_cycle': cycler(color='bgrcmyk')})
 
 # date_start = '1929-01-01'
 # date_start = '1986-01-01'
-# date_start = '1987-01-01'
+date_start = '1987-01-01'
 # date_start = '1989-01-01'
 # date_start = '1993-01-29'
-date_start = '1999-12-30'
+# date_start = '1999-12-30'
 # date_start = '2000-01-01'
 # date_start = '2001-01-01'
 # date_start = '2002-01-01'
@@ -84,7 +84,9 @@ if plot_sim:
     settings = define_default_settings()
     settings['date_start'] = date_start
     settings['date_end'] = date_end
-    stock_name = 'VOO'
+    # stock_name = 'VOO'
+    stock_name = 'QQQ'
+    # stock_name = 'TQQQ'
     # settings['ideal_portfolio_fractions'] = {stock_name_list[0]: 1.0}
     settings['ideal_portfolio_fractions'] = {stock_name: 1.0}
     # settings['periodic_investment_interval'] = 'yearly'
@@ -95,6 +97,7 @@ if plot_sim:
     # settings['tax_scheme'] = 'FIFO'
     # settings['tax_scheme'] = 'LIFO'
     settings['tax_scheme'] = 'optimized'
+    # settings['perform_bootstrap'] = True
     data = simulate_portfolio_evolution(settings)
 
     # plots

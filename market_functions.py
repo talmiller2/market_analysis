@@ -13,6 +13,9 @@ def simulate_portfolio_evolution(settings):
     # load all necessary data for simulation
     data = load_data(settings)
 
+    # monte-carlo realization of synthetic date with bootstrap
+    data = bootstrap_data(settings, data)
+
     # initialize portfolio
     data = initialize_portfolio(settings, data)
     data = calculate_portfolio_fractions(settings, data, 0)
@@ -82,6 +85,47 @@ def load_data(settings):
         _, stock_values = load_stock_data(index_name, date_start, date_end,
                                           dividend_yield=dividend_yield, settings=settings)
         data[stock_name] = stock_values
+
+    return data
+
+
+def bootstrap_data(settings, data):
+    """
+    Irrelevant for back-testing.
+    Exploring possible future scenarios we can generate synthetic data by monte-carlo / bootstrap sampling the past data.
+    Can also take into account correlation between days by picking several days in a row from the data.
+    """
+    if settings['perform_bootstrap']:
+        # generate random indices
+        num_days_synthetic = settings['synthetic_period_years'] * settings['num_trading_days_in_year']
+        high = len(data['dates']) - settings['num_correlation_days']
+        size = int(np.ceil(1.0 * num_days_synthetic / settings['num_correlation_days']))
+        inds_bootstrap = np.random.randint(low=1, high=high, size=size)
+
+        # change the dates list to be as long as needed (the values themselves become meaningless)
+        data['dates'] = [data['dates'][0] for _ in range(num_days_synthetic)]
+
+        stock_names = settings['ideal_portfolio_fractions'].keys()
+        libor_rate_synth = np.zeros(len(data['dates']))
+        data_synthetic = {}
+        for stock_name in stock_names:
+            data_synthetic[stock_name] = np.ones(len(data['dates']))
+
+        for i, ind_bootstrap in enumerate(inds_bootstrap):
+            for j in range(settings['num_correlation_days']):
+                ind_synth = settings['num_correlation_days'] * i + j
+                ind_data = ind_bootstrap + j
+                if ind_synth < num_days_synthetic:
+                    for stock_name in stock_names:
+                        libor_rate_synth[ind_synth] = data['libor_rate'][ind_data]
+                        data_synthetic[stock_name][ind_synth] = data_synthetic[stock_name][ind_synth - 1] \
+                                                                * data[stock_name][ind_data] \
+                                                                / data[stock_name][ind_data - 1]
+
+        # overwrite the real data with the synthetic data
+        data['libor_rate'] = libor_rate_synth
+        for stock_name in stock_names:
+            data[stock_name] = data_synthetic[stock_name]
 
     return data
 
@@ -159,6 +203,8 @@ def evolve_portfolio_single_day(settings, data, ind_date):
         libor_rate_daily_percents = (leverage_factor - 1) \
                                     * data['libor_rate'][ind_date] / settings['num_trading_days_in_year']
         paper_change_percents = leverage_change_percents - expense_ratio_daily_percents - libor_rate_daily_percents
+        if paper_change_percents < -100:  # deal with case of total paper value loss
+            paper_change_percents = -100
         paper_factor = 1 + paper_change_percents / 100.0
 
         papers = papers_dict[stock_name]
