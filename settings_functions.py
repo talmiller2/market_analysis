@@ -15,17 +15,6 @@ def define_default_settings(settings=None):
     if 'date_end' not in settings:
         settings['date_end'] = '2020-09-30'
 
-    # if 'solid_stock_type' not in settings:
-    #     settings['solid_stock_type'] = 'index'
-    #     # settings['solid_stock_type'] = 'cash'
-    #     # settings['solid_stock_type'] = 'bond'
-    #
-    # if 'index_type' not in settings:
-    #     # settings['solid_stock_type'] = 'S&P500'
-    #     settings['solid_stock_type'] = 'NDX100'
-    #     # settings['solid_stock_type'] = 'TLT'
-    #     # settings['solid_stock_type'] = 'TMF'
-
     if 'ideal_portfolio_fractions' not in settings:
         settings['ideal_portfolio_fractions'] = {}
         settings['ideal_portfolio_fractions']['SP500'] = 1.0
