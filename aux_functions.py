@@ -110,6 +110,16 @@ def transform_to_days_array(dates, date_reference=None):
     return days_array
 
 
+def get_index_of_date(dates, date_to_find):
+    """
+    Get the index in a dates array for a specific date
+    """
+    for i, date in enumerate(dates):
+        if get_number_of_days_between_dates(date, date_to_find) == 0:
+            return i
+    raise ValueError(date_to_find + ' is not found in the dates list.')
+
+
 def interpolate_between_dates(dates, values, date_to_interpolate):
     """
     Based on samples of dates and values, interpolate to a specific date

@@ -1,5 +1,5 @@
 import matplotlib
-from data_functions import load_stock_data
+from data_functions import load_stock_data, define_stock_parameters
 from aux_functions import get_year_labels
 from settings_functions import define_default_settings
 from market_functions import simulate_portfolio_evolution
@@ -59,9 +59,14 @@ plot_data = True
 plot_close_adjusted = False
 # plot_close_adjusted = True
 
+settings = define_default_settings()
+expense_ratios, leverage_factors, underlying_index, dividend_yield = define_stock_parameters()
+
+
 if plot_data:
     for stock_name in stock_name_list:
-        dates, index_values = load_stock_data(stock_name, date_start, date_end)
+        dates, index_values = load_stock_data(stock_name, date_start, date_end,
+                                              dividend_yield=dividend_yield, settings=settings)
         if plot_close_adjusted:
             _, index_adjusted_values = load_stock_data(stock_name, date_start, date_end, close_type='Adj Close')
         inds_years, label_years = get_year_labels(dates)

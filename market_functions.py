@@ -65,7 +65,7 @@ def load_data(settings):
     # define the dates axis that will be mutual for all the portfolio ingredients
     date_start = settings['date_start']
     date_end = settings['date_end']
-    dates, _ = load_stock_data('SP500', date_start, date_end)
+    dates, _ = load_stock_data('SP500', date_start, date_end)  # SP500 index has the "oldest" trading dates data
     inds_years, label_years = get_year_labels(dates)
     data['dates'] = dates
     data['inds_years'] = inds_years
@@ -79,7 +79,8 @@ def load_data(settings):
     stock_names = settings['ideal_portfolio_fractions'].keys()
     for stock_name in stock_names:
         index_name = underlying_index[stock_name]
-        _, stock_values = load_stock_data(index_name, date_start, date_end)
+        _, stock_values = load_stock_data(index_name, date_start, date_end,
+                                          dividend_yield=dividend_yield, settings=settings)
         data[stock_name] = stock_values
 
     return data

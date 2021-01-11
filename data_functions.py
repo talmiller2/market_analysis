@@ -3,16 +3,15 @@ import numpy as np
 import copy
 from scipy.interpolate import interp1d
 from aux_functions import change_date_format_investingcom_to_yahoo, get_number_of_days_between_dates, \
-    transform_to_days_array, get_inds_between_dates
+    transform_to_days_array, get_inds_between_dates, get_index_of_date
 
 
 def define_stock_parameters():
     expense_ratios = {}  # [percents]
-    leverage_factors = {} # [percents]
-    dividend_yield = {} # [percents] calibrated as constant in time
-    underlying_index = {} # for simulation
+    leverage_factors = {}  # [percents]
+    dividend_yield = {}  # [percents] calibrated as constant in time
+    underlying_index = {}  # for simulation
 
-    # indices
     expense_ratios['SP500'] = 0
     leverage_factors['SP500'] = 1.0
     underlying_index['SP500'] = 'SP500'
@@ -105,7 +104,7 @@ def define_stock_parameters():
     expense_ratios['VBTLX'] = 0.05
     leverage_factors['VBTLX'] = 1.0
     underlying_index['VBTLX'] = 'VBTLX'
-    dividend_yield['VBTLX'] = 4.0 # TODO: calibrate
+    dividend_yield['VBTLX'] = 4.0  # TODO: calibrate
 
     # US government treasury 10 to 30-year bond etf
     expense_ratios['VUSTX'] = 0.2
@@ -140,13 +139,14 @@ def define_stock_parameters():
     return expense_ratios, leverage_factors, underlying_index, dividend_yield
 
 
-def load_stock_data(stock_name, date_start=1.0, date_end=1.0, normalize=True, close_type='Close',
-                    data_format='Yahoo'):
+def load_stock_data(stock_name, date_start=None, date_end=None, normalize=True, close_type='Close',
+                    data_format='Yahoo', dividend_yield=None, settings=None):
     """
     Load stock time evolution data.
     If date for start/end is given, restrict the output by those dates.
     Most data is from Yahoo finance.
     """
+
     data_file_name = stock_name
     if stock_name == 'SP500':
         data_file_name = '^GSPC'
@@ -167,19 +167,48 @@ def load_stock_data(stock_name, date_start=1.0, date_end=1.0, normalize=True, cl
     if data_format == 'Yahoo':
         dates = [x for x in data['Date']]
         values = np.array([x for x in data[close_type]])
-    else:
+    elif data_format == 'Investing.com':
+        # special treatment for NDX100TR
         dates = [change_date_format_investingcom_to_yahoo(x) for x in data['Date']]
         values = np.array([float(x.replace(',', '')) for x in data['Price']])
         # date is "future to past" so reverse it
         dates = dates[::-1]
         values = values[::-1]
+    else:
+        raise ValueError('invalid data_format = ' + str(data_format))
+
+    # artificially extend NDX100TR data prior to 1999 by stitching it with NDX100 data + estimated dividends
+    if stock_name == 'NDX100TR':
+        dates_NDX100, values_NDX100 = load_stock_data('NDX100', date_start=None, date_end=None,
+                                                      normalize=normalize, close_type=close_type, data_format='Yahoo',
+                                                      dividend_yield=dividend_yield, settings=settings)
+
+        data_start_NDX100TR = dates[0]
+        data_end_NDX100TR = dates[-1]
+        ind_cnt_NDX100TR = 1
+        values_merged = [1.0]
+        for i in range(1, len(dates_NDX100) - 1):
+            curr_date = dates_NDX100[i]
+            if get_number_of_days_between_dates(curr_date, data_start_NDX100TR) <= 0:
+                # use the NDX100 + dividends prior to 1999
+                values_merged += [values_merged[-1] * values_NDX100[i] / values_NDX100[i - 1]]
+                values_merged[-1] *= 1 + dividend_yield['NDX100'] / 100.0 / settings['num_trading_days_in_year']
+            elif get_number_of_days_between_dates(curr_date, data_end_NDX100TR) <= 0:
+                # use the NDX100TR data after 1999
+                values_merged += [values_merged[-1] * values[ind_cnt_NDX100TR] / values[ind_cnt_NDX100TR - 1]]
+                ind_cnt_NDX100TR += 1
+            else:
+                break
+
+        values = values_merged
+        dates = dates_NDX100
 
     # check if requested time interval is contained within the data
-    if date_start is not 1.0:
+    if date_start is not None:
         if get_number_of_days_between_dates(dates[0], date_start) > 0:
             raise ValueError('data for stock ' + str(stock_name) + ' begins at ' + dates[0]
                              + ', but requested date_start is ' + str(date_start))
-    if date_end is not 1.0:
+    if date_end is not None:
         if get_number_of_days_between_dates(dates[-1], date_end) < 0:
             raise ValueError('data for stock ' + str(stock_name) + ' ends at ' + dates[-1]
                              + ', but requested date_end is ' + str(date_end))
