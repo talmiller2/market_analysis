@@ -104,7 +104,12 @@ def bootstrap_data(settings, data):
 
         # change the dates list to be as long as needed (the values themselves become meaningless)
         data['dates'] = [data['dates'][0] for _ in range(num_days_synthetic)]
+        data['inds_years'] = [i for i in range(num_days_synthetic)
+                              if np.mod(i, settings['num_trading_days_in_year']) == 0]
+        data['label_years'] = [str(int(i / 252)) for i in range(num_days_synthetic)
+                               if np.mod(i, settings['num_trading_days_in_year']) == 0]
 
+        # initialize synthetic data arrays
         stock_names = settings['ideal_portfolio_fractions'].keys()
         libor_rate_synth = np.zeros(len(data['dates']))
         data_synthetic = {}

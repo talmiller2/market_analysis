@@ -86,7 +86,7 @@ def define_default_settings(settings=None):
         settings['num_correlation_days'] = 5
 
     if 'synthetic_period_years' not in settings:
-        # settings['synthetic_period_years'] = 10
-        settings['synthetic_period_years'] = 35
+        settings['synthetic_period_years'] = 10
+        # settings['synthetic_period_years'] = 35
 
     return settings
