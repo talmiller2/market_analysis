@@ -113,6 +113,18 @@ def define_stock_parameters():
     underlying_index['VUSTX'] = 'VUSTX'
     dividend_yield['VUSTX'] = 5.5
 
+    # fictitious leveraged VUSTX
+    expense_ratios['VUSTX2'] = 1.0
+    leverage_factors['VUSTX2'] = 2.0
+    underlying_index['VUSTX2'] = 'VUSTX'
+    dividend_yield['VUSTX2'] = 0
+
+    # fictitious leveraged VUSTX
+    expense_ratios['VUSTX3'] = 1.0
+    leverage_factors['VUSTX3'] = 3.0
+    underlying_index['VUSTX3'] = 'VUSTX'
+    dividend_yield['VUSTX3'] = 0
+
     # US government treasury 20-year bond etf
     expense_ratios['TLT'] = 0.15
     leverage_factors['TLT'] = 1.0

@@ -17,28 +17,28 @@ plt.rcParams.update({'font.size': 12})
 
 # plt.close('all')
 
-# color = None
-color = 'b'
+color = None
+# color = 'b'
 # color = 'g'
 # color = 'r'
 # color = 'orange'
 # color = 'k'
 
-use_single_color = True
-# use_single_color = False
+# use_single_color = True
+use_single_color = False
 
 # define the period from which the synthetic realization will be drawn
 
 # date_start = '1929-01-01'
 # date_start = '1986-01-01'
-date_start = '1987-01-01'
+# date_start = '1987-01-01'
 # date_start = '1989-01-01'
 # date_start = '1993-01-29'
 # date_start = '1999-12-30'
 # date_start = '2000-01-01'
 # date_start = '2001-01-01'
 # date_start = '2002-01-01'
-# date_start = '2003-01-01'
+date_start = '2003-01-01'
 
 # date_end = '2001-01-01'
 # date_end = '2015-01-01'
@@ -56,6 +56,8 @@ save_dir = 'simulations_slurm/'
 label_investment = 'investment_initial_1_periodic_0'
 # label_investment = 'investment_initial_10_periodic_1/'
 save_dir += label_investment + '/'
+settings['synthetic_period_years'] = 10
+# settings['synthetic_period_years'] = 20
 save_dir += 'period_' + str(settings['synthetic_period_years'])
 save_dir += '_cd_' + str(settings['num_correlation_days'])
 save_dir += '_date_start_' + date_start
@@ -77,33 +79,45 @@ files_filtered = []
 #     # if 'VUSTX' in file_name :
 #         files_filtered += [file_name]
 
-frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+# frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+frac_list = [0, 0.5, 1]
 # frac_list = [0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
 # frac_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 # frac_list = [0, 0.2, 0.4, 0.6, 0.8, 1]
 # frac_list = [0, 0.1, 0.2]
 # frac_list = [0, 0.1, 0.2, 0.9, 1.0]
-stock1 = 'VOO'
+
+# stock1 = 'VOO'
+# stock1 = 'SSO'
+# stock1 = 'UPRO'
 # stock1 = 'QQQ'
+stock1 = 'QLD'
+# stock1 = 'TQQQ'
+
+# stock2 = 'SSO'
+# stock2 = 'UPRO'
 # stock2 = 'QLD'
 # stock2 = 'TQQQ'
-stock2 = 'VUSTX'
+# stock2 = 'VUSTX'
+# stock2 = 'TLT'
+stock2 = 'TMF'
+
 # files_filtered = ['yields_' + stock1 + '_' + '{:0.2f}'.format(1-frac)
 #                   + '_' + stock2 + '_' + '{:0.2f}'.format(frac) + '.txt'
 files_filtered = [stock1 + '_' + '{:0.2f}'.format(1-frac) + '_' + stock2 + '_' + '{:0.2f}'.format(frac) + '.txt'
                   for frac in frac_list]
-# label = stock1 + '/' + stock2
-label = label_investment + ': ' + stock1 + '/' + stock2
+label = stock1 + '/' + stock2
+# label = label_investment + ': ' + stock1 + '/' + stock2
 
 colors = cm.rainbow(np.linspace(0, 1, len(files_filtered)))
 
 for ind_file, file_name in enumerate(files_filtered):
-    # if not use_single_color:
-    #     color = colors[ind_file]
-    #     label = file_name.split('yields_')[1]
-    #     label = label.split('.txt')[0]
-    #
-    # try:
+    if not use_single_color:
+        if color is not None:
+            color = colors[ind_file]
+        label = file_name.split('.txt')[0]
+
+    try:
         yield_list = np.loadtxt(save_dir + file_name)
 
         # calculate numeric percentiles
@@ -193,8 +207,8 @@ for ind_file, file_name in enumerate(files_filtered):
         # plt.title('yield probability distribution')
         # plt.legend()
 
-    # except:
-    #     pass
+    except:
+        pass
 
 plt.figure(1)
 plt.xlabel('yield ' + str(percentiles[0]) + '% percentile')
