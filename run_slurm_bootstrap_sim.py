@@ -23,8 +23,8 @@ main_folder = '/home/talm/code/market_analysis/simulations_slurm/'
 
 # date_start = '1929-01-01'
 # date_start = '1986-01-01'
-date_start = '1987-01-01'
-# date_start = '1989-01-01'
+# date_start = '1987-01-01'
+date_start = '1989-01-01'
 # date_start = '1993-01-29'
 # date_start = '1999-12-30'
 # date_start = '2000-01-01'
@@ -45,8 +45,8 @@ date_end = '2020-09-30'
 # num_realizations = 100
 # num_realizations = 100
 # num_realizations = 200
-# num_realizations = 500
-num_realizations = 1000
+num_realizations = 500
+# num_realizations = 1000
 # num_realizations = 2000
 # num_realizations = 5000
 
@@ -55,7 +55,8 @@ num_realizations = 1000
 # frac_list = [0.3]
 # frac_list = [0.9]
 # frac_list = [1.0]
-frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+# frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+frac_list = np.linspace(0, 1, 20)
 # frac_list = [0, 0.2, 0.4, 0.6, 0.8, 1]
 
 # stock1_list = ['VOO', 'VOO']
@@ -68,8 +69,14 @@ frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 # stock2_list = ['QLD', 'TQQQ', 'SSO', 'UPRO']
 # stock1_list = ['VOO', 'QQQ']
 # stock2_list = ['VUSTX', 'VUSTX']
-stock1_list = ['VOO', 'QQQ', 'QQQ', 'QQQ', 'VOO', 'VOO']
+stock1_list = [  'VOO',   'QQQ', 'QQQ',  'QQQ', 'VOO',  'VOO']
 stock2_list = ['VUSTX', 'VUSTX', 'QLD', 'TQQQ', 'SSO', 'UPRO']
+# stock1_list = []
+# stock2_list = []
+# stock1_list += [  'VOO', 'VOO', 'VOO', 'VOO',  'VOO']
+# stock2_list += ['VUSTX', 'TLT', 'TMF', 'SSO', 'UPRO']
+# stock1_list += [  'QQQ', 'QQQ', 'QQQ', 'QQQ',  'QQQ']
+# stock2_list += ['VUSTX', 'TLT', 'TMF', 'QLD', 'TQQQ']
 
 total_number_of_runs = len(frac_list) * len(stock1_list)
 cnt = 0
@@ -84,10 +91,10 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         settings['ideal_portfolio_fractions'] = {stock1: 1-frac, stock2: frac}
         settings['tax_scheme'] = 'optimized'
         settings['perform_bootstrap'] = True
+        # settings['synthetic_period_years'] = 20
         # settings['initial_investment'] = 10
         # settings['periodic_investment'] = 1
         # settings['capital_gains_tax_percents'] = 0
-
 
         # save the result to plot later
         save_dir = ''
@@ -96,7 +103,8 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         save_dir += 'period_' + str(settings['synthetic_period_years'])
         save_dir += '_cd_' + str(settings['num_correlation_days'])
         save_dir += '_date_start_' + date_start
-        # save_dir += '_no_tax'
+        if settings['capital_gains_tax_percents'] == 0:
+            save_dir += '_no_tax'
         save_dir += '/'
         save_dir = main_folder + '/' + save_dir
         print('save_dir: ' + str(save_dir))

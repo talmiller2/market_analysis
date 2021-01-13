@@ -18,8 +18,8 @@ plt.rcParams.update({'font.size': 12})
 # plt.close('all')
 
 # color = None
-# color = 'b'
-color = 'g'
+color = 'b'
+# color = 'g'
 # color = 'r'
 # color = 'orange'
 # color = 'k'
@@ -48,7 +48,8 @@ date_end = '2020-09-30'
 settings = define_default_settings()
 
 # save the result to plot later
-save_dir = 'simulations/'
+# save_dir = 'simulations/'
+save_dir = 'simulations_slurm/'
 # save_dir += 'lower_res/'
 # save_dir += 'investment_initial_' + str(settings['initial_investment'])
 # save_dir += '_periodic_' + str(settings['periodic_investment']) + '/'
@@ -58,7 +59,7 @@ save_dir += label_investment + '/'
 save_dir += 'period_' + str(settings['synthetic_period_years'])
 save_dir += '_cd_' + str(settings['num_correlation_days'])
 save_dir += '_date_start_' + date_start
-save_dir += '_no_tax'
+# save_dir += '_no_tax'
 save_dir += '/'
 
 file_names = os.listdir(save_dir)
@@ -82,13 +83,14 @@ frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 # frac_list = [0, 0.2, 0.4, 0.6, 0.8, 1]
 # frac_list = [0, 0.1, 0.2]
 # frac_list = [0, 0.1, 0.2, 0.9, 1.0]
-# stock1 = 'VOO'
-stock1 = 'QQQ'
-stock2 = 'QLD'
+stock1 = 'VOO'
+# stock1 = 'QQQ'
+# stock2 = 'QLD'
 # stock2 = 'TQQQ'
-# stock2 = 'VUSTX'
-files_filtered = ['yields_' + stock1 + '_' + '{:0.1f}'.format(1-frac)
-                  + '_' + stock2 + '_' + '{:0.1f}'.format(frac) + '.txt'
+stock2 = 'VUSTX'
+# files_filtered = ['yields_' + stock1 + '_' + '{:0.2f}'.format(1-frac)
+#                   + '_' + stock2 + '_' + '{:0.2f}'.format(frac) + '.txt'
+files_filtered = [stock1 + '_' + '{:0.2f}'.format(1-frac) + '_' + stock2 + '_' + '{:0.2f}'.format(frac) + '.txt'
                   for frac in frac_list]
 # label = stock1 + '/' + stock2
 label = label_investment + ': ' + stock1 + '/' + stock2
@@ -96,12 +98,12 @@ label = label_investment + ': ' + stock1 + '/' + stock2
 colors = cm.rainbow(np.linspace(0, 1, len(files_filtered)))
 
 for ind_file, file_name in enumerate(files_filtered):
-    if not use_single_color:
-        color = colors[ind_file]
-        label = file_name.split('yields_')[1]
-        label = label.split('.txt')[0]
-
-    try:
+    # if not use_single_color:
+    #     color = colors[ind_file]
+    #     label = file_name.split('yields_')[1]
+    #     label = label.split('.txt')[0]
+    #
+    # try:
         yield_list = np.loadtxt(save_dir + file_name)
 
         # calculate numeric percentiles
@@ -191,8 +193,8 @@ for ind_file, file_name in enumerate(files_filtered):
         # plt.title('yield probability distribution')
         # plt.legend()
 
-    except:
-        pass
+    # except:
+    #     pass
 
 plt.figure(1)
 plt.xlabel('yield ' + str(percentiles[0]) + '% percentile')

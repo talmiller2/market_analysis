@@ -21,8 +21,8 @@ bootstrap_params = ast.literal_eval(args.bootstrap_params)
 
 # define log file
 # os.makedirs(bootstrap_params['save_dir'], exist_ok=True)
-log_file_path = bootstrap_params['save_dir'] + '/log_' + bootstrap_params['sim_name'] + '.txt'
-log_file = open(log_file_path, 'w')
+# log_file_path = bootstrap_params['save_dir'] + '/log_' + bootstrap_params['sim_name'] + '.txt'
+# log_file = open(log_file_path, 'w')
 
 # perform bootstrap loop
 yield_list = []
@@ -36,4 +36,4 @@ for ind_real in range(bootstrap_params['num_realizations']):
 save_file_path = bootstrap_params['save_dir'] + '/' + bootstrap_params['sim_name'] + '.txt'
 np.savetxt(save_file_path, yield_list)
 
-log_file.close()
+# log_file.close()
