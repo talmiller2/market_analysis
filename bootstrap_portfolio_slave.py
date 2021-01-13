@@ -29,7 +29,7 @@ yield_list = []
 for ind_real in range(bootstrap_params['num_realizations']):
     data = simulate_portfolio_evolution(settings)
     label = 'real ' + str(ind_real) + ', yield=' + '{:0.2f}'.format(data['total_yield'])
-    print(label, file=log_file)
+    # print(label, file=log_file)
     yield_list += [data['total_yield']]
 
 # save results to file
