@@ -46,8 +46,8 @@ date_end = '2020-09-30'
 # num_realizations = 100
 # num_realizations = 200
 # num_realizations = 500
-num_realizations = 1000
-# num_realizations = 2000
+# num_realizations = 1000
+num_realizations = 2000
 # num_realizations = 5000
 
 # frac_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
@@ -55,30 +55,35 @@ num_realizations = 1000
 # frac_list = [0.3]
 # frac_list = [0.9]
 # frac_list = [1.0]
-frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-# frac_list = np.linspace(0, 1, 20)
+# frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+frac_list = np.linspace(0, 1, 20)
 # frac_list = [0, 0.2, 0.4, 0.6, 0.8, 1]
 
-# stock1_list = ['VOO', 'VOO']
-# stock2_list = ['SSO', 'UPRO']
-# stock1_list = ['QQQ']
-# stock2_list = ['QLD']
-# stock1_list = ['QQQ', 'QQQ']
-# stock2_list = ['QLD', 'TQQQ']
-# stock1_list = ['QQQ', 'QQQ', 'VOO', 'VOO']
-# stock2_list = ['QLD', 'TQQQ', 'SSO', 'UPRO']
-# stock1_list = ['VOO', 'QQQ']
-# stock2_list = ['VUSTX', 'VUSTX']
-# stock1_list = [  'VOO',   'QQQ', 'QQQ',  'QQQ', 'VOO',  'VOO']
-# stock2_list = ['VUSTX', 'VUSTX', 'QLD', 'TQQQ', 'SSO', 'UPRO']
-stock1_list = [   'SSO',   'UPRO',    'QLD',   'TQQQ']
-stock2_list = ['VUSTX3', 'VUSTX3', 'VUSTX3', 'VUSTX3']
-# stock1_list = []
-# stock2_list = []
+stock1_list = []
+stock2_list = []
+
+# stock1_list += [  'VOO', 'VOO',  'VOO']
+# stock2_list += ['VUSTX', 'SSO', 'UPRO']
+# stock1_list += [  'QQQ', 'QQQ',  'QQQ']
+# stock2_list += ['VUSTX', 'QLD', 'TQQQ']
+# stock1_list += [   'SSO',   'UPRO',    'QLD',   'TQQQ']
+# stock2_list += ['VUSTX3', 'VUSTX3', 'VUSTX3', 'VUSTX3']
 # stock1_list += [  'VOO', 'VOO', 'VOO', 'VOO',  'VOO', 'SSO', 'SSO', 'UPRO', 'UPRO']
 # stock2_list += ['VUSTX', 'TLT', 'TMF', 'SSO', 'UPRO', 'TLT', 'TMF',  'TLT',  'TMF']
 # stock1_list += [  'QQQ', 'QQQ', 'QQQ', 'QQQ',  'QQQ', 'QLD', 'QLD', 'TQQQ', 'TQQQ']
 # stock2_list += ['VUSTX', 'TLT', 'TMF', 'QLD', 'TQQQ', 'TLT', 'TMF',  'TLT',  'TMF']
+
+stock1_list += [ 'VOO',  'VOO']
+stock2_list += [ 'SSO', 'UPRO']
+stock1_list += [ 'QQQ',  'QQQ']
+stock2_list += [ 'QLD', 'TQQQ']
+stock1_list += ['VUSTX', 'VUSTX', 'VUSTX', 'VUSTX', 'VUSTX', 'VUSTX']
+stock2_list += [  'VOO',   'SSO',  'UPRO',   'QQQ',   'QLD',  'TQQQ']
+stock1_list += ['VUSTX2', 'VUSTX2', 'VUSTX2', 'VUSTX2', 'VUSTX2', 'VUSTX2']
+stock2_list += [   'VOO',    'SSO',   'UPRO',    'QQQ',    'QLD',   'TQQQ']
+stock1_list += ['VUSTX3', 'VUSTX3', 'VUSTX3', 'VUSTX3', 'VUSTX3', 'VUSTX3']
+stock2_list += [   'VOO',    'SSO',   'UPRO',    'QQQ',    'QLD',   'TQQQ']
+
 
 total_number_of_runs = len(frac_list) * len(stock1_list)
 cnt = 0
