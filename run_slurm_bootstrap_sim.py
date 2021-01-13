@@ -98,13 +98,10 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         save_dir += '_date_start_' + date_start
         save_dir += '_no_tax'
         save_dir += '/'
+        print('save_dir: ' + str(save_dir))
 
         sim_name = stock1 + '_' + '{:0.2f}'.format(1-frac) + '_' + stock2 + '_' + '{:0.2f}'.format(frac)
-
-        settings['save_dir'] = main_folder + '/' + save_dir
-        # print('save dir: ' + str(settings['save_dir']))
-        os.makedirs(settings['save_dir'], exist_ok=True)
-        # os.chdir(settings['save_dir'])
+        print('sim_name : ' + str(sim_name))
 
         bootstrap_params = {}
         bootstrap_params['save_dir'] = save_dir
