@@ -17,7 +17,7 @@ bootstrap_script = get_script_bootstrap_slave()
 slurm_kwargs = {'partition': 'core'}  # default
 
 
-main_folder = '/home/talm/code/market_analysis/slurm_simulations/'
+main_folder = '/home/talm/code/market_analysis/simulations_slurm/'
 
 # define the period from which the synthetic realization will be drawn
 
@@ -98,7 +98,10 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         save_dir += '_date_start_' + date_start
         save_dir += '_no_tax'
         save_dir += '/'
+        save_dir = main_folder + '/' + save_dir
         print('save_dir: ' + str(save_dir))
+        os.makedirs(save_dir, exist_ok=True)
+        os.chdir(save_dir)
 
         sim_name = stock1 + '_' + '{:0.2f}'.format(1-frac) + '_' + stock2 + '_' + '{:0.2f}'.format(frac)
         print('sim_name : ' + str(sim_name))
