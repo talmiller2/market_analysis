@@ -22,7 +22,7 @@ bootstrap_params = ast.literal_eval(args.bootstrap_params)
 # define log file
 # os.makedirs(bootstrap_params['save_dir'], exist_ok=True)
 log_file_path = bootstrap_params['save_dir'] + '/log_' + bootstrap_params['sim_name'] + '.txt'
-log_file = open('filename.txt', 'w')
+log_file = open(log_file_path, 'w')
 
 # perform bootstrap loop
 yield_list = []
