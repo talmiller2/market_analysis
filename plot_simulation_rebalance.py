@@ -17,14 +17,14 @@ matplotlib.rcParams.update({'axes.prop_cycle': cycler(color='bgrcmyk')})
 
 # date_start = '1929-01-01'
 # date_start = '1986-01-01'
-# date_start = '1987-01-01'
+date_start = '1987-01-01'
 # date_start = '1989-01-01'
 # date_start = '1993-01-29'
 # date_start = '1999-12-30'
 # date_start = '2000-01-01'
 # date_start = '2001-01-01'
 # date_start = '2002-01-01'
-date_start = '2003-01-01'
+# date_start = '2003-01-01'
 # date_start = '2010-01-01'
 # date_start = '2011-01-01'
 
@@ -48,7 +48,7 @@ stock_name_list += ['NDX100TR']
 # stock_name_list += ['TQQQ']
 
 # stock_name_list += ['TLT']
-stock_name_list += ['TLT-TR']
+# stock_name_list += ['TLT-TR']
 # stock_name_list += ['VUSTX']
 # stock_name_list += ['VBTLX']
 # stock_name_list += ['TMF']
@@ -99,11 +99,13 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'UPRO': 1.0}
     # settings['ideal_portfolio_fractions'] = {'QQQ': 1.0}
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 1.0}
+    # settings['ideal_portfolio_fractions'] = {'QLD': 1.0}
+    settings['ideal_portfolio_fractions'] = {'QQQ': 0.0, 'QLD': 1.0}
     # settings['ideal_portfolio_fractions'] = {'TLT': 1.0}
     # settings['ideal_portfolio_fractions'] = {'TMF': 1.0}
     # settings['ideal_portfolio_fractions'] = {'VOO': 0.5, 'QQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VOO': 0.5, 'TLT': 0.5}
-    settings['ideal_portfolio_fractions'] = {'UPRO': 0.5, 'TQQQ': 0.5}
+    # settings['ideal_portfolio_fractions'] = {'UPRO': 0.5, 'TQQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'UPRO': 0.5, 'TMF': 0.5}
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 0.5, 'TMF': 0.5}
     # settings['periodic_investment_interval'] = 'yearly'

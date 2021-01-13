@@ -40,14 +40,42 @@ date_start = '1987-01-01'
 date_end = '2020-09-30'
 # date_end = '1996-09-30'
 
+
+# num_realizations = 1
+# num_realizations = 5
+# num_realizations = 50
+# num_realizations = 100
+# num_realizations = 100
+# num_realizations = 200
+num_realizations = 500
+# num_realizations = 1000
+# num_realizations = 2000
+# num_realizations = 5000
+
 # frac_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+# frac_list = [0, 1]
 # frac_list = [0.3]
+# frac_list = [0.9]
+frac_list = [1.0]
 # frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-frac_list = [0, 0.2, 0.4, 0.6, 0.8, 1]
+# frac_list = [0, 0.2, 0.4, 0.6, 0.8, 1]
 
-lev_stock_list = ['SSO', 'UPRO']
+# stock1_list = ['VOO', 'VOO']
+# stock2_list = ['SSO', 'UPRO']
+stock1_list = ['QQQ']
+stock2_list = ['QLD']
+# stock1_list = ['QQQ', 'QQQ']
+# stock2_list = ['QLD', 'TQQQ']
+# stock1_list = ['QQQ', 'QQQ', 'VOO', 'VOO']
+# stock2_list = ['QLD', 'TQQQ', 'SSO', 'UPRO']
+# stock1_list = ['VOO', 'QQQ']
+# stock2_list = ['VUSTX', 'VUSTX']
+# stock1_list = ['VOO', 'QQQ', 'QQQ', 'QQQ', 'VOO', 'VOO']
+# stock2_list = ['VUSTX', 'VUSTX', 'QLD', 'TQQQ', 'SSO', 'UPRO']
 
-for lev_stock in lev_stock_list:
+
+for stock1, stock2 in zip(stock1_list, stock2_list):
+    print('stock1 ' + stock1 + ', stock2 ' + stock2)
     for frac in frac_list:
         print('frac = ' + str(frac))
 
@@ -59,21 +87,14 @@ for lev_stock in lev_stock_list:
         # settings['ideal_portfolio_fractions'] = {'QQQ': 1-frac, 'QLD': frac}
         # settings['ideal_portfolio_fractions'] = {'VOO': 1-frac, 'UPRO': frac}
         # settings['ideal_portfolio_fractions'] = {'VOO': 1-frac, 'SSO': frac}
-        settings['ideal_portfolio_fractions'] = {'VOO': 1-frac, lev_stock: frac}
+        # settings['ideal_portfolio_fractions'] = {'VOO': 1-frac, lev_stock: frac}
+        settings['ideal_portfolio_fractions'] = {stock1: 1-frac, stock2: frac}
         settings['tax_scheme'] = 'optimized'
         settings['perform_bootstrap'] = True
+        # settings['initial_investment'] = 10
+        # settings['periodic_investment'] = 1
+        settings['capital_gains_tax_percents'] = 0
 
-
-        # num_realizations = 1
-        # num_realizations = 5
-        # num_realizations = 50
-        # num_realizations = 100
-        # num_realizations = 100
-        # num_realizations = 200
-        num_realizations = 500
-        # num_realizations = 1000
-        # num_realizations = 2000
-        # num_realizations = 5000
 
         yield_list = []
 
@@ -97,20 +118,23 @@ for lev_stock in lev_stock_list:
 
         # save the result to plot later
         save_dir = 'simulations/'
-        save_dir += 'lower_res/'
-        # save_dir += 'investment_initial_' + str(settings['initial_investment'])
-        # save_dir += '_periodic_' + str(settings['periodic_investment']) + '/'
+        # save_dir += 'lower_res/'
+        save_dir += 'investment_initial_' + str(settings['initial_investment'])
+        save_dir += '_periodic_' + str(settings['periodic_investment']) + '/'
         save_dir += 'period_' + str(settings['synthetic_period_years'])
         save_dir += '_cd_' + str(settings['num_correlation_days'])
         save_dir += '_date_start_' + date_start
+        save_dir += '_no_tax'
         save_dir += '/'
 
+        # save results to file
         os.makedirs(save_dir, exist_ok=True)
-
         file_name = 'yields'
-        for stock_name in settings['ideal_portfolio_fractions'].keys():
+        # for stock_name in settings['ideal_portfolio_fractions'].keys():
             # file_name += '_' + stock_name + '_' + str(settings['ideal_portfolio_fractions'][stock_name])
-            file_name += '_' + stock_name + '_' + '{:0.1f}'.format(settings['ideal_portfolio_fractions'][stock_name])
+            # file_name += '_' + stock_name + '_' + '{:0.1f}'.format(settings['ideal_portfolio_fractions'][stock_name])
+        file_name += '_' + stock1 + '_' + '{:0.1f}'.format(1-frac) \
+                     + '_' + stock2 + '_' + '{:0.1f}'.format(frac)
         file_name += '.txt'
         np.savetxt(save_dir + file_name, yield_list)
 

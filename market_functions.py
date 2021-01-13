@@ -11,7 +11,7 @@ def simulate_portfolio_evolution(settings):
     """
 
     # load all necessary data for simulation
-    data = load_data(settings)
+    settings, data = load_data(settings)
 
     # monte-carlo realization of synthetic date with bootstrap
     data = bootstrap_data(settings, data)
@@ -78,15 +78,25 @@ def load_data(settings):
     libor_rate = get_libor_rate(dates)
     data['libor_rate'] = libor_rate
 
-    # stocks to be a part of the portfolio
+    # check that portfolio fractions are all positive (and remove zeros if exist)
     stock_names = settings['ideal_portfolio_fractions'].keys()
+    zero_stocks = []
+    for stock_name in stock_names:
+        if settings['ideal_portfolio_fractions'][stock_name] < 0:
+            raise ValueError('negative portfolio fraction for ' + str(stock_name))
+        elif settings['ideal_portfolio_fractions'][stock_name] == 0:
+            zero_stocks += [stock_name]
+    for stock_name in zero_stocks:
+        settings['ideal_portfolio_fractions'].pop(stock_name)
+
+    # stocks to be a part of the portfolio
     for stock_name in stock_names:
         index_name = underlying_index[stock_name]
         _, stock_values = load_stock_data(index_name, date_start, date_end,
                                           dividend_yield=dividend_yield, settings=settings)
         data[stock_name] = stock_values
 
-    return data
+    return settings, data
 
 
 def bootstrap_data(settings, data):
