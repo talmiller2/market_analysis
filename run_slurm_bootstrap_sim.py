@@ -40,36 +40,36 @@ date_end = '2020-09-30'
 
 # num_realizations = 1
 # num_realizations = 5
-num_realizations = 10
+# num_realizations = 10
 # num_realizations = 50
 # num_realizations = 100
 # num_realizations = 100
 # num_realizations = 200
 # num_realizations = 500
-# num_realizations = 1000
+num_realizations = 1000
 # num_realizations = 2000
 # num_realizations = 5000
 
 # frac_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 # frac_list = [0, 1]
-frac_list = [0.3]
+# frac_list = [0.3]
 # frac_list = [0.9]
 # frac_list = [1.0]
-# frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 # frac_list = [0, 0.2, 0.4, 0.6, 0.8, 1]
 
 # stock1_list = ['VOO', 'VOO']
 # stock2_list = ['SSO', 'UPRO']
-stock1_list = ['QQQ']
-stock2_list = ['QLD']
+# stock1_list = ['QQQ']
+# stock2_list = ['QLD']
 # stock1_list = ['QQQ', 'QQQ']
 # stock2_list = ['QLD', 'TQQQ']
 # stock1_list = ['QQQ', 'QQQ', 'VOO', 'VOO']
 # stock2_list = ['QLD', 'TQQQ', 'SSO', 'UPRO']
 # stock1_list = ['VOO', 'QQQ']
 # stock2_list = ['VUSTX', 'VUSTX']
-# stock1_list = ['VOO', 'QQQ', 'QQQ', 'QQQ', 'VOO', 'VOO']
-# stock2_list = ['VUSTX', 'VUSTX', 'QLD', 'TQQQ', 'SSO', 'UPRO']
+stock1_list = ['VOO', 'QQQ', 'QQQ', 'QQQ', 'VOO', 'VOO']
+stock2_list = ['VUSTX', 'VUSTX', 'QLD', 'TQQQ', 'SSO', 'UPRO']
 
 total_number_of_runs = len(frac_list) * len(stock1_list)
 cnt = 0
@@ -96,7 +96,7 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         save_dir += 'period_' + str(settings['synthetic_period_years'])
         save_dir += '_cd_' + str(settings['num_correlation_days'])
         save_dir += '_date_start_' + date_start
-        save_dir += '_no_tax'
+        # save_dir += '_no_tax'
         save_dir += '/'
         save_dir = main_folder + '/' + save_dir
         print('save_dir: ' + str(save_dir))
