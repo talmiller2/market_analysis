@@ -80,6 +80,8 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         print('frac = ' + str(frac))
 
         settings = define_default_settings()
+        settings['date_start'] = date_start
+        settings['date_end'] = date_end
         # settings['ideal_portfolio_fractions'] = {'VOO': 1.0}
         # settings['ideal_portfolio_fractions'] = {'QQQ': 1.0}
         # settings['ideal_portfolio_fractions'] = {'TQQQ': 1.0}
