@@ -4,6 +4,7 @@ import copy
 from scipy.interpolate import interp1d
 from aux_functions import change_date_format_investingcom_to_yahoo, get_number_of_days_between_dates, \
     transform_to_days_array, get_inds_between_dates, get_index_of_date
+import os
 
 
 def define_stock_parameters():
@@ -162,7 +163,8 @@ def load_stock_data(stock_name, date_start=None, date_end=None, normalize=True, 
         data_file_name = 'Nasdaq 100 TR Historical Data'
         data_format = 'Investing.com'
 
-    data = pd.read_csv('data/' + data_file_name + '.csv')
+    main_dir = os.path.dirname(os.path.abspath(__file__))
+    data = pd.read_csv(main_dir + '/data/' + data_file_name + '.csv')
 
     if data_format == 'Yahoo':
         dates = [x for x in data['Date']]
