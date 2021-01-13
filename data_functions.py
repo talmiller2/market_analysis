@@ -257,7 +257,8 @@ def get_dividend_yield(dates_to_interpolate, index_name='SP500'):
 
 def load_libor_rates():
     # data from https://www.macrotrends.net/1433/historical-libor-rates-chart
-    loan_rates_data = pd.read_csv('data/historical-libor-rates-chart.csv')
+    main_dir = os.path.dirname(os.path.abspath(__file__))
+    loan_rates_data = pd.read_csv(main_dir + '/data/historical-libor-rates-chart.csv')
     dates = [x for x in loan_rates_data['date']]
     libor_rate = [x for x in loan_rates_data['libor-1-month']]
     return dates, libor_rate
