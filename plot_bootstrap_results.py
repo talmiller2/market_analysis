@@ -19,13 +19,13 @@ plt.rcParams.update({'font.size': 12})
 
 # color = None
 # color = 'b'
-color = 'g'
-# color = 'r'
+# color = 'g'
+color = 'r'
 # color = 'orange'
 # color = 'k'
 
-# use_single_color = True
-use_single_color = False
+use_single_color = True
+# use_single_color = False
 
 # define the period from which the synthetic realization will be drawn
 
@@ -53,8 +53,8 @@ save_dir = 'simulations_slurm/'
 # save_dir += 'lower_res/'
 # save_dir += 'investment_initial_' + str(settings['initial_investment'])
 # save_dir += '_periodic_' + str(settings['periodic_investment']) + '/'
-# label_investment = 'investment_initial_1_periodic_0'
-label_investment = 'investment_initial_10_periodic_1/'
+label_investment = 'investment_initial_1_periodic_0'
+# label_investment = 'investment_initial_10_periodic_1/'
 save_dir += label_investment + '/'
 settings['synthetic_period_years'] = 10
 # settings['synthetic_period_years'] = 20
@@ -79,7 +79,8 @@ files_filtered = []
 #     # if 'VUSTX' in file_name :
 #         files_filtered += [file_name]
 
-frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+# frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+frac_list = np.linspace(0, 1, 20)
 # frac_list = [0, 0.5, 1]
 # frac_list = [0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
 # frac_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
@@ -88,18 +89,20 @@ frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 # frac_list = [0, 0.1, 0.2, 0.9, 1.0]
 
 # stock1 = 'VOO'
-stock1 = 'SSO'
+# stock1 = 'SSO'
 # stock1 = 'UPRO'
 # stock1 = 'QQQ'
 # stock1 = 'QLD'
 # stock1 = 'TQQQ'
+# stock1 = 'VUSTX'
+# stock1 = 'VUSTX2'
+stock1 = 'VUSTX3'
 
 # stock2 = 'SSO'
 # stock2 = 'UPRO'
+# stock2 = 'QQQ'
 # stock2 = 'QLD'
-# stock2 = 'TQQQ'
-# stock2 = 'VUSTX'
-stock2 = 'VUSTX3'
+stock2 = 'TQQQ'
 # stock2 = 'TLT'
 # stock2 = 'TMF'
 
@@ -107,7 +110,10 @@ stock2 = 'VUSTX3'
 #                   + '_' + stock2 + '_' + '{:0.2f}'.format(frac) + '.txt'
 files_filtered = [stock1 + '_' + '{:0.2f}'.format(1-frac) + '_' + stock2 + '_' + '{:0.2f}'.format(frac) + '.txt'
                   for frac in frac_list]
-label = stock1 + '/' + stock2
+label = ''
+label += date_start[0:4] + ': '
+label += stock1 + '/' + stock2
+
 # label = label_investment + ': ' + stock1 + '/' + stock2
 
 colors = cm.rainbow(np.linspace(0, 1, len(files_filtered)))
