@@ -14,7 +14,8 @@ from slurmpy.slurmpy import Slurm
 pwd = os.getcwd()
 bootstrap_script = get_script_bootstrap_slave()
 
-slurm_kwargs = {'partition': 'core'}  # default
+# slurm_kwargs = {'partition': 'core'}  # default
+slurm_kwargs = {'partition': 'socket'}
 
 
 main_folder = '/home/talm/code/market_analysis/simulations_slurm/'
@@ -97,11 +98,14 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         settings['date_end'] = date_end
         settings['ideal_portfolio_fractions'] = {stock1: 1-frac, stock2: frac}
         settings['tax_scheme'] = 'optimized'
+        settings['tax_scheme'] = 'FIFO'
+        # settings['tax_scheme'] = 'LIFO'
         settings['perform_bootstrap'] = True
         # settings['synthetic_period_years'] = 20
-        # settings['initial_investment'] = 10
-        # settings['periodic_investment'] = 1
+        settings['initial_investment'] = 10
+        settings['periodic_investment'] = 1
         # settings['capital_gains_tax_percents'] = 0
+        # settings['num_correlation_days'] = 1
 
         # save the result to plot later
         save_dir = ''
@@ -110,6 +114,8 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         save_dir += 'period_' + str(settings['synthetic_period_years'])
         save_dir += '_cd_' + str(settings['num_correlation_days'])
         save_dir += '_date_start_' + date_start
+        if settings['tax_scheme'] != 'optimized':
+            save_dir += '_tax_' + settings['tax_scheme']
         if settings['capital_gains_tax_percents'] == 0:
             save_dir += '_no_tax'
         save_dir += '/'
