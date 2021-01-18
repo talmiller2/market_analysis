@@ -42,14 +42,11 @@ def define_default_settings(settings=None):
         settings['rebalance_percent_deviation'] = 10.0
         # settings['rebalance_percent_deviation'] = 5.0
 
-    if 'leverage_factor' not in settings:
-        # settings['leverage_factor'] = 2
-        settings['leverage_factor'] = 3
 
     if 'tax_scheme' not in settings:
-        settings['tax_scheme'] = 'FIFO'
+        # settings['tax_scheme'] = 'FIFO'
         # settings['tax_scheme'] = 'LIFO'
-        # settings['tax_scheme'] = 'optimized'
+        settings['tax_scheme'] = 'optimized'
 
     if 'capital_gains_tax_percents' not in settings:
         settings['capital_gains_tax_percents'] = 25

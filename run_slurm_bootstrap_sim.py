@@ -98,14 +98,15 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         settings['date_end'] = date_end
         settings['ideal_portfolio_fractions'] = {stock1: 1-frac, stock2: frac}
         settings['tax_scheme'] = 'optimized'
-        settings['tax_scheme'] = 'FIFO'
+        # settings['tax_scheme'] = 'FIFO'
         # settings['tax_scheme'] = 'LIFO'
         settings['perform_bootstrap'] = True
         # settings['synthetic_period_years'] = 20
-        settings['initial_investment'] = 10
-        settings['periodic_investment'] = 1
+        # settings['initial_investment'] = 10
+        # settings['periodic_investment'] = 1
         # settings['capital_gains_tax_percents'] = 0
         # settings['num_correlation_days'] = 1
+        settings['rebalance_percent_deviation'] = 20
 
         # save the result to plot later
         save_dir = ''
@@ -118,6 +119,8 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
             save_dir += '_tax_' + settings['tax_scheme']
         if settings['capital_gains_tax_percents'] == 0:
             save_dir += '_no_tax'
+        if settings['rebalance_percent_deviation'] != 10:
+            save_dir += '_rebalance_percent_' + str(settings['rebalance_percent_deviation'])
         save_dir += '/'
         save_dir = main_folder + '/' + save_dir
         print('save_dir: ' + str(save_dir))
