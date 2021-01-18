@@ -14,8 +14,8 @@ from slurmpy.slurmpy import Slurm
 pwd = os.getcwd()
 bootstrap_script = get_script_bootstrap_slave()
 
-# slurm_kwargs = {'partition': 'core'}  # default
-slurm_kwargs = {'partition': 'socket'}
+slurm_kwargs = {'partition': 'core'}  # default
+# slurm_kwargs = {'partition': 'socket'}
 
 
 main_folder = '/home/talm/code/market_analysis/simulations_slurm/'
