@@ -35,9 +35,8 @@ date_start = '1989-01-01'
 
 # date_end = '2001-01-01'
 # date_end = '2015-01-01'
-date_end = '2020-09-30'
-# date_end = '1996-09-30'
-
+date_end = '2019-01-01'
+# date_end = '2020-09-30'
 
 # num_realizations = 1
 # num_realizations = 5
@@ -106,7 +105,7 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         # settings['periodic_investment'] = 1
         # settings['capital_gains_tax_percents'] = 0
         # settings['num_correlation_days'] = 1
-        settings['rebalance_percent_deviation'] = 20
+        # settings['rebalance_percent_deviation'] = 20
 
         # save the result to plot later
         save_dir = ''
@@ -115,6 +114,8 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         save_dir += 'period_' + str(settings['synthetic_period_years'])
         save_dir += '_cd_' + str(settings['num_correlation_days'])
         save_dir += '_date_start_' + date_start
+        if settings['date_end'] != '2020-09-30':
+            save_dir += '_date_end_' + settings['date_end']
         if settings['tax_scheme'] != 'optimized':
             save_dir += '_tax_' + settings['tax_scheme']
         if settings['capital_gains_tax_percents'] == 0:

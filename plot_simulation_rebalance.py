@@ -37,27 +37,27 @@ date_end = '2005-01-01'
 ### plot data section
 
 stock_name_list = []
-# stock_name_list += ['SP500']
-# stock_name_list += ['SP500TR']
+stock_name_list += ['SP500']
+stock_name_list += ['SP500TR']
 # stock_name_list += ['SPY']
 # stock_name_list += ['VOO']
 # stock_name_list += ['IVV']
 # stock_name_list += ['UPRO']
 
-stock_name_list += ['NDX100']
-stock_name_list += ['NDX100TR']
+# stock_name_list += ['NDX100']
+# stock_name_list += ['NDX100TR']
 # stock_name_list += ['QQQ']
 # stock_name_list += ['TQQQ']
 
 # stock_name_list += ['TLT']
 # stock_name_list += ['TLT-TR']
-stock_name_list += ['VUSTX']
-stock_name_list += ['VUSTX-TR']
+# stock_name_list += ['VUSTX']
+# stock_name_list += ['VUSTX-TR']
 # stock_name_list += ['VBTLX']
 # stock_name_list += ['TMF']
 
-# plot_data = False
-plot_data = True
+plot_data = False
+# plot_data = True
 
 plot_close_adjusted = False
 # plot_close_adjusted = True
@@ -99,10 +99,11 @@ if plot_sim:
     settings['date_end'] = date_end
     # settings['ideal_portfolio_fractions'] = {'SP500': 1.0}
     # settings['ideal_portfolio_fractions'] = {'VOO': 1.0}
-    # settings['ideal_portfolio_fractions'] = {'UPRO': 1.0}
+    # settings['ideal_portfolio_fractions'] = {'SSO': 1.0}
+    settings['ideal_portfolio_fractions'] = {'UPRO': 1.0}
     # settings['ideal_portfolio_fractions'] = {'QQQ': 1.0}
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 1.0}
-    settings['ideal_portfolio_fractions'] = {'QLD': 1.0}
+    # settings['ideal_portfolio_fractions'] = {'QLD': 1.0}
     # settings['ideal_portfolio_fractions'] = {'QQQ': 0.0, 'QLD': 1.0}
     # settings['ideal_portfolio_fractions'] = {'TLT': 1.0}
     # settings['ideal_portfolio_fractions'] = {'TMF': 1.0}

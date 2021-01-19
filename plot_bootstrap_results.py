@@ -28,14 +28,17 @@ tax_scheme_list = []
 stock1_list = []
 stock2_list = []
 
-# invest_strategy = 'single'
-invest_strategy = 'monthly'
+invest_strategy = 'single'
+# invest_strategy = 'monthly'
 
 synthetic_period_years = 10
 # synthetic_period_years = 20
 
 num_correlation_days = 5
 # num_correlation_days = 1
+
+# rebalance_percent = 10
+rebalance_percent = 20
 
 year1 = 1989
 year2 = 2003
@@ -187,55 +190,55 @@ bond_X3_stock = 'VUSTX3'
 
 #### plot both index leverage and bond leverage combinations (both leverages)
 
-year = year1
-# year = year2
-
-stock1 = index_stock
-stock2 = index_X2_stock
-stock3 = bond_X2_stock
-
-color_list += ['b']
-year_start_list += [year]
-investing_strategy_list += [invest_strategy]
-correlation_days_list += [num_correlation_days]
-synthetic_period_years_list += [synthetic_period_years]
-tax_scheme_list += [tax_scheme]
-stock1_list += [stock1]
-stock2_list += [stock2]
-
-color_list += ['g']
-year_start_list += [year]
-investing_strategy_list += [invest_strategy]
-correlation_days_list += [num_correlation_days]
-synthetic_period_years_list += [synthetic_period_years]
-tax_scheme_list += [tax_scheme]
-stock1_list += [stock3]
-# stock2_list += [stock1]
-stock2_list += [stock2]
-
-
-stock1 = index_stock
-stock2 = index_X3_stock
-stock3 = bond_X3_stock
-
-color_list += ['r']
-year_start_list += [year]
-investing_strategy_list += [invest_strategy]
-correlation_days_list += [num_correlation_days]
-synthetic_period_years_list += [synthetic_period_years]
-tax_scheme_list += [tax_scheme]
-stock1_list += [stock1]
-stock2_list += [stock2]
-
-color_list += ['orange']
-year_start_list += [year]
-investing_strategy_list += [invest_strategy]
-correlation_days_list += [num_correlation_days]
-synthetic_period_years_list += [synthetic_period_years]
-tax_scheme_list += [tax_scheme]
-stock1_list += [stock3]
-# stock2_list += [stock1]
-stock2_list += [stock2]
+# year = year1
+# # year = year2
+#
+# stock1 = index_stock
+# stock2 = index_X2_stock
+# stock3 = bond_X2_stock
+#
+# color_list += ['b']
+# year_start_list += [year]
+# investing_strategy_list += [invest_strategy]
+# correlation_days_list += [num_correlation_days]
+# synthetic_period_years_list += [synthetic_period_years]
+# tax_scheme_list += [tax_scheme]
+# stock1_list += [stock1]
+# stock2_list += [stock2]
+#
+# color_list += ['g']
+# year_start_list += [year]
+# investing_strategy_list += [invest_strategy]
+# correlation_days_list += [num_correlation_days]
+# synthetic_period_years_list += [synthetic_period_years]
+# tax_scheme_list += [tax_scheme]
+# stock1_list += [stock3]
+# # stock2_list += [stock1]
+# stock2_list += [stock2]
+#
+#
+# stock1 = index_stock
+# stock2 = index_X3_stock
+# stock3 = bond_X3_stock
+#
+# color_list += ['r']
+# year_start_list += [year]
+# investing_strategy_list += [invest_strategy]
+# correlation_days_list += [num_correlation_days]
+# synthetic_period_years_list += [synthetic_period_years]
+# tax_scheme_list += [tax_scheme]
+# stock1_list += [stock1]
+# stock2_list += [stock2]
+#
+# color_list += ['orange']
+# year_start_list += [year]
+# investing_strategy_list += [invest_strategy]
+# correlation_days_list += [num_correlation_days]
+# synthetic_period_years_list += [synthetic_period_years]
+# tax_scheme_list += [tax_scheme]
+# stock1_list += [stock3]
+# # stock2_list += [stock1]
+# stock2_list += [stock2]
 
 
 ####  plot dependence on tax scheme
@@ -349,6 +352,41 @@ stock2_list += [stock2]
 # stock1_list += [stock1]
 # stock2_list += [stock3]
 
+####  plot dependence on rebalance percent
+
+year = year1
+
+color_list += ['b']
+# color_list += ['c']
+year_start_list += [year]
+investing_strategy_list += [invest_strategy]
+correlation_days_list += [num_correlation_days]
+synthetic_period_years_list += [synthetic_period_years]
+tax_scheme_list += [tax_scheme]
+stock1_list += [bond_stock]
+stock2_list += [index_stock]
+
+color_list += ['g']
+# color_list += ['k']
+year_start_list += [year]
+investing_strategy_list += [invest_strategy]
+correlation_days_list += [num_correlation_days]
+synthetic_period_years_list += [synthetic_period_years]
+tax_scheme_list += [tax_scheme]
+stock1_list += [bond_X2_stock]
+stock2_list += [index_X2_stock]
+
+color_list += ['r']
+# color_list += ['m']
+year_start_list += [year]
+investing_strategy_list += [invest_strategy]
+correlation_days_list += [num_correlation_days]
+synthetic_period_years_list += [synthetic_period_years]
+tax_scheme_list += [tax_scheme]
+stock1_list += [bond_X3_stock]
+stock2_list += [index_X3_stock]
+
+
 ###########################
 
 for ind_set, color in enumerate(color_list):
@@ -393,6 +431,8 @@ for ind_set, color in enumerate(color_list):
         save_dir += '_tax_FIFO'
     elif tax_scheme == 'LIFO':
         save_dir += '_tax_LIFO'
+    if rebalance_percent != 10:
+        save_dir += '_rebalance_percent_20'
     save_dir += '/'
 
     # frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
@@ -402,9 +442,10 @@ for ind_set, color in enumerate(color_list):
     files_filtered = [stock1 + '_' + '{:0.2f}'.format(1-frac) + '_' + stock2 + '_' + '{:0.2f}'.format(frac) + '.txt'
                       for frac in frac_list]
     label = ''
-    label += 'y' + date_start[0:4] + ': '
+    # label += 'y' + date_start[0:4] + ': '
     # label += 'y' + date_start[0:4] + ', cd' + str(correlation_days) + ': '
     # label += 'y' + date_start[0:4] + ' ' + tax_scheme + ': '
+    label += 'y' + date_start[0:4] + ', rebalance@' + str(rebalance_percent) + '%: '
     label += stock1 + '/' + stock2
 
     colors = cm.rainbow(np.linspace(0, 1, len(files_filtered)))
@@ -516,6 +557,13 @@ for ind_set, color in enumerate(color_list):
 
         except:
             pass
+
+    # joke
+    # plt.scatter(3, 10, color='k')
+    # plt.annotate('TSLA', (3 + text_dist, 10 + text_dist), size=20, color='k')
+    # plt.scatter(-3, -10, color='k')
+    # plt.annotate('BTC', (-3 + text_dist, -10 + text_dist), size=20, color='k')
+
 
     plt.figure(1)
     plt.xlabel('yield ' + str(percentiles[0]) + '% percentile')
