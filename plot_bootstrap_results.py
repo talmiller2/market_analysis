@@ -28,8 +28,8 @@ tax_scheme_list = []
 stock1_list = []
 stock2_list = []
 
-invest_strategy = 'single'
-# invest_strategy = 'monthly'
+# invest_strategy = 'single'
+invest_strategy = 'monthly'
 
 synthetic_period_years = 10
 # synthetic_period_years = 20
@@ -37,15 +37,20 @@ synthetic_period_years = 10
 num_correlation_days = 5
 # num_correlation_days = 1
 
-# rebalance_percent = 10
-rebalance_percent = 20
+rebalance_percent = 10
+# rebalance_percent = 20
+# rebalance_percent = 30
+# rebalance_percent = 40
+# rebalance_percent = 50
 
 year1 = 1989
 year2 = 2003
 
+
 tax_scheme = 'optimized'
 # tax_scheme = 'LIFO'
 # tax_scheme = 'FIFO'
+# tax_scheme = 'no_tax'
 
 index_base = 'NDX100'
 # index_base = 'SP500'
@@ -104,7 +109,44 @@ bond_X3_stock = 'VUSTX3'
 ####  plot dependence on leveraged bond / index portfolios
 
 # year = year1
+year = year2
+
+color_list += ['b']
+year_start_list += [year]
+investing_strategy_list += [invest_strategy]
+correlation_days_list += [num_correlation_days]
+synthetic_period_years_list += [synthetic_period_years]
+tax_scheme_list += [tax_scheme]
+stock1_list += [bond_stock]
+stock2_list += [index_stock]
+
+color_list += ['g']
+year_start_list += [year]
+investing_strategy_list += [invest_strategy]
+correlation_days_list += [num_correlation_days]
+synthetic_period_years_list += [synthetic_period_years]
+tax_scheme_list += [tax_scheme]
+stock1_list += [bond_X2_stock]
+stock2_list += [index_X2_stock]
+
+color_list += ['r']
+year_start_list += [year]
+investing_strategy_list += [invest_strategy]
+correlation_days_list += [num_correlation_days]
+synthetic_period_years_list += [synthetic_period_years]
+tax_scheme_list += [tax_scheme]
+stock1_list += [bond_X3_stock]
+stock2_list += [index_X3_stock]
+
+
+####  plot dependence on portfolio with leveraged index + different bond leverages
+
+# year = year1
 # # year = year2
+#
+# # curr_index = index_stock
+# # curr_index = index_X2_stock
+# curr_index = index_X3_stock
 #
 # color_list += ['b']
 # year_start_list += [year]
@@ -113,8 +155,7 @@ bond_X3_stock = 'VUSTX3'
 # synthetic_period_years_list += [synthetic_period_years]
 # tax_scheme_list += [tax_scheme]
 # stock1_list += [bond_stock]
-# stock2_list += [index_stock]
-# # stock2_list += [index_X3_stock]
+# stock2_list += [curr_index]
 #
 # color_list += ['g']
 # year_start_list += [year]
@@ -123,8 +164,7 @@ bond_X3_stock = 'VUSTX3'
 # synthetic_period_years_list += [synthetic_period_years]
 # tax_scheme_list += [tax_scheme]
 # stock1_list += [bond_X2_stock]
-# stock2_list += [index_X2_stock]
-# # stock2_list += [index_stock]
+# stock2_list += [curr_index]
 #
 # color_list += ['r']
 # year_start_list += [year]
@@ -133,8 +173,8 @@ bond_X3_stock = 'VUSTX3'
 # synthetic_period_years_list += [synthetic_period_years]
 # tax_scheme_list += [tax_scheme]
 # stock1_list += [bond_X3_stock]
-# stock2_list += [index_X3_stock]
-# # stock2_list += [index_stock]
+# stock2_list += [curr_index]
+
 
 #### plot both index leverage and bond leverage combinations (both years)
 
@@ -354,37 +394,38 @@ bond_X3_stock = 'VUSTX3'
 
 ####  plot dependence on rebalance percent
 
-year = year1
-
-color_list += ['b']
-# color_list += ['c']
-year_start_list += [year]
-investing_strategy_list += [invest_strategy]
-correlation_days_list += [num_correlation_days]
-synthetic_period_years_list += [synthetic_period_years]
-tax_scheme_list += [tax_scheme]
-stock1_list += [bond_stock]
-stock2_list += [index_stock]
-
-color_list += ['g']
-# color_list += ['k']
-year_start_list += [year]
-investing_strategy_list += [invest_strategy]
-correlation_days_list += [num_correlation_days]
-synthetic_period_years_list += [synthetic_period_years]
-tax_scheme_list += [tax_scheme]
-stock1_list += [bond_X2_stock]
-stock2_list += [index_X2_stock]
-
-color_list += ['r']
-# color_list += ['m']
-year_start_list += [year]
-investing_strategy_list += [invest_strategy]
-correlation_days_list += [num_correlation_days]
-synthetic_period_years_list += [synthetic_period_years]
-tax_scheme_list += [tax_scheme]
-stock1_list += [bond_X3_stock]
-stock2_list += [index_X3_stock]
+# year = year1
+#
+# color_list += ['b']
+# # color_list += ['c']
+# year_start_list += [year]
+# investing_strategy_list += [invest_strategy]
+# correlation_days_list += [num_correlation_days]
+# synthetic_period_years_list += [synthetic_period_years]
+# tax_scheme_list += [tax_scheme]
+# stock1_list += [bond_stock]
+# stock2_list += [index_stock]
+#
+# color_list += ['g']
+# # color_list += ['k']
+# year_start_list += [year]
+# investing_strategy_list += [invest_strategy]
+# correlation_days_list += [num_correlation_days]
+# synthetic_period_years_list += [synthetic_period_years]
+# tax_scheme_list += [tax_scheme]
+# stock1_list += [bond_X2_stock]
+# stock2_list += [index_X2_stock]
+#
+# color_list += ['r']
+# # color_list += ['m']
+# # color_list += ['c']
+# year_start_list += [year]
+# investing_strategy_list += [invest_strategy]
+# correlation_days_list += [num_correlation_days]
+# synthetic_period_years_list += [synthetic_period_years]
+# tax_scheme_list += [tax_scheme]
+# stock1_list += [bond_X3_stock]
+# stock2_list += [index_X3_stock]
 
 
 ###########################
@@ -407,6 +448,7 @@ for ind_set, color in enumerate(color_list):
     else:
         date_start = '2003-01-01'
 
+    # date_end = '2019-01-01'
     date_end = '2020-09-30'
 
     settings = define_default_settings()
@@ -425,6 +467,8 @@ for ind_set, color in enumerate(color_list):
     save_dir += 'period_' + str(synthetic_period_years)
     save_dir += '_cd_' + str(correlation_days)
     save_dir += '_date_start_' + date_start
+    if date_end != '2020-09-30':
+        save_dir += '_date_end_' + date_end
     if tax_scheme == 'no_tax':
         save_dir += '_no_tax'
     elif tax_scheme == 'FIFO':
@@ -444,8 +488,9 @@ for ind_set, color in enumerate(color_list):
     label = ''
     # label += 'y' + date_start[0:4] + ': '
     # label += 'y' + date_start[0:4] + ', cd' + str(correlation_days) + ': '
-    # label += 'y' + date_start[0:4] + ' ' + tax_scheme + ': '
-    label += 'y' + date_start[0:4] + ', rebalance@' + str(rebalance_percent) + '%: '
+    label += 'y' + date_start[0:4] + ' ' + tax_scheme + ': '
+    # label += 'y' + date_start[0:4] + ', rebalance@' + str(rebalance_percent) + '%: '
+    # label += 'y' + date_start[0:4] + ', rebalance@' + str(rebalance_percent) + '%, ' + tax_scheme + ': '
     label += stock1 + '/' + stock2
 
     colors = cm.rainbow(np.linspace(0, 1, len(files_filtered)))
