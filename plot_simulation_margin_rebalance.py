@@ -30,6 +30,10 @@ date_start = '1989-01-01'
 # date_start = '2011-01-01'
 
 # date_end = '1996-01-01'
+# date_end = '1989-12-20'
+# date_end = '1990-01-01'
+# date_end = '1990-09-09'
+# date_end = '1991-01-01'
 # date_end = '1998-01-01'
 # date_end = '2001-01-01'
 # date_end = '2005-01-01'
@@ -39,15 +43,15 @@ date_end = '2020-09-30'
 ### plot data section
 
 stock_name_list = []
-stock_name_list += ['SP500']
-stock_name_list += ['SP500TR']
+# stock_name_list += ['SP500']
+# stock_name_list += ['SP500TR']
 # stock_name_list += ['SPY']
 # stock_name_list += ['VOO']
 # stock_name_list += ['IVV']
 # stock_name_list += ['UPRO']
 
-# stock_name_list += ['NDX100']
-# stock_name_list += ['NDX100TR']
+stock_name_list += ['NDX100']
+stock_name_list += ['NDX100TR']
 # stock_name_list += ['QQQ']
 # stock_name_list += ['TQQQ']
 
@@ -58,8 +62,8 @@ stock_name_list += ['VUSTX-TR']
 # stock_name_list += ['VBTLX']
 # stock_name_list += ['TMF']
 
-# plot_data = False
-plot_data = True
+plot_data = False
+# plot_data = True
 
 plot_close_adjusted = False
 # plot_close_adjusted = True
@@ -82,8 +86,8 @@ if plot_data:
         if plot_close_adjusted and stock_name not in ['SP500', 'SP500TR', 'NDX100', 'NDX100TR']:
             plt.plot(index_adjusted_values, label=stock_name + ' (TR)', linewidth=1)
         # plt.yscale('log')
-        plt.xticks(inds_years, label_years, rotation='vertical')
-        plt.ylabel('yield')
+        # plt.xticks(inds_years, label_years, rotation='vertical')
+        # plt.ylabel('yield')
         plt.title('Stock Data')
         plt.legend()
         plt.grid(True)
@@ -118,35 +122,47 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 0.5, 'TMF': 0.5}
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 0.5, 'VUSTX3': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'VOO': 0.5}
-    settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'SSO': 0.5}
+    # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'SSO': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.5, 'UPRO': 0.5}
-    # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'QQQ': 0.5}
+    settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'QQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'QLD': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.5, 'TQQQ': 0.5}
     # settings['periodic_investment_interval'] = 'yearly'
     # settings['periodic_investment_interval'] = 'quarterly'
-    settings['capital_gains_tax_percents'] = 0
+    # settings['capital_gains_tax_percents'] = 0
     # settings['capital_gains_tax_percents'] = 5
     # settings['transaction_fee_percents'] = 0
     # settings['tax_scheme'] = 'FIFO'
     # settings['tax_scheme'] = 'LIFO'
     settings['tax_scheme'] = 'optimized'
+    # settings['margin_leverage_target'] = 1.0
+    # settings['margin_leverage_target'] = 1.5
+    settings['margin_leverage_target'] = 2.0
+    # settings['margin_leverage_target'] = 3.0
+    # settings['margin_rate_percents'] = 5.0
     data = simulate_portfolio_evolution(settings)
+    inds_years, label_years = get_year_labels(data['dates'])
 
     # plots
     plt.figure(1)
     # label = 'sim tax ' + settings['tax_scheme']
     # label = 'sim tax ' + settings['tax_scheme'] + ' (total sell tax loss ' + '{:0.2f}'.format(data['total_sell_tax_loss_percents']) + '%)'
-    label = 'sim portfolio: ' + str(settings['ideal_portfolio_fractions'])
-    # plt.plot(data['total_portfolio_value'], label=label, linewidth=2)
+    label = 'sim: ' + str(settings['ideal_portfolio_fractions'])
+    if settings['margin_leverage_target'] > 0:
+        label += ' margin leverage X' + str(settings['margin_leverage_target'])
+    # color = 'k'
+    color = 'b'
+    plt.plot(data['total_portfolio_value'] - data['margin_debt'], color=color, label=label, linewidth=2)
+    plt.plot(data['margin_debt'], linestyle='--', color=color, label='margin debt', linewidth=2)
     # plt.plot(data['total_portfolio_value'], label=label, linewidth=2, color='k', zorder=1)
     # plt.plot(data['total_portfolio_value'] / data['total_investment'], label=label, linewidth=2, color='k', zorder=1)
-    plt.plot(data['total_portfolio_value'] / data['total_investment'], label=label, linewidth=2, color=None)
+    # plt.plot(data['total_portfolio_value'] / data['total_investment'], label=label, linewidth=2, color=None)
+    # plt.plot(data['total_portfolio_value'] - data['margin_debt'], label=label, linewidth=2, color=None)
     # plt.scatter(data['papers_buy_days'], data['portfolio_values_at_buy_days'], s=2, color=data['papers_status_colors'], zorder=2)
     # plt.plot(data['total_portfolio_value'] + data['cash_in_account'], label=label + ' + divs not reinvested', linewidth=2)
     # plt.plot(data['cash_in_account'], label='cash_in_account', linewidth=2)
     # plt.yscale('log')
-    # plt.xticks(inds_years, label_years, rotation='vertical')
+    plt.xticks(inds_years, label_years, rotation='vertical')
     # plt.ylabel('yield')
     # plt.title('Stock Data')
     plt.legend()
@@ -156,9 +172,16 @@ if plot_sim:
     plt.figure(2)
     for stock_name in data['portfolio_fractions'].keys():
         plt.plot(data['portfolio_fractions'][stock_name], label=stock_name, linewidth=2)
-    plt.xticks(inds_years, label_years, rotation='vertical')
+    # plt.xticks(inds_years, label_years, rotation='vertical')
     plt.title('portfolio fractions')
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
 
+    plt.figure(3)
+    plt.plot(data['margin_leverage'], linewidth=2)
+    # plt.xticks(inds_years, label_years, rotation='vertical')
+    plt.title('margin leverage')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()

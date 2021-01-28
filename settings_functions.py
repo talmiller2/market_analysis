@@ -42,6 +42,15 @@ def define_default_settings(settings=None):
         settings['rebalance_percent_deviation'] = 10.0
         # settings['rebalance_percent_deviation'] = 5.0
 
+    if 'margin_leverage_target' not in settings:
+        settings['margin_leverage_target'] = 1.0
+
+    if 'margin_leverage_percent_deviation' not in settings:
+        settings['margin_leverage_percent_deviation'] = 10.0
+
+    if 'margin_rate_percents' not in settings:
+        settings['margin_rate_percents'] = 1.59
+        # settings['margin_rate_percents'] = 5.0
 
     if 'tax_scheme' not in settings:
         # settings['tax_scheme'] = 'FIFO'

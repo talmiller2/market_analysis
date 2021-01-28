@@ -44,7 +44,7 @@ def simulate_portfolio_evolution(settings):
             # check if tax criterion reached (end of year), sell some to withdraw for tax
             # save cumulative amount of paid tax
             if check_tax_criterion_reached(settings, data):
-                data = sell_papers_for_tax(settings, data)
+                data = sell_papers_for_tax(settings, data, ind_date)
 
     # track the open/closed papers for visualization
     data = track_paper_status(settings, data)
@@ -116,7 +116,7 @@ def bootstrap_data(settings, data):
         data['dates'] = [data['dates'][0] for _ in range(num_days_synthetic)]
         data['inds_years'] = [i for i in range(num_days_synthetic)
                               if np.mod(i, settings['num_trading_days_in_year']) == 0]
-        data['label_years'] = [str(int(i / 252)) for i in range(num_days_synthetic)
+        data['label_years'] = [str(int(i / settings['num_trading_days_in_year'])) for i in range(num_days_synthetic)
                                if np.mod(i, settings['num_trading_days_in_year']) == 0]
 
         # initialize synthetic data arrays
@@ -156,6 +156,10 @@ def initialize_portfolio(settings, data):
     if sum([ideal_portfolio_fractions[stock_name] for stock_name in stock_names]) != 1.0:
         raise ValueError('portfolio_fractions do not add up to 100%')
 
+    # check margin leverage is positive
+    if settings['margin_leverage_target'] < 1.0:
+        raise ValueError('margin_leverage_target must be greater than 1.')
+
     # buy the initial papers for the portfolio
     papers_dict = {}  # will contain all the paper purchases, different list per stock name
     for stock_name in stock_names:
@@ -163,7 +167,8 @@ def initialize_portfolio(settings, data):
         paper = {}
         paper['id'] = len(papers)
         paper['value_at_buy'] = ideal_portfolio_fractions[stock_name] * settings['initial_investment'] \
-                                * (1 - settings['transaction_fee_percents'] / 100.0)
+                                * (1 - settings['transaction_fee_percents'] / 100.0) \
+                                * settings['margin_leverage_target']
         paper['value_current'] = paper['value_at_buy']
         paper['date'] = data['dates'][0]
         paper['ind_day_at_buy'] = 0
@@ -172,7 +177,7 @@ def initialize_portfolio(settings, data):
         papers_dict[stock_name] = papers
     data['papers_dict'] = papers_dict
     data['total_portfolio_value'] = np.nan * np.zeros(len(data['dates']))
-    data['total_portfolio_value'][0] = settings['initial_investment']
+    data['total_portfolio_value'][0] = settings['initial_investment'] * settings['margin_leverage_target']
     data['total_investment'] = np.nan * np.zeros(len(data['dates']))
     data['total_investment'][0] = settings['initial_investment']
 
@@ -185,7 +190,12 @@ def initialize_portfolio(settings, data):
 
     # initialize the cash in account (will be accumulated due to dividends and then reinvested)
     data['cash_in_account'] = np.nan * np.zeros(len(data['dates']))
-    data['cash_in_account'][0] = 0
+    data['cash_in_account'][0] = - settings['initial_investment'] * (settings['margin_leverage_target'] - 1.0)
+
+    # initialize margin debt and leverage
+    data['margin_debt'] = np.nan * np.zeros(len(data['dates']))
+    data['margin_leverage'] = np.nan * np.zeros(len(data['dates']))
+    data = calculate_margin_state(settings, data, 0)
 
     # initialize additional counters
     data['days_since_invest'] = 0
@@ -207,8 +217,16 @@ def evolve_portfolio_single_day(settings, data, ind_date):
     expense_ratios = data['expense_ratios']
     leverage_factors = data['leverage_factors']
     dividend_yield = data['dividend_yield']
-    data['cash_in_account'][ind_date] = data['cash_in_account'][ind_date - 1]
+
     data['total_investment'][ind_date] = data['total_investment'][ind_date - 1]
+    data['cash_in_account'][ind_date] = data['cash_in_account'][ind_date - 1]
+
+    # add margin loan rate that decreases the cash further every day
+    if data['cash_in_account'][ind_date] < 0:
+        data['cash_in_account'][ind_date] *= 1 + settings['margin_rate_percents'] \
+                                             / 100.0 / settings['num_trading_days_in_year']
+
+    data = calculate_margin_state(settings, data, ind_date)
 
     for stock_name in papers_dict.keys():
         leverage_factor = leverage_factors[stock_name]
@@ -231,10 +249,11 @@ def evolve_portfolio_single_day(settings, data, ind_date):
             total_dividend_received = papers[ind_paper]['value_current'] * dividend_fraction
             data['yearly_gains'] += total_dividend_received
             data['cash_in_account'][ind_date] += total_dividend_received
+
         papers_dict[stock_name] = papers
     data['papers_dict'] = papers_dict
 
-    # evolove counters
+    # evolve counters
     data['days_since_invest'] += 1
     data['days_since_rebalance'] += 1
     data['days_since_start_of_year'] += 1
@@ -267,47 +286,51 @@ def add_cash_to_portfolio(settings, data, ind_date):
     """
     data['days_since_invest'] = 0
     data['number_of_buy_days'] += 1
-    data['cash_in_account'][ind_date] += settings['periodic_investment']
     data['total_investment'][ind_date] += settings['periodic_investment']
+    data['cash_in_account'][ind_date] += settings['periodic_investment']
+    data = calculate_margin_state(settings, data, ind_date)
 
     # invest the cash to buy new papers, while trying to rebalance the portfolio as much as possible
-    ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
-    portfolio_fractions = data['portfolio_fractions']
-    stock_names = ideal_portfolio_fractions.keys()
-    cash_list = []
-    for stock_name in stock_names:
-        # using imperfect but simple heuristic that adds cash to all stocks,
-        # but with greater weight to those that are under the wanted portfolio fraction.
-        weight = ideal_portfolio_fractions[stock_name] / portfolio_fractions[stock_name][ind_date]
-        cash_list += [weight]
-    cash_list = np.array(cash_list)
-    cash_list *= data['cash_in_account'][ind_date] / sum(cash_list)
-    cash_list *= (1 - settings['transaction_fee_percents'] / 100.0)
+    if data['cash_in_account'][ind_date] > 0:
+        ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
+        portfolio_fractions = data['portfolio_fractions']
+        stock_names = ideal_portfolio_fractions.keys()
+        cash_list = []
+        for stock_name in stock_names:
+            # using imperfect but simple heuristic that adds cash to all stocks,
+            # but with greater weight to those that are under the wanted portfolio fraction.
+            weight = ideal_portfolio_fractions[stock_name] / portfolio_fractions[stock_name][ind_date]
+            cash_list += [weight]
+        cash_list = np.array(cash_list)
+        cash_list *= data['cash_in_account'][ind_date] / sum(cash_list)
+        cash_list *= (1 - settings['transaction_fee_percents'] / 100.0)
 
-    # buy new papers with the cash
-    papers_dict = data['papers_dict']
-    for stock_name, cash_portion in zip(stock_names, cash_list):
-        if cash_portion > 0:
-            paper = {}
-            paper['id'] = len(papers_dict[stock_name]) + 1
-            paper['value_at_buy'] = cash_portion
-            paper['value_current'] = paper['value_at_buy']
-            paper['date'] = data['dates'][ind_date]
-            paper['ind_day_at_buy'] = ind_date
-            paper['status'] = 'open'
-            papers_dict[stock_name] += [paper]
-    data['papers_dict'] = papers_dict
+        # buy new papers with the cash
+        papers_dict = data['papers_dict']
+        for stock_name, cash_portion in zip(stock_names, cash_list):
+            if cash_portion > 0:
+                paper = {}
+                paper['id'] = len(papers_dict[stock_name]) + 1
+                paper['value_at_buy'] = cash_portion
+                paper['value_current'] = paper['value_at_buy']
+                paper['date'] = data['dates'][ind_date]
+                paper['ind_day_at_buy'] = ind_date
+                paper['status'] = 'open'
+                papers_dict[stock_name] += [paper]
+        data['papers_dict'] = papers_dict
 
-    # cash was used in total
-    data['cash_in_account'][ind_date] = 0
+        # cash was used in total
+        data['cash_in_account'][ind_date] = 0
 
     return data
 
 
 def check_rebalancing_criterion_reached(settings, data, ind_date):
     """
-    check if it is time to rebalance
+    check if it is time to rebalance based on different criteria
     """
+    if settings['rebalance_criterion'] not in ['percent_deviation', 'monthly', 'quarterly', 'yearly']:
+        raise ValueError('invalid rebalance_criterion: ' + str(settings['rebalance_criterion']))
 
     if settings['rebalance_criterion'] == 'percent_deviation':
         deviation_frac = settings['rebalance_percent_deviation'] / 100.0
@@ -319,21 +342,24 @@ def check_rebalancing_criterion_reached(settings, data, ind_date):
             frac_curr = portfolio_fractions[stock_name][ind_date]
             if abs(frac_curr - frac) > deviation_frac:
                 return True
-        return False
 
-    elif settings['rebalance_criterion'] == 'monthly':
+    if settings['margin_leverage_target'] > 1:
+        margin_deviation_percents = abs(data['margin_leverage'][ind_date] - settings['margin_leverage_target']) \
+                                / settings['margin_leverage_target'] * 100.0
+        if margin_deviation_percents > settings['margin_leverage_percent_deviation']:
+            return True
+
+    days_between_rebalances = np.inf
+    if settings['rebalance_criterion'] == 'monthly':
         days_between_rebalances = settings['num_trading_days_in_year'] / 12.0
     elif settings['rebalance_criterion'] == 'quarterly':
         days_between_rebalances = settings['num_trading_days_in_year'] / 4.0
     elif settings['rebalance_criterion'] == 'yearly':
         days_between_rebalances = settings['num_trading_days_in_year']
-    else:
-        raise ValueError('invalid rebalance_criterion: ' + str(settings['rebalance_criterion']))
-
     if data['days_since_rebalance'] >= days_between_rebalances:
         return True
-    else:
-        return False
+
+    return False
 
 
 def rebalance_portfolio(settings, data, ind_date):
@@ -344,17 +370,24 @@ def rebalance_portfolio(settings, data, ind_date):
     data['number_of_sell_days'] += 1
     data['days_since_rebalance'] = 0
 
+    # when using margin leverage, calculate how much needs to be increased or reduced
+    total_portfolio_value = data['total_portfolio_value'][ind_date]
+    margin_debt = data['margin_debt'][ind_date]
+    leverage_target = settings['margin_leverage_target']
+    delta_loan = leverage_target * (total_portfolio_value - margin_debt) - total_portfolio_value
+
     # calculate how much needs to be bought or sold from each stock type
     papers_dict = data['papers_dict']
     ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
     portfolio_fractions = data['portfolio_fractions']
-    total_portfolio_value = data['total_portfolio_value'][ind_date]
     transfers = {}
     stock_names = portfolio_fractions.keys()
     for stock_name in stock_names:
-        # the algebraic solution below assumes perfect sum-zero transfers between the stocks, neglecting transaction fee.
+        # the algebraic solution below assumes transfers between the stocks + total value shift if margin debt is
+        # changed, but neglecting transaction fee.
         transfers[stock_name] = total_portfolio_value \
-                                * (ideal_portfolio_fractions[stock_name] - portfolio_fractions[stock_name][ind_date])
+                                * (ideal_portfolio_fractions[stock_name] - portfolio_fractions[stock_name][ind_date]) \
+                                + ideal_portfolio_fractions[stock_name] * delta_loan
 
     # negative transfers are positions that need to be reduced in size, so sell papers
     for stock_name in stock_names:
@@ -408,6 +441,11 @@ def rebalance_portfolio(settings, data, ind_date):
 
     data['papers_dict'] = papers_dict
 
+    # update total portfolio value, cash and margin
+    data['total_portfolio_value'][ind_date] += delta_loan
+    data['cash_in_account'][ind_date] -= delta_loan
+    data = calculate_margin_state(settings, data, ind_date)
+
     return data
 
 
@@ -416,7 +454,6 @@ def check_tax_criterion_reached(settings, data):
     check if time to pay tax arrived
     """
     if settings['capital_gains_tax_percents'] > 0:
-        data['days_since_start_of_year'] += 1
         if data['days_since_start_of_year'] >= settings['num_trading_days_in_year']:
             data['days_since_start_of_year'] = 0
             return True
@@ -426,7 +463,7 @@ def check_tax_criterion_reached(settings, data):
         return False
 
 
-def sell_papers_for_tax(settings, data):
+def sell_papers_for_tax(settings, data, ind_date):
     """
     sell papers for tax at end of year.
     sell different stock types according to their fraction of the portfolio.
@@ -437,20 +474,20 @@ def sell_papers_for_tax(settings, data):
 
         # total amount of tax to be paid for this year's gains
         tax_to_pay = data['yearly_gains'] * settings['capital_gains_tax_percents'] / 100.0
-        # globally take the transaction fees into account by effectively increasing the amount of tax to be paid
-        tax_to_pay /= (1 - settings['transaction_fee_percents'] / 100.0)
 
-        # initialize the 'per stock' tax
-        stock_tax_left_to_pay = 0
+        # the total amount to be sold also includes all margin debt in case using margin leverage
+        total_to_sell = tax_to_pay + data['margin_debt'][ind_date]
+
+        # globally take the transaction fees into account by effectively increasing the amount that needs to be sold
+        total_to_sell /= (1 - settings['transaction_fee_percents'] / 100.0)
 
         papers_dict = data['papers_dict']
         ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
-
         stock_names = ideal_portfolio_fractions.keys()
         for stock_name in stock_names:
 
-            # amount of tax to be paid from a specific stock type
-            stock_tax_left_to_pay += tax_to_pay * ideal_portfolio_fractions[stock_name]
+            # amount of specific stock to be sold uses the current fractions, so there is enough stock to sell from each type
+            stock_amount_left_to_sell = total_to_sell * data['portfolio_fractions'][stock_name][ind_date]
 
             # sort the papers in the order dictated by tax scheme
             papers = papers_dict[stock_name]
@@ -458,35 +495,53 @@ def sell_papers_for_tax(settings, data):
 
             # sell papers in the order calculated above
             for ind_paper in indices_papers:
+
                 paper = papers[ind_paper]
                 if papers[ind_paper]['status'] == 'open':
 
                     # sell papers for tax, but it the current paper is profitable, then tax must be paid for it as well.
-                    paper_is_profitable = (paper['value_current'] > paper['value_at_buy'])
-                    if paper_is_profitable:
-                        amount_to_sell = stock_tax_left_to_pay / (1 - settings['capital_gains_tax_percents'] / 100.0)
-                    else:
-                        amount_to_sell = stock_tax_left_to_pay
+                    paper_profit = paper['value_current'] - paper['value_at_buy']
 
-                    if paper['value_current'] >= amount_to_sell:
-                        papers[ind_paper]['value_current'] -= amount_to_sell
-                        stock_tax_left_to_pay = 0
+                    if paper_profit > 0:
+                        stock_amount_left_to_sell_with_tax = stock_amount_left_to_sell \
+                                         / (1 - settings['capital_gains_tax_percents'] / 100.0)
+                        paper_additional_tax = paper_profit * settings['capital_gains_tax_percents'] / 100.0
+                    else:
+                        stock_amount_left_to_sell_with_tax = stock_amount_left_to_sell
+                        paper_additional_tax = 0
+
+                    if paper['value_current'] >= stock_amount_left_to_sell_with_tax:
+                        papers[ind_paper]['value_current'] -= stock_amount_left_to_sell_with_tax
+                        stock_amount_left_to_sell = 0
                         break
                     else:
-                        stock_tax_left_to_pay -= papers[ind_paper]['value_current']
+                        stock_amount_left_to_sell -= paper['value_current']
+                        stock_amount_left_to_sell += paper_additional_tax
                         papers[ind_paper]['value_current'] = 0
                         papers[ind_paper]['status'] = 'closed'
 
             papers_dict[stock_name] = papers
 
+            # check tax was fully paid for this stock type
+            if stock_amount_left_to_sell != 0:
+                raise ValueError('stock_amount_left_to_sell should be zero at this point for stock_name: '
+                                 + str(stock_name) + ', but it equals ' + str(stock_amount_left_to_sell))
+
+
         data['papers_dict'] = papers_dict
 
-        # check tax was fully paid
-        if stock_tax_left_to_pay != 0:
-            raise ValueError('stock_tax_left_to_pay should be zero at this point. '
-                             'stock_tax_left_to_pay = ' + str(stock_tax_left_to_pay))
+        # # check tax was fully paid
+        # if stock_amount_left_to_sell != 0:
+        #     raise ValueError('stock_amount_left_to_sell should be zero at this point. '
+        #                      'stock_amount_left_to_sell = ' + str(stock_amount_left_to_sell))
 
-    # tax year over, initialize for next year
+        # reset margin debt and cash for next year
+        data['total_portfolio_value'][ind_date] -= total_to_sell
+        data['cash_in_account'][ind_date] = 0
+        data['margin_debt'][ind_date] = 0
+        data['margin_leverage'][ind_date] = 1.0
+
+    # tax year over, reset for next year
     data['yearly_gains'] = 0
 
     return data
@@ -501,7 +556,7 @@ def sort_papers_by_tax_scheme(settings, data, stock_name):
         # future to past
         indices_papers = [i for i in range(len(papers))][::-1]
     elif settings['tax_scheme'] == 'optimized':
-        # order the papers from least to most profitable ar current date
+        # order the papers from least to most profitable at current date
         paper_profits = []
         for paper in papers:
             paper_profits += [paper['value_current'] - paper['value_at_buy']]
@@ -534,6 +589,20 @@ def calculate_portfolio_fractions(settings, data, ind_date):
         portfolio_fractions[stock_name] /= curr_total_portfolio_value
         data['portfolio_fractions'][stock_name][ind_date] = portfolio_fractions[stock_name]
 
+    return data
+
+
+def calculate_margin_state(settings, data, ind_date):
+    """
+    update current margin debt and margin leverage
+    """
+    if data['cash_in_account'][ind_date] < 0:
+        data['margin_debt'][ind_date] = - data['cash_in_account'][ind_date]
+    else:
+        data['margin_debt'][ind_date] = 0
+
+    data['margin_leverage'][ind_date] = data['total_portfolio_value'][ind_date] \
+                                        / (data['total_portfolio_value'][ind_date] - data['margin_debt'][ind_date])
     return data
 
 
@@ -582,6 +651,7 @@ def calculate_total_portfolio_yield(settings, data):
                     total_profit += paper_profit
 
     total_portfolio_after_sell = data['total_portfolio_value'][-1] * (1 - settings['transaction_fee_percents'] / 100.0)
+    total_portfolio_after_sell -= data['margin_debt'][-1]  # cover margin after total sell
     capital_gains_tax_to_pay = total_profit * settings['capital_gains_tax_percents'] / 100.0
 
     data['total_yield'] = (total_portfolio_after_sell - capital_gains_tax_to_pay) / data['total_investment'][-1]

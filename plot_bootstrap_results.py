@@ -47,10 +47,10 @@ year1 = 1989
 year2 = 2003
 
 
-tax_scheme = 'optimized'
+# tax_scheme = 'optimized'
 # tax_scheme = 'LIFO'
 # tax_scheme = 'FIFO'
-# tax_scheme = 'no_tax'
+tax_scheme = 'no_tax'
 
 index_base = 'NDX100'
 # index_base = 'SP500'
