@@ -34,8 +34,9 @@ date_start = '1989-01-01'
 # date_start = '2003-01-01'
 
 # date_end = '2001-01-01'
+date_end = '2010-01-01'
 # date_end = '2015-01-01'
-date_end = '2019-01-01'
+# date_end = '2019-01-01'
 # date_end = '2020-09-30'
 
 # num_realizations = 1
@@ -96,13 +97,19 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         settings['date_start'] = date_start
         settings['date_end'] = date_end
         settings['ideal_portfolio_fractions'] = {stock1: 1-frac, stock2: frac}
+
         settings['tax_scheme'] = 'optimized'
         # settings['tax_scheme'] = 'FIFO'
         # settings['tax_scheme'] = 'LIFO'
+
         settings['perform_bootstrap'] = True
+
         # settings['synthetic_period_years'] = 20
+        # settings['synthetic_period_years'] = 5
+
         # settings['initial_investment'] = 10
         # settings['periodic_investment'] = 1
+
         # settings['capital_gains_tax_percents'] = 0
         # settings['num_correlation_days'] = 1
         # settings['rebalance_percent_deviation'] = 20

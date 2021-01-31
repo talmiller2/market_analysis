@@ -41,7 +41,7 @@ rebalance_percent = 10
 # rebalance_percent = 20
 # rebalance_percent = 30
 # rebalance_percent = 40
-# rebalance_percent = 50
+# rebalance_percent = 50ß
 
 year1 = 1989
 year2 = 2003
@@ -108,8 +108,8 @@ bond_X3_stock = 'VUSTX3'
 
 ####  plot dependence on leveraged bond / index portfolios
 
-# year = year1
-year = year2
+year = year1
+# year = year2
 
 color_list += ['b']
 year_start_list += [year]
@@ -501,107 +501,130 @@ for ind_set, color in enumerate(color_list):
         # label_annotate = file_name.split('.txt')[0]
         label_annotate = file_name.split('.txt')[0].split('_')[-1]
 
-
         if not use_single_color:
             if color is not None:
                 color = colors[ind_file]
             label = file_name.split('.txt')[0]
 
-        try:
-            yield_list = np.loadtxt(save_dir + file_name)
+        # try:
 
-            # calculate numeric percentiles
-            # percentiles = [10, 50, 95]
-            percentiles = [5, 50, 95]
-            yield_percentiles = []
-            yield_percentiles_err_low = []
-            yield_percentiles_err_high = []
-            yield_percentiles_err = []
-            for percentile in percentiles:
+        yield_list = np.loadtxt(save_dir + file_name)
+
+        # calculate numeric percentiles
+        # percentiles = [10, 50, 95]
+        percentiles = [5, 50, 95]
+        # percentiles = [1, 50, 95]
+        yield_percentiles = []
+        yield_percentiles_err_low = []
+        yield_percentiles_err_high = []
+        yield_percentiles_err = []
+        p_lose_err = []
+        for percentile in percentiles:
+            # calculate yield based on data
+            yield_percentile = np.percentile(yield_list, percentile)
+
+            # calculate yield based on fit to data
+            # fit_params = scipy.stats.lognorm.fit(yield_list)
+            # fit_dist = scipy.stats.lognorm(*fit_params)
+            # yield_percentile = fit_dist.ppf(percentile / 100.0)
+
+            # estimate numeric error with bootstrap
+            # bootstrap_realizations = 100
+            bootstrap_realizations = 300
+            # bootstrap_realizations = 1000
+            # bootstrap_err_CL = 95
+            bootstrap_err_CL = 68
+            yield_percentile_err_list = []
+            for i in range(bootstrap_realizations):
+                inds_bootstrap = np.random.randint(low=1, high=len(yield_list), size=bootstrap_realizations)
+
                 # calculate yield based on data
-                yield_percentile = np.percentile(yield_list, percentile)
+                yield_percentile_err_list += [np.percentile(yield_list[inds_bootstrap], percentile)]
 
                 # calculate yield based on fit to data
-                # fit_params = scipy.stats.lognorm.fit(yield_list)
+                # fit_params = scipy.stats.lognorm.fit(yield_list[inds_bootstrap])
                 # fit_dist = scipy.stats.lognorm(*fit_params)
-                # yield_percentile = fit_dist.ppf(percentile / 100.0)
+                # yield_percentile_err_list += [fit_dist.ppf(percentile / 100.0)]
 
-                # estimate numeric error with bootstrap
-                # bootstrap_realizations = 100
-                bootstrap_realizations = 300
-                # bootstrap_realizations = 1000
-                # bootstrap_err_CL = 95
-                bootstrap_err_CL = 68
-                yield_percentile_err_list = []
-                for i in range(bootstrap_realizations):
-                    inds_bootstrap = np.random.randint(low=1, high=len(yield_list), size=bootstrap_realizations)
+            yield_err_low = np.percentile(yield_percentile_err_list, 100 - bootstrap_err_CL)
+            yield_err_low = abs(yield_percentile - yield_err_low)
+            yield_err_high = np.percentile(yield_percentile_err_list, bootstrap_err_CL)
+            yield_err_high = abs(yield_percentile - yield_err_high)
+            yield_err = np.std(yield_percentile_err_list)
 
-                    # calculate yield based on data
-                    yield_percentile_err_list += [np.percentile(yield_list[inds_bootstrap], percentile)]
+            yield_percentiles += [yield_percentile]
+            yield_percentiles_err_low += [yield_err_low]
+            yield_percentiles_err_high += [yield_err_high]
+            yield_percentiles_err += [yield_err]
 
-                    # calculate yield based on fit to data
-                    # fit_params = scipy.stats.lognorm.fit(yield_list[inds_bootstrap])
-                    # fit_dist = scipy.stats.lognorm(*fit_params)
-                    # yield_percentile_err_list += [fit_dist.ppf(percentile / 100.0)]
+        # calculate probability to finish with less than the investement (yield<1)
+        yield_cut_off = 1
+        p_lose = len(np.where(yield_list < yield_cut_off)[0]) / len(yield_list)
+        p_lose_err_list = []
+        for i in range(bootstrap_realizations):
+            inds_bootstrap = np.random.randint(low=1, high=len(yield_list), size=bootstrap_realizations)
+            p_lose_err_list += [len(np.where(yield_list[inds_bootstrap] < yield_cut_off)[0]) / len(yield_list[inds_bootstrap])]
+        p_lose_err_low = np.percentile(p_lose_err_list, 100 - bootstrap_err_CL)
+        p_lose_err_low = abs(p_lose - p_lose_err_low)
+        p_lose_err_high = np.percentile(p_lose_err_list, bootstrap_err_CL)
+        p_lose_err_high = abs(p_lose - p_lose_err_high)
 
-                yield_err_low = np.percentile(yield_percentile_err_list, 100 - bootstrap_err_CL)
-                yield_err_low = abs(yield_percentile - yield_err_low)
-                yield_err_high = np.percentile(yield_percentile_err_list, bootstrap_err_CL)
-                yield_err_high = abs(yield_percentile - yield_err_high)
-                yield_err = np.std(yield_percentile_err_list)
-
-                yield_percentiles += [yield_percentile]
-                yield_percentiles_err_low += [yield_err_low]
-                yield_percentiles_err_high += [yield_err_high]
-                yield_percentiles_err += [yield_err]
-
-
-            # plot
-            if use_single_color:
-                if ind_file == 0:
-                    label_curr = label
-                else:
-                    label_curr = None
-            else:
+        # plot
+        if use_single_color:
+            if ind_file == 0:
                 label_curr = label
+            else:
+                label_curr = None
+        else:
+            label_curr = label
 
 
-            plt.figure(1)
-            plt.scatter(yield_percentiles[0], yield_percentiles[1], color=color)
-            text_dist = 0.02
-            plt.annotate(label_annotate, (yield_percentiles[0] + text_dist, yield_percentiles[1] + text_dist), size=10, color=color)
-            plt.errorbar(yield_percentiles[0], yield_percentiles[1],
-                         yerr=np.array([[yield_percentiles_err_low[1]], [yield_percentiles_err_high[1]]]),
-                         xerr=np.array([[yield_percentiles_err_low[0]], [yield_percentiles_err_high[0]]]),
-                         label=label_curr,
-                         color=color)
-            # plt.errorbar(yield_percentiles[0], yield_percentiles[1],
-            #              yerr=yield_percentiles_err[1],
-            #              xerr=yield_percentiles_err[0],
-            #              label=label_curr,
-            #              color=color)
+        plt.figure(1)
+        plt.scatter(yield_percentiles[0], yield_percentiles[1], color=color)
+        text_dist = 0.02
+        plt.annotate(label_annotate, (yield_percentiles[0] + text_dist, yield_percentiles[1] + text_dist), size=10, color=color)
+        plt.errorbar(yield_percentiles[0], yield_percentiles[1],
+                     yerr=np.array([[yield_percentiles_err_low[1]], [yield_percentiles_err_high[1]]]),
+                     xerr=np.array([[yield_percentiles_err_low[0]], [yield_percentiles_err_high[0]]]),
+                     label=label_curr,
+                     color=color)
+        # plt.errorbar(yield_percentiles[0], yield_percentiles[1],
+        #              yerr=yield_percentiles_err[1],
+        #              xerr=yield_percentiles_err[0],
+        #              label=label_curr,
+        #              color=color)
 
 
-            # plt.figure(2)
-            # plt.scatter(yield_percentiles[0], yield_percentiles[2], color=color)
-            # plt.errorbar(yield_percentiles[0], yield_percentiles[2],
-            #              yerr=np.array([[yield_percentiles_err_low[2]], [yield_percentiles_err_high[2]]]),
-            #              xerr=np.array([[yield_percentiles_err_low[0]], [yield_percentiles_err_high[0]]]),
-            #              label=label_curr,
-            #              color=color)
+        # plt.figure(2)
+        # plt.scatter(yield_percentiles[0], yield_percentiles[2], color=color)
+        # plt.errorbar(yield_percentiles[0], yield_percentiles[2],
+        #              yerr=np.array([[yield_percentiles_err_low[2]], [yield_percentiles_err_high[2]]]),
+        #              xerr=np.array([[yield_percentiles_err_low[0]], [yield_percentiles_err_high[0]]]),
+        #              label=label_curr,
+        #              color=color)
 
-            # plt.figure(3)
-            # bins = np.linspace(0,yield_percentiles[-1],50)
-            # x = np.linspace(0, max(bins), 200)
-            # yield_percentiles_string = ','.join(['{:0.2f}'.format(y) for y in yield_percentiles])
-            # label += ', boot %=' + yield_percentiles_string
-            # plt.hist(yield_list, bins=bins, density=True, alpha=0.5, label=label, color=color)
-            # plt.xlabel('yield')
-            # plt.title('yield probability distribution')
-            # plt.legend()
+        # plt.figure(3)
+        # bins = np.linspace(0,yield_percentiles[-1],50)
+        # x = np.linspace(0, max(bins), 200)
+        # yield_percentiles_string = ','.join(['{:0.2f}'.format(y) for y in yield_percentiles])
+        # label += ', boot %=' + yield_percentiles_string
+        # plt.hist(yield_list, bins=bins, density=True, alpha=0.5, label=label, color=color)
+        # plt.xlabel('yield')
+        # plt.title('yield probability distribution')
+        # plt.legend()
 
-        except:
-            pass
+        plt.figure(4)
+        plt.scatter(p_lose, yield_percentiles[1], color=color)
+        text_dist = 0.005
+        plt.annotate(label_annotate, (p_lose + text_dist, yield_percentiles[1] + text_dist), size=10, color=color)
+        plt.errorbar(p_lose, yield_percentiles[1],
+                     yerr=np.array([[yield_percentiles_err_low[1]], [yield_percentiles_err_high[1]]]),
+                     xerr=np.array([[p_lose_err_low], [p_lose_err_high]]),
+                     label=label_curr,
+                     color=color)
+
+        # except:
+        #     pass
 
     # joke
     # plt.scatter(3, 10, color='k')
@@ -625,3 +648,10 @@ for ind_set, color in enumerate(color_list):
     # plt.title('yields')
     # plt.grid(True)
     # plt.legend()
+
+    plt.figure(4)
+    plt.xlabel('p(yield<' + str(yield_cut_off) + ')')
+    plt.ylabel('yield ' + str(percentiles[1]) + '% percentile')
+    plt.title('yields after ' + str(synthetic_period_years) + ' years (' + invest_strategy + ' investment)')
+    plt.grid(True)
+    plt.legend()
