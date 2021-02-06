@@ -39,7 +39,8 @@ def define_default_settings(settings=None):
         # settings['rebalance_criterion'] = 'yearly'
 
     if 'rebalance_percent_deviation' not in settings:
-        settings['rebalance_percent_deviation'] = 10.0
+        settings['rebalance_percent_deviation'] = 20.0
+        # settings['rebalance_percent_deviation'] = 10.0
         # settings['rebalance_percent_deviation'] = 5.0
 
     if 'margin_leverage_target' not in settings:

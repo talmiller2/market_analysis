@@ -73,9 +73,10 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'VOO': 0.5, 'QQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VOO': 0.5, 'TLT': 0.5}
     # settings['ideal_portfolio_fractions'] = {'UPRO': 0.5, 'TQQQ': 0.5}
-    settings['ideal_portfolio_fractions'] = {'QQQ': 0.5, 'TQQQ': 0.5}
+    # settings['ideal_portfolio_fractions'] = {'QQQ': 0.5, 'TQQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'UPRO': 0.5, 'TMF': 0.5}
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 0.5, 'TMF': 0.5}
+    settings['ideal_portfolio_fractions'] = {'TQQQ': 0.5, 'VUSTX3': 0.5}
     # settings['periodic_investment_interval'] = 'yearly'
     # settings['periodic_investment_interval'] = 'quarterly'
     # settings['capital_gains_tax_percents'] = 0

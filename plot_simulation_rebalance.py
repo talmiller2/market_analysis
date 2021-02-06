@@ -40,13 +40,13 @@ date_end = '2020-09-30'
 
 stock_name_list = []
 stock_name_list += ['SP500']
-stock_name_list += ['SP500TR']
+# stock_name_list += ['SP500TR']
 # stock_name_list += ['SPY']
 # stock_name_list += ['VOO']
 # stock_name_list += ['IVV']
 # stock_name_list += ['UPRO']
 
-# stock_name_list += ['NDX100']
+stock_name_list += ['NDX100']
 # stock_name_list += ['NDX100TR']
 # stock_name_list += ['QQQ']
 # stock_name_list += ['TQQQ']
@@ -54,15 +54,15 @@ stock_name_list += ['SP500TR']
 # stock_name_list += ['TLT']
 # stock_name_list += ['TLT-TR']
 stock_name_list += ['VUSTX']
-stock_name_list += ['VUSTX-TR']
+# stock_name_list += ['VUSTX-TR']
 # stock_name_list += ['VBTLX']
 # stock_name_list += ['TMF']
 
 # plot_data = False
 plot_data = True
 
-plot_close_adjusted = False
-# plot_close_adjusted = True
+# plot_close_adjusted = False
+plot_close_adjusted = True
 
 settings = define_default_settings()
 expense_ratios, leverage_factors, underlying_index, dividend_yield = define_stock_parameters()
@@ -104,7 +104,7 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'SSO': 1.0}
     # settings['ideal_portfolio_fractions'] = {'UPRO': 1.0}
     # settings['ideal_portfolio_fractions'] = {'QQQ': 1.0}
-    # settings['ideal_portfolio_fractions'] = {'TQQQ': 1.0}
+    settings['ideal_portfolio_fractions'] = {'TQQQ': 1.0}
     # settings['ideal_portfolio_fractions'] = {'QLD': 1.0}
     # settings['ideal_portfolio_fractions'] = {'QQQ': 0.0, 'QLD': 1.0}
     # settings['ideal_portfolio_fractions'] = {'VUSTX': 1.0}
@@ -118,11 +118,12 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 0.5, 'TMF': 0.5}
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 0.5, 'VUSTX3': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'VOO': 0.5}
-    settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'SSO': 0.5}
+    # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'SSO': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.5, 'UPRO': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'QQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'QLD': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.5, 'TQQQ': 0.5}
+    # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.65, 'TQQQ': 0.35}
     # settings['periodic_investment_interval'] = 'yearly'
     # settings['periodic_investment_interval'] = 'quarterly'
     settings['capital_gains_tax_percents'] = 0

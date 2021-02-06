@@ -474,9 +474,7 @@ def sell_papers_for_tax(settings, data, ind_date):
 
         # total amount of tax to be paid for this year's gains
         tax_to_pay = data['yearly_gains'] * settings['capital_gains_tax_percents'] / 100.0
-
-        # the total amount to be sold also includes all margin debt in case using margin leverage
-        total_to_sell = tax_to_pay + data['margin_debt'][ind_date]
+        total_to_sell = tax_to_pay
 
         # globally take the transaction fees into account by effectively increasing the amount that needs to be sold
         total_to_sell /= (1 - settings['transaction_fee_percents'] / 100.0)
@@ -527,19 +525,11 @@ def sell_papers_for_tax(settings, data, ind_date):
                 raise ValueError('stock_amount_left_to_sell should be zero at this point for stock_name: '
                                  + str(stock_name) + ', but it equals ' + str(stock_amount_left_to_sell))
 
-
         data['papers_dict'] = papers_dict
-
-        # # check tax was fully paid
-        # if stock_amount_left_to_sell != 0:
-        #     raise ValueError('stock_amount_left_to_sell should be zero at this point. '
-        #                      'stock_amount_left_to_sell = ' + str(stock_amount_left_to_sell))
 
         # reset margin debt and cash for next year
         data['total_portfolio_value'][ind_date] -= total_to_sell
-        data['cash_in_account'][ind_date] = 0
-        data['margin_debt'][ind_date] = 0
-        data['margin_leverage'][ind_date] = 1.0
+        data = calculate_margin_state(settings, data, ind_date)
 
     # tax year over, reset for next year
     data['yearly_gains'] = 0

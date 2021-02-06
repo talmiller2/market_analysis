@@ -101,6 +101,12 @@ def define_stock_parameters():
     underlying_index['TQQQ'] = 'NDX100TR'
     dividend_yield['TQQQ'] = 0
 
+    # fictitious NDX100 X4 etf
+    expense_ratios['QQQ4'] = 0.95
+    leverage_factors['QQQ4'] = 4.0
+    underlying_index['QQQ4'] = 'NDX100TR'
+    dividend_yield['QQQ4'] = 0
+
     # Total bond market index etf
     expense_ratios['VBTLX'] = 0.05
     leverage_factors['VBTLX'] = 1.0
@@ -123,6 +129,11 @@ def define_stock_parameters():
     leverage_factors['VUSTX3'] = 3.0
     underlying_index['VUSTX3'] = 'VUSTX-TR'
     dividend_yield['VUSTX3'] = 0
+
+    expense_ratios['VUSTX4'] = 1.0
+    leverage_factors['VUSTX4'] = 4.0
+    underlying_index['VUSTX4'] = 'VUSTX-TR'
+    dividend_yield['VUSTX4'] = 0
 
     # US government treasury 20-year bond etf
     expense_ratios['TLT'] = 0.15
@@ -176,7 +187,6 @@ def load_stock_data(stock_name, date_start=None, date_end=None, normalize=True, 
         # date from https://www.investing.com/indices/nasdaq-100-tr-historical-data
         data_file_name = 'Nasdaq 100 TR Historical Data'
         data_format = 'Investing.com'
-
 
     main_dir = os.path.dirname(os.path.abspath(__file__))
     data = pd.read_csv(main_dir + '/data/' + data_file_name + '.csv')
