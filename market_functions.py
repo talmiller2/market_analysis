@@ -1,9 +1,6 @@
-import pandas as pd
 import numpy as np
-import copy
 from data_functions import load_stock_data, get_libor_rate, define_stock_parameters
 from aux_functions import get_year_labels
-
 
 def simulate_portfolio_evolution(settings):
     """
@@ -51,6 +48,9 @@ def simulate_portfolio_evolution(settings):
 
     # end of simulation period reached, calculate profit if entire portfolio sold now
     data = calculate_total_portfolio_yield(settings, data)
+
+    # calculate additinal risk metrics during the simulation
+    data = calculate_risk_metrics(settings, data)
 
     return data
 
@@ -245,7 +245,12 @@ def evolve_portfolio_single_day(settings, data, ind_date):
             papers[ind_paper]['value_current'] *= paper_factor
 
             # we assume the dividends are given on a daily basis for simplicity
-            dividend_fraction = dividend_yield[stock_name] / 100.0 / settings['num_trading_days_in_year']
+            if stock_name in ['VUSTX', 'TLT']:
+                # phenomenological model to treat the time varying dividend of bonds
+                curr_div_yield = dividend_yield[stock_name] + 0.5 * data['libor_rate'][ind_date]
+            else:
+                curr_div_yield = dividend_yield[stock_name]
+            dividend_fraction = curr_div_yield / 100.0 / settings['num_trading_days_in_year']
             total_dividend_received = papers[ind_paper]['value_current'] * dividend_fraction
             data['yearly_gains'] += total_dividend_received
             data['cash_in_account'][ind_date] += total_dividend_received
@@ -345,7 +350,7 @@ def check_rebalancing_criterion_reached(settings, data, ind_date):
 
     if settings['margin_leverage_target'] > 1:
         margin_deviation_percents = abs(data['margin_leverage'][ind_date] - settings['margin_leverage_target']) \
-                                / settings['margin_leverage_target'] * 100.0
+                                    / settings['margin_leverage_target'] * 100.0
         if margin_deviation_percents > settings['margin_leverage_percent_deviation']:
             return True
 
@@ -502,7 +507,7 @@ def sell_papers_for_tax(settings, data, ind_date):
 
                     if paper_profit > 0:
                         stock_amount_left_to_sell_with_tax = stock_amount_left_to_sell \
-                                         / (1 - settings['capital_gains_tax_percents'] / 100.0)
+                                                             / (1 - settings['capital_gains_tax_percents'] / 100.0)
                         paper_additional_tax = paper_profit * settings['capital_gains_tax_percents'] / 100.0
                     else:
                         stock_amount_left_to_sell_with_tax = stock_amount_left_to_sell
@@ -647,5 +652,26 @@ def calculate_total_portfolio_yield(settings, data):
     data['total_yield'] = (total_portfolio_after_sell - capital_gains_tax_to_pay) / data['total_investment'][-1]
     data['total_yield_tax_free'] = total_portfolio_after_sell / data['total_investment'][-1]
     data['total_sell_tax_loss_percents'] = 100.0 * (1 - data['total_yield'] / data['total_yield_tax_free'])
+
+    return data
+
+
+def calculate_risk_metrics(settings, data):
+    """
+    calculate risk metrics that characterize the volatility of the portfolio which is not important
+    in the long run, but can be hard psychologically.
+    """
+
+    yield_history = (data['total_portfolio_value'] - data['margin_debt']) / data['total_investment']
+    data['yield_min'] = np.min(yield_history)
+    data['yield_max'] = np.max(yield_history)
+
+    yield_relative_to_cum_max = 0 * yield_history
+    curr_max = 0
+    for i, curr_yield in enumerate(yield_history):
+        curr_max = max(curr_max, curr_yield)
+        yield_relative_to_cum_max[i] = curr_yield / curr_max
+    data['drawdown'] = 1 - yield_relative_to_cum_max
+    data['max_drawdown'] = np.max(data['drawdown'])
 
     return data

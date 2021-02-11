@@ -21,6 +21,7 @@ matplotlib.rcParams.update({'axes.prop_cycle': cycler(color='bgrcmyk')})
 date_start = '1989-01-01'
 # date_start = '1993-01-29'
 # date_start = '1995-01-01'
+# date_start = '1997-01-01'
 # date_start = '1999-12-30'
 # date_start = '2000-01-01'
 # date_start = '2001-01-01'
@@ -39,14 +40,14 @@ date_end = '2020-09-30'
 ### plot data section
 
 stock_name_list = []
-stock_name_list += ['SP500']
+# stock_name_list += ['SP500']
 # stock_name_list += ['SP500TR']
 # stock_name_list += ['SPY']
 # stock_name_list += ['VOO']
 # stock_name_list += ['IVV']
 # stock_name_list += ['UPRO']
 
-stock_name_list += ['NDX100']
+# stock_name_list += ['NDX100']
 # stock_name_list += ['NDX100TR']
 # stock_name_list += ['QQQ']
 # stock_name_list += ['TQQQ']
@@ -58,9 +59,14 @@ stock_name_list += ['VUSTX']
 # stock_name_list += ['VBTLX']
 # stock_name_list += ['TMF']
 
+# stock_name_list += ['TM']
+# stock_name_list += ['BMW.DE']
+# stock_name_list += ['F']
+# stock_name_list += ['GM']
+
 # plot_data = False
 plot_data = True
-
+#
 # plot_close_adjusted = False
 plot_close_adjusted = True
 
@@ -84,7 +90,7 @@ if plot_data:
         # plt.yscale('log')
         plt.xticks(inds_years, label_years, rotation='vertical')
         plt.ylabel('yield')
-        plt.title('Stock Data')
+        # plt.title('Stock Data')
         plt.legend()
         plt.grid(True)
         plt.tight_layout()
@@ -98,16 +104,18 @@ plot_sim = True
 if plot_sim:
     settings = define_default_settings()
     settings['date_start'] = date_start
+
     settings['date_end'] = date_end
     # settings['ideal_portfolio_fractions'] = {'SP500': 1.0}
     # settings['ideal_portfolio_fractions'] = {'VOO': 1.0}
     # settings['ideal_portfolio_fractions'] = {'SSO': 1.0}
     # settings['ideal_portfolio_fractions'] = {'UPRO': 1.0}
+    # settings['ideal_portfolio_fractions'] = {'NDX100': 1.0}
     # settings['ideal_portfolio_fractions'] = {'QQQ': 1.0}
-    settings['ideal_portfolio_fractions'] = {'TQQQ': 1.0}
+    # settings['ideal_portfolio_fractions'] = {'TQQQ': 1.0}
     # settings['ideal_portfolio_fractions'] = {'QLD': 1.0}
     # settings['ideal_portfolio_fractions'] = {'QQQ': 0.0, 'QLD': 1.0}
-    # settings['ideal_portfolio_fractions'] = {'VUSTX': 1.0}
+    settings['ideal_portfolio_fractions'] = {'VUSTX': 1.0}
     # settings['ideal_portfolio_fractions'] = {'TLT': 1.0}
     # settings['ideal_portfolio_fractions'] = {'TMF': 1.0}
     # settings['ideal_portfolio_fractions'] = {'VUSTX3': 1.0}
@@ -121,11 +129,17 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'SSO': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.5, 'UPRO': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'QQQ': 0.5}
+    # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.65, 'QQQ': 0.35}
     # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'QLD': 0.5}
+    # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.65, 'QLD': 0.35}
     # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.5, 'TQQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.65, 'TQQQ': 0.35}
+    settings['periodic_investment_interval'] = 'monthly'
     # settings['periodic_investment_interval'] = 'yearly'
     # settings['periodic_investment_interval'] = 'quarterly'
+    # settings['initial_investment'] = 1
+    # settings['periodic_investment'] = 1
+
     settings['capital_gains_tax_percents'] = 0
     # settings['capital_gains_tax_percents'] = 5
     # settings['transaction_fee_percents'] = 0
@@ -138,7 +152,7 @@ if plot_sim:
     plt.figure(1)
     # label = 'sim tax ' + settings['tax_scheme']
     # label = 'sim tax ' + settings['tax_scheme'] + ' (total sell tax loss ' + '{:0.2f}'.format(data['total_sell_tax_loss_percents']) + '%)'
-    label = 'sim portfolio: ' + str(settings['ideal_portfolio_fractions'])
+    label = 'sim: ' + str(settings['ideal_portfolio_fractions'])
     # plt.plot(data['total_portfolio_value'], label=label, linewidth=2)
     # plt.plot(data['total_portfolio_value'], label=label, linewidth=2, color='k', zorder=1)
     # plt.plot(data['total_portfolio_value'] / data['total_investment'], label=label, linewidth=2, color='k', zorder=1)
@@ -146,7 +160,7 @@ if plot_sim:
     # plt.scatter(data['papers_buy_days'], data['portfolio_values_at_buy_days'], s=2, color=data['papers_status_colors'], zorder=2)
     # plt.plot(data['total_portfolio_value'] + data['cash_in_account'], label=label + ' + divs not reinvested', linewidth=2)
     # plt.plot(data['cash_in_account'], label='cash_in_account', linewidth=2)
-    # plt.yscale('log')
+    plt.yscale('log')
     # plt.xticks(inds_years, label_years, rotation='vertical')
     # plt.ylabel('yield')
     # plt.title('Stock Data')
@@ -154,12 +168,19 @@ if plot_sim:
     plt.grid(True)
     plt.tight_layout()
 
-    plt.figure(2)
-    for stock_name in data['portfolio_fractions'].keys():
-        plt.plot(data['portfolio_fractions'][stock_name], label=stock_name, linewidth=2)
-    plt.xticks(inds_years, label_years, rotation='vertical')
-    plt.title('portfolio fractions')
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-
+    # plt.figure(2)
+    # for stock_name in data['portfolio_fractions'].keys():
+    #     plt.plot(data['portfolio_fractions'][stock_name], label=stock_name, linewidth=2)
+    # # plt.xticks(inds_years, label_years, rotation='vertical')
+    # plt.title('portfolio fractions')
+    # plt.legend()
+    # plt.grid(True)
+    # plt.tight_layout()
+    #
+    # plt.figure(4)
+    # plt.plot(data['drawdown'], label=label, linewidth=2)
+    # # plt.xticks(inds_years, label_years, rotation='vertical')
+    # plt.title('drawdown')
+    # plt.legend()
+    # plt.grid(True)
+    # plt.tight_layout()

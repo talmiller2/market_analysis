@@ -162,11 +162,11 @@ if plot_sim:
     label2 = 'sim: ' + str(settings['ideal_portfolio_fractions'])
     if settings['margin_leverage_target'] > 0:
         label2 += ' margin X' + str(settings['margin_leverage_target'])
-    color = 'k'
-    plt.plot(data1['total_portfolio_value'] - data1['margin_debt'], color=color, label=label1, linewidth=2)
-    color = 'r'
-    plt.plot(data2['total_portfolio_value'] - data2['margin_debt'], color=color, label=label2, linewidth=2)
-    plt.plot(data2['margin_debt'], linestyle='--', color=color, label='margin debt', linewidth=2)
+    color1 = 'k'
+    plt.plot(data1['total_portfolio_value'] - data1['margin_debt'], color=color1, label=label1, linewidth=2)
+    color2 = 'r'
+    plt.plot(data2['total_portfolio_value'] - data2['margin_debt'], color=color2, label=label2, linewidth=2)
+    plt.plot(data2['margin_debt'], linestyle='--', color=color2, label='margin debt', linewidth=2)
     # plt.plot(data['total_portfolio_value'], label=label, linewidth=2, color='k', zorder=1)
     # plt.plot(data['total_portfolio_value'] / data['total_investment'], label=label, linewidth=2, color='k', zorder=1)
     # plt.plot(data['total_portfolio_value'] / data['total_investment'], label=label, linewidth=2, color=None)
@@ -197,6 +197,15 @@ if plot_sim:
     plt.plot(data2['margin_leverage'], linewidth=2)
     plt.xticks(inds_years, label_years, rotation='vertical')
     plt.title('margin leverage')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+
+    plt.figure(4)
+    plt.plot(data1['drawdown'], color=color1, label=label1, linewidth=2)
+    plt.plot(data2['drawdown'], color=color2, label=label2, linewidth=2)
+    plt.xticks(inds_years, label_years, rotation='vertical')
+    plt.title('drawdown')
     plt.legend()
     plt.grid(True)
     plt.tight_layout()

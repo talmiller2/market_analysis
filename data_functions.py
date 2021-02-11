@@ -117,7 +117,7 @@ def define_stock_parameters():
     expense_ratios['VUSTX'] = 0.2
     leverage_factors['VUSTX'] = 1.0
     underlying_index['VUSTX'] = 'VUSTX'
-    dividend_yield['VUSTX'] = 5.5
+    dividend_yield['VUSTX'] = 5
 
     # fictitious leveraged VUSTX variants
     expense_ratios['VUSTX2'] = 1.0

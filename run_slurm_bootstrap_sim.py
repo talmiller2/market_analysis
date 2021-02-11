@@ -18,7 +18,8 @@ slurm_kwargs = {'partition': 'core'}  # default
 # slurm_kwargs = {'partition': 'socket'}
 
 
-main_folder = '/home/talm/code/market_analysis/simulations_slurm/'
+# main_folder = '/home/talm/code/market_analysis/simulations_slurm/'
+main_folder = '/home/talm/code/market_analysis/simulations_slurm_2/'
 
 # define the period from which the synthetic realization will be drawn
 
@@ -34,10 +35,10 @@ date_start = '1989-01-01'
 # date_start = '2003-01-01'
 
 # date_end = '2001-01-01'
-date_end = '2010-01-01'
+# date_end = '2010-01-01'
 # date_end = '2015-01-01'
 # date_end = '2019-01-01'
-# date_end = '2020-09-30'
+date_end = '2020-09-30'
 
 # num_realizations = 1
 # num_realizations = 5
@@ -47,18 +48,12 @@ date_end = '2010-01-01'
 # num_realizations = 100
 # num_realizations = 200
 # num_realizations = 500
-# num_realizations = 1000
-num_realizations = 2000
+num_realizations = 1000
+# num_realizations = 2000
 # num_realizations = 5000
 
-# frac_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-# frac_list = [0, 1]
-# frac_list = [0.3]
-# frac_list = [0.9]
-# frac_list = [1.0]
-# frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-frac_list = np.linspace(0, 1, 20)
-# frac_list = [0, 0.2, 0.4, 0.6, 0.8, 1]
+# frac_list = np.linspace(0, 1, 20)
+frac_list = np.linspace(0, 1, 21)
 
 stock1_list = []
 stock2_list = []
