@@ -57,6 +57,7 @@ frac_list = np.linspace(0, 1, 21)
 
 stock1_list = []
 stock2_list = []
+margin_lev_list = []
 
 # stock1_list += [  'VOO', 'VOO',  'VOO']
 # stock2_list += ['VUSTX', 'SSO', 'UPRO']
@@ -69,21 +70,37 @@ stock2_list = []
 # stock1_list += [  'QQQ', 'QQQ', 'QQQ', 'QQQ',  'QQQ', 'QLD', 'QLD', 'TQQQ', 'TQQQ']
 # stock2_list += ['VUSTX', 'TLT', 'TMF', 'QLD', 'TQQQ', 'TLT', 'TMF',  'TLT',  'TMF']
 
-stock1_list += [ 'VOO',  'VOO']
-stock2_list += [ 'SSO', 'UPRO']
-stock1_list += [ 'QQQ',  'QQQ']
-stock2_list += [ 'QLD', 'TQQQ']
-stock1_list += ['VUSTX', 'VUSTX', 'VUSTX', 'VUSTX', 'VUSTX', 'VUSTX']
-stock2_list += [  'VOO',   'SSO',  'UPRO',   'QQQ',   'QLD',  'TQQQ']
-stock1_list += ['VUSTX2', 'VUSTX2', 'VUSTX2', 'VUSTX2', 'VUSTX2', 'VUSTX2']
-stock2_list += [   'VOO',    'SSO',   'UPRO',    'QQQ',    'QLD',   'TQQQ']
-stock1_list += ['VUSTX3', 'VUSTX3', 'VUSTX3', 'VUSTX3', 'VUSTX3', 'VUSTX3']
-stock2_list += [   'VOO',    'SSO',   'UPRO',    'QQQ',    'QLD',   'TQQQ']
+# stock1_list += [ 'VOO',  'VOO']
+# stock2_list += [ 'SSO', 'UPRO']
+# stock1_list += [ 'QQQ',  'QQQ']
+# stock2_list += [ 'QLD', 'TQQQ']
+# stock1_list += ['VUSTX', 'VUSTX', 'VUSTX', 'VUSTX', 'VUSTX', 'VUSTX']
+# stock2_list += [  'VOO',   'SSO',  'UPRO',   'QQQ',   'QLD',  'TQQQ']
+# stock1_list += ['VUSTX2', 'VUSTX2', 'VUSTX2', 'VUSTX2', 'VUSTX2', 'VUSTX2']
+# stock2_list += [   'VOO',    'SSO',   'UPRO',    'QQQ',    'QLD',   'TQQQ']
+# stock1_list += ['VUSTX3', 'VUSTX3', 'VUSTX3', 'VUSTX3', 'VUSTX3', 'VUSTX3']
+# stock2_list += [   'VOO',    'SSO',   'UPRO',    'QQQ',    'QLD',   'TQQQ']
+
+
+stock1_list += ['VUSTX', 'VUSTX2', 'VUSTX3', 'VUSTX4']
+stock2_list += [  'VOO',    'SSO',   'UPRO',   'VOO4']
+margin_lev_list += [1, 1, 1, 1]
+stock1_list += ['VUSTX', 'VUSTX2', 'VUSTX3', 'VUSTX4']
+stock2_list += [  'QQQ',    'QLD',   'TQQQ',   'QQQ4']
+margin_lev_list += [1, 1, 1, 1]
+stock1_list += ['VUSTX' for _ in range(3)]
+stock2_list += ['VOO' for _ in range(3)]
+margin_lev_list += [2, 3, 4]
+stock1_list += ['VUSTX' for _ in range(3)]
+stock2_list += ['QQQ' for _ in range(3)]
+margin_lev_list += [2, 3, 4]
 
 
 total_number_of_runs = len(frac_list) * len(stock1_list)
 cnt = 0
-for stock1, stock2 in zip(stock1_list, stock2_list):
+# for stock1, stock2 in zip(stock1_list, stock2_list):
+#     print('stock1 ' + stock1 + ', stock2 ' + stock2)
+for stock1, stock2, margin_lev in zip(stock1_list, stock2_list, margin_lev_list):
     print('stock1 ' + stock1 + ', stock2 ' + stock2)
     for frac in frac_list:
         print('frac = ' + str(frac))
@@ -92,6 +109,7 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         settings['date_start'] = date_start
         settings['date_end'] = date_end
         settings['ideal_portfolio_fractions'] = {stock1: 1-frac, stock2: frac}
+        settings['margin_leverage_target'] = margin_lev
 
         settings['tax_scheme'] = 'optimized'
         # settings['tax_scheme'] = 'FIFO'
@@ -105,8 +123,10 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         # settings['initial_investment'] = 10
         # settings['periodic_investment'] = 1
 
-        # settings['capital_gains_tax_percents'] = 0
+        settings['capital_gains_tax_percents'] = 0
+
         # settings['num_correlation_days'] = 1
+
         # settings['rebalance_percent_deviation'] = 20
 
         # save the result to plot later
@@ -115,9 +135,8 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         save_dir += '_periodic_' + str(settings['periodic_investment']) + '/'
         save_dir += 'period_' + str(settings['synthetic_period_years'])
         save_dir += '_cd_' + str(settings['num_correlation_days'])
-        save_dir += '_date_start_' + date_start
-        if settings['date_end'] != '2020-09-30':
-            save_dir += '_date_end_' + settings['date_end']
+        save_dir += '_date_start_' + settings['date_start']
+        save_dir += '_end_' + settings['date_end']
         if settings['tax_scheme'] != 'optimized':
             save_dir += '_tax_' + settings['tax_scheme']
         if settings['capital_gains_tax_percents'] == 0:
@@ -131,6 +150,8 @@ for stock1, stock2 in zip(stock1_list, stock2_list):
         os.chdir(save_dir)
 
         sim_name = stock1 + '_' + '{:0.2f}'.format(1-frac) + '_' + stock2 + '_' + '{:0.2f}'.format(frac)
+        if margin_lev > 1:
+            sim_name += '_mX' + str(margin_lev)
         print('sim_name : ' + str(sim_name))
 
         bootstrap_params = {}

@@ -26,14 +26,21 @@ bootstrap_params = ast.literal_eval(args.bootstrap_params)
 
 # perform bootstrap loop
 yield_list = []
+yield_min_list = []
+max_drawdown_list = []
 for ind_real in range(bootstrap_params['num_realizations']):
     data = simulate_portfolio_evolution(settings)
     label = 'real ' + str(ind_real) + ', yield=' + '{:0.2f}'.format(data['total_yield'])
     # print(label, file=log_file)
     yield_list += [data['total_yield']]
+    yield_min_list += [data['yield_min']]
+    max_drawdown_list += [data['max_drawdown']]
+
+results_mat = np.array([yield_list, yield_min_list, max_drawdown_list]).T
 
 # save results to file
 save_file_path = bootstrap_params['save_dir'] + '/' + bootstrap_params['sim_name'] + '.txt'
-np.savetxt(save_file_path, yield_list)
+# np.savetxt(save_file_path, yield_list)
+np.savetxt(save_file_path, results_mat)
 
 # log_file.close()

@@ -83,6 +83,12 @@ def define_stock_parameters():
     underlying_index['UPRO'] = 'SP500TR'
     dividend_yield['UPRO'] = 0
 
+    # fictitious P500 X4 etf
+    expense_ratios['VOO4'] = 1.0
+    leverage_factors['VOO4'] = 4.0
+    underlying_index['VOO4'] = 'SP500TR'
+    dividend_yield['VOO4'] = 0
+
     # NDX100 etf
     expense_ratios['QQQ'] = 0.2
     leverage_factors['QQQ'] = 1.0
@@ -102,7 +108,7 @@ def define_stock_parameters():
     dividend_yield['TQQQ'] = 0
 
     # fictitious NDX100 X4 etf
-    expense_ratios['QQQ4'] = 0.95
+    expense_ratios['QQQ4'] = 1.0
     leverage_factors['QQQ4'] = 4.0
     underlying_index['QQQ4'] = 'NDX100TR'
     dividend_yield['QQQ4'] = 0

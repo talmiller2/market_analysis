@@ -127,13 +127,13 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'QQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'QLD': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.6, 'QLD': 0.4}
-    settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.5, 'TQQQ': 0.5}
-    # settings['ideal_portfolio_fractions'] = {'VUSTX4': 0.5, 'QQQ4': 0.5}
+    # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.5, 'TQQQ': 0.5}
+    settings['ideal_portfolio_fractions'] = {'VUSTX4': 0.5, 'QQQ4': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX4': 0.6, 'QQQ4': 0.4}
     # settings['periodic_investment_interval'] = 'yearly'
     # settings['periodic_investment_interval'] = 'quarterly'
-    # settings['capital_gains_tax_percents'] = 0
-    settings['capital_gains_tax_percents'] = 25
+    settings['capital_gains_tax_percents'] = 0
+    # settings['capital_gains_tax_percents'] = 25
     # settings['transaction_fee_percents'] = 0
     # settings['tax_scheme'] = 'FIFO'
     # settings['tax_scheme'] = 'LIFO'
@@ -147,13 +147,17 @@ if plot_sim:
     settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'QQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.6, 'QQQ': 0.4}
     # settings['margin_leverage_target'] = 2.0
-    settings['margin_leverage_target'] = 3.0
-    # settings['margin_leverage_target'] = 4.0
+    # settings['margin_leverage_target'] = 3.0
+    settings['margin_leverage_target'] = 4.0
     # settings['margin_leverage_percent_deviation'] = 10.0
     settings['margin_leverage_percent_deviation'] = 20.0
     # settings['margin_leverage_percent_deviation'] = 40.0
     # settings['margin_rate_percents'] = 5.0
     data2 = simulate_portfolio_evolution(settings)
+
+    print('total_yield = ', data2['total_yield'])
+    print('yield_min = ', data2['yield_min'])
+    print('max_drawdown = ', data2['max_drawdown'])
 
     # plots
     plt.figure(1)
