@@ -647,7 +647,7 @@ def calculate_total_portfolio_yield(settings, data):
 
     total_portfolio_after_sell = data['total_portfolio_value'][-1] * (1 - settings['transaction_fee_percents'] / 100.0)
     total_portfolio_after_sell -= data['margin_debt'][-1]  # cover margin after total sell
-    capital_gains_tax_to_pay = total_profit * settings['capital_gains_tax_percents'] / 100.0
+    capital_gains_tax_to_pay = total_profit * settings['total_sell_capital_gains_tax_percents'] / 100.0
 
     data['total_yield'] = (total_portfolio_after_sell - capital_gains_tax_to_pay) / data['total_investment'][-1]
     data['total_yield_tax_free'] = total_portfolio_after_sell / data['total_investment'][-1]

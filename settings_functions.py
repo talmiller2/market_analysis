@@ -63,6 +63,9 @@ def define_default_settings(settings=None):
         settings['capital_gains_tax_percents'] = 25
         # settings['capital_gains_tax_percents'] = 0
 
+    if 'total_sell_capital_gains_tax_percents' not in settings:
+        settings['total_sell_capital_gains_tax_percents'] = 25
+
     if 'transaction_fee_percents' not in settings:
         # settings['transaction_fee_percents'] = 1.0
         settings['transaction_fee_percents'] = 0.1

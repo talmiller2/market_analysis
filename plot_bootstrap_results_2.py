@@ -27,6 +27,7 @@ synthetic_period_years_list = []
 tax_scheme_list = []
 stock1_list = []
 stock2_list = []
+margin_lev_list = []
 
 invest_strategy = 'single'
 # invest_strategy = 'monthly'
@@ -37,8 +38,8 @@ synthetic_period_years = 10
 num_correlation_days = 5
 # num_correlation_days = 1
 
-rebalance_percent = 10
-# rebalance_percent = 20
+# rebalance_percent = 10
+rebalance_percent = 20
 # rebalance_percent = 30
 # rebalance_percent = 40
 # rebalance_percent = 50ß
@@ -46,11 +47,10 @@ rebalance_percent = 10
 year1 = 1989
 year2 = 2003
 
-
-# tax_scheme = 'optimized'
+tax_scheme = 'optimized'
 # tax_scheme = 'LIFO'
 # tax_scheme = 'FIFO'
-tax_scheme = 'no_tax'
+# tax_scheme = 'no_tax'
 
 index_base = 'NDX100'
 # index_base = 'SP500'
@@ -58,53 +58,17 @@ if index_base == 'NDX100':
     index_stock = 'QQQ'
     index_X2_stock = 'QLD'
     index_X3_stock = 'TQQQ'
+    index_X4_stock = 'QQQ4'
 else:
     index_stock = 'VOO'
     index_X2_stock = 'SSO'
     index_X3_stock = 'UPRO'
+    index_X4_stock = 'VOO4'
 
 bond_stock = 'VUSTX'
 bond_X2_stock = 'VUSTX2'
 bond_X3_stock = 'VUSTX3'
-
-#### plot dependence on index / leveraged index portfolios
-
-# color_list += ['b']
-# year_start_list += [year1]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [index_stock]
-# stock2_list += [index_X2_stock]
-#
-# color_list += ['g']
-# year_start_list += [year1]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [index_stock]
-# stock2_list += [index_X3_stock]
-#
-# color_list += ['r']
-# year_start_list += [year2]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [index_stock]
-# stock2_list += [index_X2_stock]
-#
-# color_list += ['k']
-# year_start_list += [year2]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [index_stock]
-# stock2_list += [index_X3_stock]
-
+bond_X4_stock = 'VUSTX4'
 
 ####  plot dependence on leveraged bond / index portfolios
 
@@ -119,6 +83,7 @@ synthetic_period_years_list += [synthetic_period_years]
 tax_scheme_list += [tax_scheme]
 stock1_list += [bond_stock]
 stock2_list += [index_stock]
+margin_lev_list += [1]
 
 color_list += ['g']
 year_start_list += [year]
@@ -128,6 +93,7 @@ synthetic_period_years_list += [synthetic_period_years]
 tax_scheme_list += [tax_scheme]
 stock1_list += [bond_X2_stock]
 stock2_list += [index_X2_stock]
+margin_lev_list += [1]
 
 color_list += ['r']
 year_start_list += [year]
@@ -137,266 +103,29 @@ synthetic_period_years_list += [synthetic_period_years]
 tax_scheme_list += [tax_scheme]
 stock1_list += [bond_X3_stock]
 stock2_list += [index_X3_stock]
+margin_lev_list += [1]
 
-####  plot dependence on portfolio with leveraged index + different bond leverages
-
-# year = year1
-# # year = year2
-#
-# # curr_index = index_stock
-# # curr_index = index_X2_stock
-# curr_index = index_X3_stock
-#
-# color_list += ['b']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [bond_stock]
-# stock2_list += [curr_index]
-#
-# color_list += ['g']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [bond_X2_stock]
-# stock2_list += [curr_index]
-#
-# color_list += ['r']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [bond_X3_stock]
-# stock2_list += [curr_index]
-
-
-#### plot both index leverage and bond leverage combinations (both years)
-
-# stock1 = index_stock
-# stock2 = index_X2_stock
-# stock3 = bond_X2_stock
-#
-# # stock1 = index_stock
-# # stock2 = index_X3_stock
-# # stock3 = bond_X3_stock
-#
-# year = year1
-#
-# color_list += ['b']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [stock1]
-# stock2_list += [stock2]
-#
-# color_list += ['g']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [stock3]
-# # stock2_list += [stock1]
-# stock2_list += [stock2]
-#
-# year = year2
-#
-# color_list += ['r']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [stock1]
-# stock2_list += [stock2]
-#
-# color_list += ['orange']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [stock3]
-# # stock2_list += [stock1]
-# stock2_list += [stock2]
-
-#### plot both index leverage and bond leverage combinations (both leverages)
-
-# year = year1
-# # year = year2
-#
-# stock1 = index_stock
-# stock2 = index_X2_stock
-# stock3 = bond_X2_stock
-#
-# color_list += ['b']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [stock1]
-# stock2_list += [stock2]
-#
-# color_list += ['g']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [stock3]
-# # stock2_list += [stock1]
-# stock2_list += [stock2]
-#
-#
-# stock1 = index_stock
-# stock2 = index_X3_stock
-# stock3 = bond_X3_stock
-#
-# color_list += ['r']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [stock1]
-# stock2_list += [stock2]
-#
-# color_list += ['orange']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [stock3]
-# # stock2_list += [stock1]
-# stock2_list += [stock2]
-
-
-####  plot dependence on tax scheme
-
-# color_list += ['b']
-# year_start_list += [1989]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [bond_stock]
-# stock2_list += [index_stock]
-#
-# color_list += ['g']
-# year_start_list += [1989]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += ['FIFO']
-# stock1_list += [bond_stock]
-# stock2_list += [index_stock]
-#
-# color_list += ['r']
-# year_start_list += [1989]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += ['LIFO']
-# stock1_list += [bond_stock]
-# stock2_list += [index_stock]
-#
 # color_list += ['k']
-# year_start_list += [1989]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += ['no_tax']
-# stock1_list += [bond_stock]
-# stock2_list += [index_stock]
-
-####  plot dependence on correlation days
-
-# # stock1 = bond_stock
-# # stock2 = index_stock
-# stock1 = index_stock
-# stock2 = index_X2_stock
-#
-# color_list += ['b']
-# year_start_list += [1989]
+# year_start_list += [year]
 # investing_strategy_list += [invest_strategy]
 # correlation_days_list += [num_correlation_days]
 # synthetic_period_years_list += [synthetic_period_years]
 # tax_scheme_list += [tax_scheme]
-# stock1_list += [stock1]
-# stock2_list += [stock2]
+# stock1_list += [bond_X4_stock]
+# stock2_list += [index_X4_stock]
+# margin_lev_list += [1]
 #
-# color_list += ['g']
-# year_start_list += [1989]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [1]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [stock1]
-# stock2_list += [stock2]
-
-
-####  plot dependence on total period
-
-# # stock1 = bond_stock
-# # stock2 = index_stock
-# stock1 = index_stock
-# stock2 = index_X2_stock
-# stock3 = index_X3_stock
+color_list += ['c']
+year_start_list += [year]
+investing_strategy_list += [invest_strategy]
+correlation_days_list += [num_correlation_days]
+synthetic_period_years_list += [synthetic_period_years]
+tax_scheme_list += [tax_scheme]
+stock1_list += [bond_stock]
+stock2_list += [index_stock]
+margin_lev_list += [2]
 #
-# # year = year1
-# year = year2
-#
-# color_list += ['b']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [10]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [stock1]
-# stock2_list += [stock2]
-#
-# color_list += ['g']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [20]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [stock1]
-# stock2_list += [stock2]
-#
-# color_list += ['r']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [10]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [stock1]
-# stock2_list += [stock3]
-#
-# color_list += ['orange']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [20]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [stock1]
-# stock2_list += [stock3]
-
-####  plot dependence on rebalance percent
-
-# year = year1
-#
-# color_list += ['b']
-# # color_list += ['c']
+# color_list += ['c']
 # year_start_list += [year]
 # investing_strategy_list += [invest_strategy]
 # correlation_days_list += [num_correlation_days]
@@ -404,32 +133,26 @@ stock2_list += [index_X3_stock]
 # tax_scheme_list += [tax_scheme]
 # stock1_list += [bond_stock]
 # stock2_list += [index_stock]
-#
-# color_list += ['g']
-# # color_list += ['k']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [bond_X2_stock]
-# stock2_list += [index_X2_stock]
-#
-# color_list += ['r']
-# # color_list += ['m']
-# # color_list += ['c']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [bond_X3_stock]
-# stock2_list += [index_X3_stock]
+# margin_lev_list += [3]
 
+# color_list += ['c']
+# year_start_list += [year]
+# investing_strategy_list += [invest_strategy]
+# correlation_days_list += [num_correlation_days]
+# synthetic_period_years_list += [synthetic_period_years]
+# tax_scheme_list += [tax_scheme]
+# stock1_list += [bond_stock]
+# stock2_list += [index_stock]
+# margin_lev_list += [4]
+
+
+color_list = cm.rainbow(np.linspace(0, 1, len(stock1_list)))
 
 ###########################
 
 for ind_set, color in enumerate(color_list):
+    print('set ' + str(ind_set))
+
     year_start = year_start_list[ind_set]
     investing_strategy = investing_strategy_list[ind_set]
     correlation_days = correlation_days_list[ind_set]
@@ -437,6 +160,7 @@ for ind_set, color in enumerate(color_list):
     tax_scheme = tax_scheme_list[ind_set]
     stock1 = stock1_list[ind_set]
     stock2 = stock2_list[ind_set]
+    margin_lev = margin_lev_list[ind_set]
 
     use_single_color = True
     # use_single_color = False
@@ -447,9 +171,9 @@ for ind_set, color in enumerate(color_list):
     else:
         date_start = '2003-01-01'
 
-    date_end = '2010-01-01'
+    # date_end = '2010-01-01'
     # date_end = '2019-01-01'
-    # date_end = '2020-09-30'
+    date_end = '2020-09-30'
 
     settings = define_default_settings()
 
@@ -457,8 +181,7 @@ for ind_set, color in enumerate(color_list):
     save_dir = ''
     # save_dir += 'simulations/'
     save_dir = '/Users/talmiller/Downloads/'
-    save_dir += 'simulations_slurm/'
-    # save_dir += 'simulations_slurm_2/'
+    save_dir += 'simulations_slurm_2/'
 
     if investing_strategy == 'single':
         label_investment = 'investment_initial_1_periodic_0'
@@ -468,32 +191,38 @@ for ind_set, color in enumerate(color_list):
     save_dir += 'period_' + str(synthetic_period_years)
     save_dir += '_cd_' + str(correlation_days)
     save_dir += '_date_start_' + date_start
-    if date_end != '2020-09-30':
-        save_dir += '_date_end_' + date_end
+    save_dir += '_end_' + date_end
     if tax_scheme == 'no_tax':
         save_dir += '_no_tax'
     elif tax_scheme == 'FIFO':
         save_dir += '_tax_FIFO'
     elif tax_scheme == 'LIFO':
         save_dir += '_tax_LIFO'
-    if rebalance_percent != 10:
-        save_dir += '_rebalance_percent_20'
+    if rebalance_percent != 20:
+        save_dir += '_rebalance_percent_' + str(rebalance_percent)
     save_dir += '/'
 
-    # frac_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-    frac_list = np.linspace(0, 1, 20)
-    # frac_list = np.linspace(0, 1, 21)
+    frac_list = np.linspace(0, 1, 21)
 
+    if margin_lev == 1:
+        files_filtered = [
+            stock1 + '_' + '{:0.2f}'.format(1 - frac) + '_' + stock2 + '_' + '{:0.2f}'.format(frac) + '.txt'
+            for frac in frac_list]
+    else:
+        files_filtered = [
+            stock1 + '_' + '{:0.2f}'.format(1 - frac) + '_' + stock2 + '_' + '{:0.2f}'.format(frac) + '_mX' + str(
+                margin_lev) + '.txt'
+            for frac in frac_list]
 
-    files_filtered = [stock1 + '_' + '{:0.2f}'.format(1-frac) + '_' + stock2 + '_' + '{:0.2f}'.format(frac) + '.txt'
-                      for frac in frac_list]
     label = ''
     # label += 'y' + date_start[0:4] + ': '
     # label += 'y' + date_start[0:4] + ', cd' + str(correlation_days) + ': '
-    label += 'y' + date_start[0:4] + ' ' + tax_scheme + ': '
+    # label += 'y' + date_start[0:4] + ' ' + tax_scheme + ': '
     # label += 'y' + date_start[0:4] + ', rebalance@' + str(rebalance_percent) + '%: '
     # label += 'y' + date_start[0:4] + ', rebalance@' + str(rebalance_percent) + '%, ' + tax_scheme + ': '
     label += stock1 + '/' + stock2
+    if margin_lev > 1:
+        label += ' mX' + str(margin_lev)
 
     colors = cm.rainbow(np.linspace(0, 1, len(files_filtered)))
 
@@ -501,7 +230,8 @@ for ind_set, color in enumerate(color_list):
 
         # prepare label for annotation
         # label_annotate = file_name.split('.txt')[0]
-        label_annotate = file_name.split('.txt')[0].split('_')[-1]
+        # label_annotate = file_name.split('.txt')[0].split('_')[-1]
+        label_annotate = file_name.split('.txt')[0].split('_')[1]
 
         if not use_single_color:
             if color is not None:
@@ -510,20 +240,37 @@ for ind_set, color in enumerate(color_list):
 
         try:
 
-            yield_list = np.loadtxt(save_dir + file_name)
+            results_mat = np.loadtxt(save_dir + file_name)
+            # [yield_list, yield_min_list, max_drawdown_list] = np.loadtxt(save_dir + file_name, usecols=[0, 1, 2])
+            # results_mat = np.array([yield_list, yield_min_list, max_drawdown_list]).T
+            yield_list = results_mat[:, 0]
+            min_yield_list = results_mat[:, 1]
+            max_drawdown_list = results_mat[:, 2]
 
             # calculate numeric percentiles
             # percentiles = [10, 50, 95]
             percentiles = [5, 50, 95]
             # percentiles = [1, 50, 95]
+
             yield_percentiles = []
             yield_percentiles_err_low = []
             yield_percentiles_err_high = []
             yield_percentiles_err = []
             p_lose_err = []
+
+            min_yield_percentiles = []
+            min_yield_percentiles_err_low = []
+            min_yield_percentiles_err_high = []
+
+            max_drawdown_percentiles = []
+            max_drawdown_percentiles_err_low = []
+            max_drawdown_percentiles_err_high = []
+
             for percentile in percentiles:
                 # calculate yield based on data
                 yield_percentile = np.percentile(yield_list, percentile)
+                min_yield_percentile = np.percentile(min_yield_list, percentile)
+                max_drawdown_percentile = np.percentile(max_drawdown_list, percentile)
 
                 # calculate yield based on fit to data
                 # fit_params = scipy.stats.lognorm.fit(yield_list)
@@ -537,27 +284,40 @@ for ind_set, color in enumerate(color_list):
                 # bootstrap_err_CL = 95
                 bootstrap_err_CL = 68
                 yield_percentile_err_list = []
+                min_yield_percentiles_err_list = []
+                max_drawdown_percentiles_err_list = []
+
                 for i in range(bootstrap_realizations):
                     inds_bootstrap = np.random.randint(low=1, high=len(yield_list), size=bootstrap_realizations)
-
-                    # calculate yield based on data
                     yield_percentile_err_list += [np.percentile(yield_list[inds_bootstrap], percentile)]
-
-                    # calculate yield based on fit to data
-                    # fit_params = scipy.stats.lognorm.fit(yield_list[inds_bootstrap])
-                    # fit_dist = scipy.stats.lognorm(*fit_params)
-                    # yield_percentile_err_list += [fit_dist.ppf(percentile / 100.0)]
+                    min_yield_percentiles_err_list += [np.percentile(min_yield_list[inds_bootstrap], percentile)]
+                    max_drawdown_percentiles_err_list += [np.percentile(max_drawdown_list[inds_bootstrap], percentile)]
 
                 yield_err_low = np.percentile(yield_percentile_err_list, 100 - bootstrap_err_CL)
                 yield_err_low = abs(yield_percentile - yield_err_low)
                 yield_err_high = np.percentile(yield_percentile_err_list, bootstrap_err_CL)
                 yield_err_high = abs(yield_percentile - yield_err_high)
                 yield_err = np.std(yield_percentile_err_list)
-
                 yield_percentiles += [yield_percentile]
                 yield_percentiles_err_low += [yield_err_low]
                 yield_percentiles_err_high += [yield_err_high]
                 yield_percentiles_err += [yield_err]
+
+                min_yield_err_low = np.percentile(min_yield_percentiles_err_list, 100 - bootstrap_err_CL)
+                min_yield_err_low = abs(min_yield_percentile - min_yield_err_low)
+                min_yield_err_high = np.percentile(min_yield_percentiles_err_list, bootstrap_err_CL)
+                min_yield_err_high = abs(min_yield_percentile - min_yield_err_high)
+                min_yield_percentiles += [min_yield_percentile]
+                min_yield_percentiles_err_low += [min_yield_err_low]
+                min_yield_percentiles_err_high += [min_yield_err_high]
+
+                max_drawdown_err_low = np.percentile(max_drawdown_percentiles_err_list, 100 - bootstrap_err_CL)
+                max_drawdown_err_low = abs(max_drawdown_percentile - max_drawdown_err_low)
+                max_drawdown_err_high = np.percentile(max_drawdown_percentiles_err_list, bootstrap_err_CL)
+                max_drawdown_err_high = abs(max_drawdown_percentile - max_drawdown_err_high)
+                max_drawdown_percentiles += [max_drawdown_percentile]
+                max_drawdown_percentiles_err_low += [max_drawdown_err_low]
+                max_drawdown_percentiles_err_high += [max_drawdown_err_high]
 
             # calculate probability to finish with less than the investement (yield<1)
             yield_cut_off = 1
@@ -565,7 +325,8 @@ for ind_set, color in enumerate(color_list):
             p_lose_err_list = []
             for i in range(bootstrap_realizations):
                 inds_bootstrap = np.random.randint(low=1, high=len(yield_list), size=bootstrap_realizations)
-                p_lose_err_list += [len(np.where(yield_list[inds_bootstrap] < yield_cut_off)[0]) / len(yield_list[inds_bootstrap])]
+                p_lose_err_list += [
+                    len(np.where(yield_list[inds_bootstrap] < yield_cut_off)[0]) / len(yield_list[inds_bootstrap])]
             p_lose_err_low = np.percentile(p_lose_err_list, 100 - bootstrap_err_CL)
             p_lose_err_low = abs(p_lose - p_lose_err_low)
             p_lose_err_high = np.percentile(p_lose_err_list, bootstrap_err_CL)
@@ -580,11 +341,11 @@ for ind_set, color in enumerate(color_list):
             else:
                 label_curr = label
 
-
             plt.figure(1)
             plt.scatter(yield_percentiles[0], yield_percentiles[1], color=color)
             text_dist = 0.02
-            plt.annotate(label_annotate, (yield_percentiles[0] + text_dist, yield_percentiles[1] + text_dist), size=10, color=color)
+            plt.annotate(label_annotate, (yield_percentiles[0] + text_dist, yield_percentiles[1] + text_dist), size=10,
+                         color=color)
             plt.errorbar(yield_percentiles[0], yield_percentiles[1],
                          yerr=np.array([[yield_percentiles_err_low[1]], [yield_percentiles_err_high[1]]]),
                          xerr=np.array([[yield_percentiles_err_low[0]], [yield_percentiles_err_high[0]]]),
@@ -595,7 +356,6 @@ for ind_set, color in enumerate(color_list):
             #              xerr=yield_percentiles_err[0],
             #              label=label_curr,
             #              color=color)
-
 
             # plt.figure(2)
             # plt.scatter(yield_percentiles[0], yield_percentiles[2], color=color)
@@ -635,7 +395,32 @@ for ind_set, color in enumerate(color_list):
             #              label=label_curr,
             #              color=color)
 
+
+            plt.figure(6)
+            plt.scatter(min_yield_percentiles[0], yield_percentiles[1], color=color)
+            text_dist = 0.02
+            plt.annotate(label_annotate, (min_yield_percentiles[0] + text_dist, yield_percentiles[1] + text_dist), size=10,
+                         color=color)
+            plt.errorbar(min_yield_percentiles[0], yield_percentiles[1],
+                         yerr=np.array([[yield_percentiles_err_low[1]], [yield_percentiles_err_high[1]]]),
+                         xerr=np.array([[min_yield_percentiles_err_low[0]], [min_yield_percentiles_err_high[0]]]),
+                         label=label_curr,
+                         color=color)
+
+
+            plt.figure(7)
+            plt.scatter(max_drawdown_percentiles[1], yield_percentiles[1], color=color)
+            text_dist = 0.02
+            plt.annotate(label_annotate, (max_drawdown_percentiles[1] + text_dist, yield_percentiles[1] + text_dist), size=10,
+                         color=color)
+            plt.errorbar(max_drawdown_percentiles[1], yield_percentiles[1],
+                         yerr=np.array([[yield_percentiles_err_low[1]], [yield_percentiles_err_high[1]]]),
+                         xerr=np.array([[max_drawdown_percentiles_err_low[1]], [max_drawdown_percentiles_err_high[1]]]),
+                         label=label_curr,
+                         color=color)
+
         except:
+            print('failed ', file_name)
             pass
 
     # joke
@@ -644,13 +429,14 @@ for ind_set, color in enumerate(color_list):
     # plt.scatter(-3, -10, color='k')
     # plt.annotate('BTC', (-3 + text_dist, -10 + text_dist), size=20, color='k')
 
-
     plt.figure(1)
     plt.xlabel('yield ' + str(percentiles[0]) + '% percentile')
     plt.ylabel('yield ' + str(percentiles[1]) + '% percentile')
-    # plt.title('yields')
-    # plt.title('yields after ' + str(synthetic_period_years) + ' years')
-    plt.title('yields after ' + str(synthetic_period_years) + ' years (' + invest_strategy + ' investment)')
+    title = 'yields'
+    title += ' after ' + str(synthetic_period_years) + ' years'
+    title += ' (' + invest_strategy + ' investment)'
+    title += ' ' + tax_scheme
+    plt.title(title)
     plt.grid(True)
     plt.legend()
 
@@ -674,3 +460,25 @@ for ind_set, color in enumerate(color_list):
     # plt.title('yields after ' + str(synthetic_period_years) + ' years (' + invest_strategy + ' investment)')
     # plt.grid(True)
     # plt.legend()
+
+    plt.figure(6)
+    plt.xlabel('minimum yield ' + str(percentiles[0]) + '% percentile')
+    plt.ylabel('yield ' + str(percentiles[1]) + '% percentile')
+    title = 'yields'
+    title += ' after ' + str(synthetic_period_years) + ' years'
+    title += ' (' + invest_strategy + ' investment)'
+    title += ' ' + tax_scheme
+    plt.title(title)
+    plt.grid(True)
+    plt.legend()
+
+    plt.figure(7)
+    plt.xlabel('maximum drawdown ' + str(percentiles[1]) + '% percentile')
+    plt.ylabel('yield ' + str(percentiles[1]) + '% percentile')
+    title = 'yields'
+    title += ' after ' + str(synthetic_period_years) + ' years'
+    title += ' (' + invest_strategy + ' investment)'
+    title += ' ' + tax_scheme
+    plt.title(title)
+    plt.grid(True)
+    plt.legend()

@@ -124,6 +124,9 @@ for stock1, stock2, margin_lev in zip(stock1_list, stock2_list, margin_lev_list)
         # settings['periodic_investment'] = 1
 
         settings['capital_gains_tax_percents'] = 0
+        # settings['capital_gains_tax_percents'] = 25
+        # settings['total_sell_capital_gains_tax_percents'] = 0
+        settings['total_sell_capital_gains_tax_percents'] = 25
 
         # settings['num_correlation_days'] = 1
 
@@ -141,7 +144,7 @@ for stock1, stock2, margin_lev in zip(stock1_list, stock2_list, margin_lev_list)
             save_dir += '_tax_' + settings['tax_scheme']
         if settings['capital_gains_tax_percents'] == 0:
             save_dir += '_no_tax'
-        if settings['rebalance_percent_deviation'] != 10:
+        if settings['rebalance_percent_deviation'] != 20:
             save_dir += '_rebalance_percent_' + str(settings['rebalance_percent_deviation'])
         save_dir += '/'
         save_dir = main_folder + '/' + save_dir
