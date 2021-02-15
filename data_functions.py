@@ -83,7 +83,13 @@ def define_stock_parameters():
     underlying_index['UPRO'] = 'SP500TR'
     dividend_yield['UPRO'] = 0
 
-    # fictitious P500 X4 etf
+    # fictitious SP500 X2.5 etf
+    expense_ratios['VOO2.5'] = 1.0
+    leverage_factors['VOO2.5'] = 2.5
+    underlying_index['VOO2.5'] = 'SP500TR'
+    dividend_yield['VOO2.5'] = 0
+
+    # fictitious SP500 X4 etf
     expense_ratios['VOO4'] = 1.0
     leverage_factors['VOO4'] = 4.0
     underlying_index['VOO4'] = 'SP500TR'
@@ -106,6 +112,12 @@ def define_stock_parameters():
     leverage_factors['TQQQ'] = 3.0
     underlying_index['TQQQ'] = 'NDX100TR'
     dividend_yield['TQQQ'] = 0
+
+    # fictitious NDX100 X2.5 etf
+    expense_ratios['QQQ2.5'] = 1.0
+    leverage_factors['QQQ2.5'] = 2.5
+    underlying_index['QQQ2.5'] = 'NDX100TR'
+    dividend_yield['QQQ2.5'] = 0
 
     # fictitious NDX100 X4 etf
     expense_ratios['QQQ4'] = 1.0
@@ -130,6 +142,11 @@ def define_stock_parameters():
     leverage_factors['VUSTX2'] = 2.0
     underlying_index['VUSTX2'] = 'VUSTX-TR'
     dividend_yield['VUSTX2'] = 0
+
+    expense_ratios['VUSTX2.5'] = 1.0
+    leverage_factors['VUSTX2.5'] = 2.5
+    underlying_index['VUSTX2.5'] = 'VUSTX-TR'
+    dividend_yield['VUSTX2.5'] = 0
 
     expense_ratios['VUSTX3'] = 1.0
     leverage_factors['VUSTX3'] = 3.0

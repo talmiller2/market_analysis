@@ -48,8 +48,8 @@ date_end = '2020-09-30'
 # num_realizations = 100
 # num_realizations = 200
 # num_realizations = 500
-num_realizations = 1000
-# num_realizations = 2000
+# num_realizations = 1000
+num_realizations = 2000
 # num_realizations = 5000
 
 # frac_list = np.linspace(0, 1, 20)
@@ -82,19 +82,26 @@ margin_lev_list = []
 # stock2_list += [   'VOO',    'SSO',   'UPRO',    'QQQ',    'QLD',   'TQQQ']
 
 
-stock1_list += ['VUSTX', 'VUSTX2', 'VUSTX3', 'VUSTX4']
-stock2_list += [  'VOO',    'SSO',   'UPRO',   'VOO4']
+# stock1_list += ['VUSTX', 'VUSTX2', 'VUSTX3', 'VUSTX4']
+# stock2_list += [  'VOO',    'SSO',   'UPRO',   'VOO4']
+# margin_lev_list += [1, 1, 1, 1]
+# stock1_list += ['VUSTX', 'VUSTX2', 'VUSTX3', 'VUSTX4']
+# stock2_list += [  'QQQ',    'QLD',   'TQQQ',   'QQQ4']
+# margin_lev_list += [1, 1, 1, 1]
+stock1_list += ['VUSTX', 'VUSTX2.5', 'VUSTX2', 'VUSTX3', 'VUSTX4']
+stock2_list += [  'VOO',   'VOO2.5',    'SSO',   'UPRO',   'VOO4']
 margin_lev_list += [1, 1, 1, 1]
-stock1_list += ['VUSTX', 'VUSTX2', 'VUSTX3', 'VUSTX4']
-stock2_list += [  'QQQ',    'QLD',   'TQQQ',   'QQQ4']
+stock1_list += ['VUSTX', 'VUSTX2.5', 'VUSTX2', 'VUSTX3', 'VUSTX4']
+stock2_list += [  'QQQ',   'QQQ2.5',    'QLD',   'TQQQ',   'QQQ4']
 margin_lev_list += [1, 1, 1, 1]
+
 stock1_list += ['VUSTX' for _ in range(3)]
 stock2_list += ['VOO' for _ in range(3)]
 margin_lev_list += [2, 3, 4]
+
 stock1_list += ['VUSTX' for _ in range(3)]
 stock2_list += ['QQQ' for _ in range(3)]
 margin_lev_list += [2, 3, 4]
-
 
 total_number_of_runs = len(frac_list) * len(stock1_list)
 cnt = 0
@@ -114,6 +121,8 @@ for stock1, stock2, margin_lev in zip(stock1_list, stock2_list, margin_lev_list)
         settings['tax_scheme'] = 'optimized'
         # settings['tax_scheme'] = 'FIFO'
         # settings['tax_scheme'] = 'LIFO'
+        # settings['tax_scheme'] = 'none'
+        # settings['tax_scheme'] = 'none_expect_end'
 
         settings['perform_bootstrap'] = True
 
@@ -123,10 +132,15 @@ for stock1, stock2, margin_lev in zip(stock1_list, stock2_list, margin_lev_list)
         # settings['initial_investment'] = 10
         # settings['periodic_investment'] = 1
 
-        settings['capital_gains_tax_percents'] = 0
-        # settings['capital_gains_tax_percents'] = 25
-        # settings['total_sell_capital_gains_tax_percents'] = 0
-        settings['total_sell_capital_gains_tax_percents'] = 25
+        if settings['tax_scheme'] == 'none':
+            settings['capital_gains_tax_percents'] = 0
+            settings['total_sell_capital_gains_tax_percents'] = 0
+        elif settings['tax_scheme'] == 'none_expect_end':
+            settings['capital_gains_tax_percents'] = 0
+            settings['total_sell_capital_gains_tax_percents'] = 25
+        else:
+            settings['capital_gains_tax_percents'] = 25
+            settings['total_sell_capital_gains_tax_percents'] = 25
 
         # settings['num_correlation_days'] = 1
 
@@ -140,10 +154,7 @@ for stock1, stock2, margin_lev in zip(stock1_list, stock2_list, margin_lev_list)
         save_dir += '_cd_' + str(settings['num_correlation_days'])
         save_dir += '_date_start_' + settings['date_start']
         save_dir += '_end_' + settings['date_end']
-        if settings['tax_scheme'] != 'optimized':
-            save_dir += '_tax_' + settings['tax_scheme']
-        if settings['capital_gains_tax_percents'] == 0:
-            save_dir += '_no_tax'
+        save_dir += '_tax_' + settings['tax_scheme']
         if settings['rebalance_percent_deviation'] != 20:
             save_dir += '_rebalance_percent_' + str(settings['rebalance_percent_deviation'])
         save_dir += '/'
