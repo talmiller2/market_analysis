@@ -39,6 +39,7 @@ def simulate_portfolio_evolution(settings):
                 data = rebalance_portfolio(settings, data, ind_date)
 
             # TODO: tesing if doing a re-calculation of fraction here, fixes the tax bug
+            #  it appear it didnt work...
             data = calculate_portfolio_fractions(settings, data, ind_date)
 
             # check if tax criterion reached (end of year), sell some to withdraw for tax
@@ -530,6 +531,12 @@ def sell_papers_for_tax(settings, data, ind_date):
 
             # check tax was fully paid for this stock type
             if stock_amount_left_to_sell != 0:
+                print('PROBLEM')
+                print('total_to_sell:', total_to_sell)
+                for stock_name in ideal_portfolio_fractions.keys():
+                    print('stock_name:', stock_name)
+                    print('ideal_portfolio_fraction:', ideal_portfolio_fractions[stock_name])
+                    print('portfolio_fraction:', data['portfolio_fractions'][stock_name][ind_date])
                 raise ValueError('stock_amount_left_to_sell should be zero at this point for stock_name: '
                                  + str(stock_name) + ', but it equals ' + str(stock_amount_left_to_sell))
             # TODO: sometimes this breaks, must fix.

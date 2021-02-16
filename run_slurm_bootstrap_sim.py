@@ -95,16 +95,16 @@ stock1_list += ['VUSTX', 'VUSTX2.5', 'VUSTX2', 'VUSTX3', 'VUSTX4']
 stock2_list += [  'QQQ',   'QQQ2.5',    'QLD',   'TQQQ',   'QQQ4']
 margin_lev_list += [1, 1, 1, 1, 1]
 
-stock1_list += ['VUSTX' for _ in range(3)]
-stock2_list += ['VOO' for _ in range(3)]
-margin_lev_list += [2, 3, 4]
+stock1_list += ['VUSTX' for _ in range(4)]
+stock2_list += ['VOO' for _ in range(4)]
+margin_lev_list += [1.5, 2, 3, 4]
 stock1_list += ['VUSTX2']
 stock2_list += ['SSO']
 margin_lev_list += [1.5]
 
-stock1_list += ['VUSTX' for _ in range(3)]
-stock2_list += ['QQQ' for _ in range(3)]
-margin_lev_list += [2, 3, 4]
+stock1_list += ['VUSTX' for _ in range(4)]
+stock2_list += ['QQQ' for _ in range(4)]
+margin_lev_list += [1.5, 2, 3, 4]
 stock1_list += ['VUSTX2']
 stock2_list += ['QLD']
 margin_lev_list += [1.5]
@@ -150,9 +150,9 @@ for stock1, stock2, margin_lev in zip(stock1_list, stock2_list, margin_lev_list)
 
         # save the result to plot later
         save_dir = ''
-        save_dir += 'investment_initial_' + str(settings['initial_investment'])
-        save_dir += '_periodic_' + str(settings['periodic_investment']) + '/'
-        save_dir += 'period_' + str(settings['synthetic_period_years'])
+        save_dir += 'investment_ini_' + str(settings['initial_investment'])
+        save_dir += '_periodic_' + str(settings['periodic_investment'])
+        save_dir += '_total_time_' + str(settings['synthetic_period_years'])
         save_dir += '_cd_' + str(settings['num_correlation_days'])
         save_dir += '_date_start_' + settings['date_start']
         save_dir += '_end_' + settings['date_end']

@@ -125,10 +125,10 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'SSO': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.5, 'UPRO': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'QQQ': 0.5}
-    # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'QLD': 0.5}
+    settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'QLD': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.6, 'QLD': 0.4}
     # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.5, 'TQQQ': 0.5}
-    settings['ideal_portfolio_fractions'] = {'VUSTX4': 0.5, 'QQQ4': 0.5}
+    # settings['ideal_portfolio_fractions'] = {'VUSTX4': 0.5, 'QQQ4': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX4': 0.6, 'QQQ4': 0.4}
     # settings['periodic_investment_interval'] = 'yearly'
     # settings['periodic_investment_interval'] = 'quarterly'
@@ -145,10 +145,15 @@ if plot_sim:
     label1 = 'sim: ' + str(settings['ideal_portfolio_fractions'])
 
     settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'QQQ': 0.5}
+    # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'QLD': 0.5}
+    # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.5, 'TQQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.6, 'QQQ': 0.4}
+    # settings['margin_leverage_target'] = 1.0
+    # settings['margin_leverage_target'] = 1.5
+    settings['margin_leverage_target'] = 1.65
     # settings['margin_leverage_target'] = 2.0
     # settings['margin_leverage_target'] = 3.0
-    settings['margin_leverage_target'] = 4.0
+    # settings['margin_leverage_target'] = 4.0
     # settings['margin_leverage_percent_deviation'] = 10.0
     settings['margin_leverage_percent_deviation'] = 20.0
     # settings['margin_leverage_percent_deviation'] = 40.0
