@@ -77,14 +77,18 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'UPRO': 0.5, 'TMF': 0.5}
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 0.5, 'TMF': 0.5}
     settings['ideal_portfolio_fractions'] = {'TQQQ': 0.5, 'VUSTX3': 0.5}
+    # settings['ideal_portfolio_fractions'] = {'QLD': 0.25, 'TQQQ': 0.25, 'VUSTX2': 0.25, 'VUSTX3': 0.25}
     # settings['periodic_investment_interval'] = 'yearly'
     # settings['periodic_investment_interval'] = 'quarterly'
+    # settings['initial_investment'] = 10
+    # settings['periodic_investment'] = 1
     # settings['capital_gains_tax_percents'] = 0
     # settings['capital_gains_tax_percents'] = 5
     # settings['transaction_fee_percents'] = 0
     # settings['tax_scheme'] = 'FIFO'
     # settings['tax_scheme'] = 'LIFO'
     settings['tax_scheme'] = 'optimized'
+    # settings['tax_scheme'] = 'none'
     settings['perform_bootstrap'] = True
     data = simulate_portfolio_evolution(settings)
 
@@ -94,7 +98,9 @@ if plot_sim:
     label = 'sim tax ' + settings['tax_scheme'] + ' (total sell tax loss ' + '{:0.2f}'.format(data['total_sell_tax_loss_percents']) + '%)'
     # plt.plot(data['total_portfolio_value'], label=label, linewidth=2)
     # plt.plot(data['total_portfolio_value'], label=label, linewidth=2, color='k', zorder=1)
-    plt.plot(data['total_portfolio_value'] / data['total_investment'], label=label, linewidth=2, color='k', zorder=1)
+    color = None
+    # color = 'r'
+    plt.plot(data['total_portfolio_value'] / data['total_investment'], label=label, linewidth=2, color=color, zorder=1)
     # plt.scatter(data['papers_buy_days'], data['portfolio_values_at_buy_days'], s=2, color=data['papers_status_colors'], zorder=2)
     # plt.plot(data['total_portfolio_value'] + data['cash_in_account'], label=label + ' + divs not reinvested', linewidth=2)
     # plt.plot(data['cash_in_account'], label='cash_in_account', linewidth=2)

@@ -50,7 +50,7 @@ year2 = 2003
 # tax_scheme = 'optimized'
 # tax_scheme = 'LIFO'
 # tax_scheme = 'FIFO'
-tax_scheme = 'no_tax'
+tax_scheme = 'none'
 
 # index_base = 'NDX100'
 index_base = 'SP500'
@@ -192,12 +192,7 @@ for ind_set, color in enumerate(color_list):
     save_dir += '_cd_' + str(correlation_days)
     save_dir += '_date_start_' + date_start
     save_dir += '_end_' + date_end
-    if tax_scheme == 'no_tax':
-        save_dir += '_no_tax'
-    elif tax_scheme == 'FIFO':
-        save_dir += '_tax_FIFO'
-    elif tax_scheme == 'LIFO':
-        save_dir += '_tax_LIFO'
+    save_dir += '_tax_' + tax_scheme
     if rebalance_percent != 20:
         save_dir += '_rebalance_percent_' + str(rebalance_percent)
     save_dir += '/'
@@ -244,12 +239,15 @@ for ind_set, color in enumerate(color_list):
             # [yield_list, yield_min_list, max_drawdown_list] = np.loadtxt(save_dir + file_name, usecols=[0, 1, 2])
             # results_mat = np.array([yield_list, yield_min_list, max_drawdown_list]).T
             yield_list = results_mat[:, 0]
-            min_yield_list = results_mat[:, 1]
-            max_drawdown_list = results_mat[:, 2]
+            yield_tax_free_list = results_mat[:, 1]
+            # yield_tax_free_list = yield_list
+            min_yield_list = results_mat[:, 2]
+            max_drawdown_list = results_mat[:, 3]
 
             # calculate numeric percentiles
             # percentiles = [10, 50, 95]
-            percentiles = [5, 50, 95]
+            # percentiles = [5, 50, 95]
+            percentiles = [5, 50]
             # percentiles = [1, 50, 95]
 
             yield_percentiles = []
@@ -282,7 +280,8 @@ for ind_set, color in enumerate(color_list):
                 bootstrap_realizations = 300
                 # bootstrap_realizations = 1000
                 # bootstrap_err_CL = 95
-                bootstrap_err_CL = 68
+                bootstrap_err_CL = 90
+                # bootstrap_err_CL = 68
                 yield_percentile_err_list = []
                 min_yield_percentiles_err_list = []
                 max_drawdown_percentiles_err_list = []

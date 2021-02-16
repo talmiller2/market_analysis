@@ -98,10 +98,16 @@ margin_lev_list += [1, 1, 1, 1, 1]
 stock1_list += ['VUSTX' for _ in range(3)]
 stock2_list += ['VOO' for _ in range(3)]
 margin_lev_list += [2, 3, 4]
+stock1_list += ['VUSTX2']
+stock2_list += ['SSO']
+margin_lev_list += [1.5]
 
 stock1_list += ['VUSTX' for _ in range(3)]
 stock2_list += ['QQQ' for _ in range(3)]
 margin_lev_list += [2, 3, 4]
+stock1_list += ['VUSTX2']
+stock2_list += ['QLD']
+margin_lev_list += [1.5]
 
 total_number_of_runs = len(frac_list) * len(stock1_list)
 cnt = 0
@@ -122,7 +128,7 @@ for stock1, stock2, margin_lev in zip(stock1_list, stock2_list, margin_lev_list)
         # settings['tax_scheme'] = 'FIFO'
         # settings['tax_scheme'] = 'LIFO'
         # settings['tax_scheme'] = 'none'
-        # settings['tax_scheme'] = 'none_expect_end'
+        # settings['tax_scheme'] = 'none_except_end'
 
         settings['perform_bootstrap'] = True
 
@@ -132,15 +138,11 @@ for stock1, stock2, margin_lev in zip(stock1_list, stock2_list, margin_lev_list)
         # settings['initial_investment'] = 10
         # settings['periodic_investment'] = 1
 
+        settings['total_sell_capital_gains_tax_percents'] = 25
         if settings['tax_scheme'] == 'none':
             settings['capital_gains_tax_percents'] = 0
-            settings['total_sell_capital_gains_tax_percents'] = 0
-        elif settings['tax_scheme'] == 'none_expect_end':
-            settings['capital_gains_tax_percents'] = 0
-            settings['total_sell_capital_gains_tax_percents'] = 25
         else:
             settings['capital_gains_tax_percents'] = 25
-            settings['total_sell_capital_gains_tax_percents'] = 25
 
         # settings['num_correlation_days'] = 1
 

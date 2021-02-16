@@ -38,6 +38,9 @@ def simulate_portfolio_evolution(settings):
             if check_rebalancing_criterion_reached(settings, data, ind_date):
                 data = rebalance_portfolio(settings, data, ind_date)
 
+            # TODO: tesing if doing a re-calculation of fraction here, fixes the tax bug
+            data = calculate_portfolio_fractions(settings, data, ind_date)
+
             # check if tax criterion reached (end of year), sell some to withdraw for tax
             # save cumulative amount of paid tax
             if check_tax_criterion_reached(settings, data):
@@ -529,6 +532,7 @@ def sell_papers_for_tax(settings, data, ind_date):
             if stock_amount_left_to_sell != 0:
                 raise ValueError('stock_amount_left_to_sell should be zero at this point for stock_name: '
                                  + str(stock_name) + ', but it equals ' + str(stock_amount_left_to_sell))
+            # TODO: sometimes this breaks, must fix.
 
         data['papers_dict'] = papers_dict
 
@@ -550,7 +554,7 @@ def sort_papers_by_tax_scheme(settings, data, stock_name):
     elif settings['tax_scheme'] == 'LIFO':
         # future to past
         indices_papers = [i for i in range(len(papers))][::-1]
-    elif settings['tax_scheme'] == 'optimized':
+    elif settings['tax_scheme'] in ['optimized', 'none']:
         # order the papers from least to most profitable at current date
         paper_profits = []
         for paper in papers:
