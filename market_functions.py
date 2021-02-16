@@ -532,6 +532,8 @@ def sell_papers_for_tax(settings, data, ind_date):
             # check tax was fully paid for this stock type
             if stock_amount_left_to_sell != 0:
                 print('PROBLEM')
+                print('ind_date:', ind_date)
+                print('total_portfolio_value:', data['total_portfolio_value'][ind_date])
                 print('total_to_sell:', total_to_sell)
                 for stock_name in ideal_portfolio_fractions.keys():
                     print('stock_name:', stock_name)
