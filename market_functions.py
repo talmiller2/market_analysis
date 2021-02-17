@@ -40,11 +40,16 @@ def simulate_portfolio_evolution(settings):
 
             # TODO: tesing if doing a re-calculation of fraction here, fixes the tax bug
             #  it appear it didnt work...
-            data = calculate_portfolio_fractions(settings, data, ind_date)
+            # data = calculate_portfolio_fractions(settings, data, ind_date)
 
             # check if tax criterion reached (end of year), sell some to withdraw for tax
             # save cumulative amount of paid tax
             if check_tax_criterion_reached(settings, data):
+
+                # TODO: try doing an extra rebalancing before taxes
+                data = rebalance_portfolio(settings, data, ind_date)
+                data = calculate_portfolio_fractions(settings, data, ind_date)
+
                 data = sell_papers_for_tax(settings, data, ind_date)
 
     # track the open/closed papers for visualization
@@ -347,9 +352,14 @@ def check_rebalancing_criterion_reached(settings, data, ind_date):
         portfolio_fractions = data['portfolio_fractions']
         stock_names = portfolio_fractions.keys()
         for stock_name in stock_names:
-            frac = ideal_portfolio_fractions[stock_name]
-            frac_curr = portfolio_fractions[stock_name][ind_date]
-            if abs(frac_curr - frac) > deviation_frac:
+            # TODO: del if equivalent
+            # frac = ideal_portfolio_fractions[stock_name]
+            # frac_curr = portfolio_fractions[stock_name][ind_date]
+            # if abs(frac_curr - frac) > deviation_frac:
+            #     return True
+            stock_percent_ideal = ideal_portfolio_fractions[stock_name] * 100.0
+            stock_percent_curr = portfolio_fractions[stock_name][ind_date] * 100.0
+            if abs(stock_percent_ideal - stock_percent_curr) > settings['rebalance_percent_deviation']:
                 return True
 
     if settings['margin_leverage_target'] > 1:

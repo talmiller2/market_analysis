@@ -29,6 +29,9 @@ yield_list = []
 yield_tax_free_list = []
 yield_min_list = []
 max_drawdown_list = []
+monthly_buy_days_list = []
+monthly_sell_days_list = []
+
 for ind_real in range(bootstrap_params['num_realizations']):
     data = simulate_portfolio_evolution(settings)
     label = 'real ' + str(ind_real) + ', yield=' + '{:0.2f}'.format(data['total_yield'])
@@ -38,8 +41,11 @@ for ind_real in range(bootstrap_params['num_realizations']):
     yield_tax_free_list += [data['total_yield_tax_free']]
     yield_min_list += [data['yield_min']]
     max_drawdown_list += [data['max_drawdown']]
+    monthly_buy_days_list += [data['average_monthly_buy_days']]
+    monthly_sell_days_list += [data['average_monthly_sell_days']]
 
-results_mat = np.array([yield_list, yield_tax_free_list, yield_min_list, max_drawdown_list]).T
+results_mat = np.array([yield_list, yield_tax_free_list, yield_min_list, max_drawdown_list,
+                        monthly_buy_days_list, monthly_sell_days_list]).T
 
 # save results to file
 save_file_path = bootstrap_params['save_dir'] + '/' + bootstrap_params['sim_name'] + '.txt'
