@@ -47,8 +47,8 @@ def simulate_portfolio_evolution(settings):
             if check_tax_criterion_reached(settings, data):
 
                 # TODO: try doing an extra rebalancing before taxes
-                data = rebalance_portfolio(settings, data, ind_date)
-                data = calculate_portfolio_fractions(settings, data, ind_date)
+                # data = rebalance_portfolio(settings, data, ind_date)
+                # data = calculate_portfolio_fractions(settings, data, ind_date)
 
                 data = sell_papers_for_tax(settings, data, ind_date)
 
@@ -492,11 +492,12 @@ def sell_papers_for_tax(settings, data, ind_date):
         data['number_of_sell_days'] += 1
 
         # total amount of tax to be paid for this year's gains
-        tax_to_pay = data['yearly_gains'] * settings['capital_gains_tax_percents'] / 100.0
-        total_to_sell = tax_to_pay
+        # tax_to_pay = data['yearly_gains'] * settings['capital_gains_tax_percents'] / 100.0
+        # total_to_sell = tax_to_pay
 
         # globally take the transaction fees into account by effectively increasing the amount that needs to be sold
-        total_to_sell /= (1 - settings['transaction_fee_percents'] / 100.0)
+        yearly_gains = data['yearly_gains'] / (1 - settings['transaction_fee_percents'] / 100.0)
+        cgt = settings['capital_gains_tax_percents'] / 100.0
 
         papers_dict = data['papers_dict']
         ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
@@ -504,7 +505,8 @@ def sell_papers_for_tax(settings, data, ind_date):
         for stock_name in stock_names:
 
             # amount of specific stock to be sold uses the current fractions, so there is enough stock to sell from each type
-            stock_amount_left_to_sell = total_to_sell * data['portfolio_fractions'][stock_name][ind_date]
+            # stock_amount_left_to_sell = total_to_sell * data['portfolio_fractions'][stock_name][ind_date]
+            G = yearly_gains * data['portfolio_fractions'][stock_name][ind_date]
 
             # sort the papers in the order dictated by tax scheme
             papers = papers_dict[stock_name]
@@ -516,47 +518,89 @@ def sell_papers_for_tax(settings, data, ind_date):
                 paper = papers[ind_paper]
                 if papers[ind_paper]['status'] == 'open':
 
-                    # sell papers for tax, but it the current paper is profitable, then tax must be paid for it as well.
-                    paper_profit = paper['value_current'] - paper['value_at_buy']
+                    # sell papers for tax, but if the current paper is profitable, then tax must be paid for it as well.
+                    V = paper['value_current']
+                    P = paper['value_current'] - paper['value_at_buy']
+                    G_transition = P * (1 - cgt) / cgt
 
-                    if paper_profit > 0:
-                        stock_amount_left_to_sell_with_tax = stock_amount_left_to_sell \
-                                                             / (1 - settings['capital_gains_tax_percents'] / 100.0)
-                        paper_additional_tax = paper_profit * settings['capital_gains_tax_percents'] / 100.0
+                    if G <= G_transition:
+                        delta_T = G * cgt / (1 - cgt)
                     else:
-                        stock_amount_left_to_sell_with_tax = stock_amount_left_to_sell
-                        paper_additional_tax = 0
+                        delta_T = (G + P) * cgt
 
-                    if paper['value_current'] >= stock_amount_left_to_sell_with_tax:
-                        papers[ind_paper]['value_current'] -= stock_amount_left_to_sell_with_tax
-                        stock_amount_left_to_sell = 0
+
+                    if V > delta_T:
+                        # the paper has enough value to cover the yearly gains
+                        G = 0
+                        papers[ind_paper]['value_current'] -= delta_T
                         break
                     else:
-                        stock_amount_left_to_sell -= paper['value_current']
-                        stock_amount_left_to_sell += paper_additional_tax
+                        # this paper does not have enough, so we fully sell it and continue to the next one
+                        G -= V + P
                         papers[ind_paper]['value_current'] = 0
                         papers[ind_paper]['status'] = 'closed'
+
+
+                    # if paper_profit > 0:
+                    #     stock_amount_left_to_sell_with_tax = stock_amount_left_to_sell \
+                    #                                          / (1 - settings['capital_gains_tax_percents'] / 100.0)
+                    #     paper_additional_tax = paper_profit * settings['capital_gains_tax_percents'] / 100.0
+                    # else:
+                    #     stock_amount_left_to_sell_with_tax = stock_amount_left_to_sell
+                    #     paper_additional_tax = 0
+                    #
+                    # if paper['value_current'] >= stock_amount_left_to_sell_with_tax:
+                    #     papers[ind_paper]['value_current'] -= stock_amount_left_to_sell_with_tax
+                    #     stock_amount_left_to_sell = 0
+                    #     break
+                    # else:
+                    #     stock_amount_left_to_sell -= paper['value_current']
+                    #     stock_amount_left_to_sell += paper_additional_tax
+                    #     papers[ind_paper]['value_current'] = 0
+                    #     papers[ind_paper]['status'] = 'closed'
+
+                    # if P > 0:
+                    #     paper_additional_tax = P * settings['capital_gains_tax_percents'] / 100.0
+                    # else:
+                    #     paper_additional_tax = 0
+                    #
+                    #
+                    # if paper['value_current'] >= stock_amount_left_to_sell_with_tax:
+                    #     papers[ind_paper]['value_current'] -= stock_amount_left_to_sell_with_tax
+                    #     stock_amount_left_to_sell = 0
+                    #     break
+                    # else:
+                    #     stock_amount_left_to_sell -= paper['value_current']
+                    #     stock_amount_left_to_sell += paper_additional_tax
+                    #     papers[ind_paper]['value_current'] = 0
+                    #     papers[ind_paper]['status'] = 'closed'
+
 
             papers_dict[stock_name] = papers
 
             # check tax was fully paid for this stock type
-            if stock_amount_left_to_sell != 0:
+            # if stock_amount_left_to_sell != 0:
+            if G != 0:
                 print('PROBLEM')
                 print('ind_date:', ind_date)
                 print('total_portfolio_value:', data['total_portfolio_value'][ind_date])
-                print('total_to_sell:', total_to_sell)
+                print('G:', G)
                 for stock_name in ideal_portfolio_fractions.keys():
                     print('stock_name:', stock_name)
                     print('ideal_portfolio_fraction:', ideal_portfolio_fractions[stock_name])
                     print('portfolio_fraction:', data['portfolio_fractions'][stock_name][ind_date])
-                raise ValueError('stock_amount_left_to_sell should be zero at this point for stock_name: '
-                                 + str(stock_name) + ', but it equals ' + str(stock_amount_left_to_sell))
+                raise ValueError('G should be zero at this point for stock_name: '
+                                 + str(stock_name) + ', but it equals ' + str(G))
             # TODO: sometimes this breaks, must fix.
 
         data['papers_dict'] = papers_dict
 
+        # data['total_portfolio_value'][ind_date] -= total_to_sell
+
+        # recalculate the portfolio value and fractions
+        data = calculate_portfolio_fractions(settings, data, ind_date)
+
         # reset margin debt and cash for next year
-        data['total_portfolio_value'][ind_date] -= total_to_sell
         data = calculate_margin_state(settings, data, ind_date)
 
     # tax year over, reset for next year
