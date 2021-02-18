@@ -33,6 +33,7 @@ monthly_buy_days_list = []
 monthly_sell_days_list = []
 
 for ind_real in range(bootstrap_params['num_realizations']):
+    settings['seed'] = np.random.randint(1e6) + ind_real
     data = simulate_portfolio_evolution(settings)
     label = 'real ' + str(ind_real) + ', yield=' + '{:0.2f}'.format(data['total_yield'])
     print(label, file=log_file)

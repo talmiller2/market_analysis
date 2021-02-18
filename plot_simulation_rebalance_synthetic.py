@@ -83,13 +83,13 @@ if plot_sim:
     # settings['periodic_investment_interval'] = 'quarterly'
     # settings['initial_investment'] = 10
     # settings['periodic_investment'] = 1
-    settings['capital_gains_tax_percents'] = 0
+    # settings['capital_gains_tax_percents'] = 0
     # settings['capital_gains_tax_percents'] = 5
     # settings['transaction_fee_percents'] = 0
     # settings['tax_scheme'] = 'FIFO'
     # settings['tax_scheme'] = 'LIFO'
-    settings['tax_scheme'] = 'optimized'
-    # settings['tax_scheme'] = 'none'
+    # settings['tax_scheme'] = 'optimized'
+    settings['tax_scheme'] = 'none'
     # settings['rebalance_percent_deviation'] = 30
     # settings['rebalance_percent_deviation'] = 1
     settings['generate_synthetic_realization'] = True

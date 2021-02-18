@@ -39,17 +39,9 @@ def simulate_portfolio_evolution(settings):
             if check_rebalancing_criterion_reached(settings, data, ind_date):
                 data = rebalance_portfolio(settings, data, ind_date)
 
-            # TODO: tesing if doing a re-calculation of fraction here, fixes the tax bug
-            #  it appear it didnt work...
-            # data = calculate_portfolio_fractions(settings, data, ind_date)
-
             # check if tax criterion reached (end of year), sell some to withdraw for tax
             # save cumulative amount of paid tax
             if check_tax_criterion_reached(settings, data):
-                # TODO: try doing an extra rebalancing before taxes
-                # data = rebalance_portfolio(settings, data, ind_date)
-                # data = calculate_portfolio_fractions(settings, data, ind_date)
-
                 data = sell_papers_for_tax(settings, data, ind_date)
 
     # track the open/closed papers for visualization
@@ -350,16 +342,10 @@ def check_rebalancing_criterion_reached(settings, data, ind_date):
         raise ValueError('invalid rebalance_criterion: ' + str(settings['rebalance_criterion']))
 
     if settings['rebalance_criterion'] == 'percent_deviation':
-        deviation_frac = settings['rebalance_percent_deviation'] / 100.0
         ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
         portfolio_fractions = data['portfolio_fractions']
         stock_names = portfolio_fractions.keys()
         for stock_name in stock_names:
-            # TODO: del if equivalent
-            # frac = ideal_portfolio_fractions[stock_name]
-            # frac_curr = portfolio_fractions[stock_name][ind_date]
-            # if abs(frac_curr - frac) > deviation_frac:
-            #     return True
             stock_percent_ideal = ideal_portfolio_fractions[stock_name] * 100.0
             stock_percent_curr = portfolio_fractions[stock_name][ind_date] * 100.0
             if abs(stock_percent_ideal - stock_percent_curr) > settings['rebalance_percent_deviation']:
@@ -432,10 +418,6 @@ def rebalance_portfolio(settings, data, ind_date):
                     paper_profit = paper['value_current'] - paper['value_at_buy']
                     if paper_profit < 0: paper_profit = 0
 
-                    # TODO: incorrect: only a portion of this will count as yearly gains
-                    # if paper_profit > 0:
-                    #     data['yearly_gains'] += paper_profit
-
                     if paper['value_current'] >= amount_left_to_sell:
                         data['yearly_gains'] += min(paper_profit, amount_left_to_sell)
                         papers[ind_paper]['value_current'] -= amount_left_to_sell
@@ -500,10 +482,6 @@ def sell_papers_for_tax(settings, data, ind_date):
     if data['yearly_gains'] > 0:
         data['number_of_sell_days'] += 1
 
-        # total amount of tax to be paid for this year's gains
-        # tax_to_pay = data['yearly_gains'] * settings['capital_gains_tax_percents'] / 100.0
-        # total_to_sell = tax_to_pay
-
         # globally take the transaction fees into account by effectively increasing the amount that needs to be sold
         yearly_gains = data['yearly_gains'] / (1 - settings['transaction_fee_percents'] / 100.0)
         cgt = settings['capital_gains_tax_percents'] / 100.0
@@ -513,8 +491,7 @@ def sell_papers_for_tax(settings, data, ind_date):
         stock_names = ideal_portfolio_fractions.keys()
         for stock_name in stock_names:
 
-            # amount of specific stock to be sold uses the current fractions, so there is enough stock to sell from each type
-            # stock_amount_left_to_sell = total_to_sell * data['portfolio_fractions'][stock_name][ind_date]
+            # splitting the tax to pay between the different stock types, for simplicity
             G = yearly_gains * data['portfolio_fractions'][stock_name][ind_date]
 
             # sort the papers in the order dictated by tax scheme
@@ -550,62 +527,21 @@ def sell_papers_for_tax(settings, data, ind_date):
                         papers[ind_paper]['value_current'] = 0
                         papers[ind_paper]['status'] = 'closed'
 
-                    # if paper_profit > 0:
-                    #     stock_amount_left_to_sell_with_tax = stock_amount_left_to_sell \
-                    #                                          / (1 - settings['capital_gains_tax_percents'] / 100.0)
-                    #     paper_additional_tax = paper_profit * settings['capital_gains_tax_percents'] / 100.0
-                    # else:
-                    #     stock_amount_left_to_sell_with_tax = stock_amount_left_to_sell
-                    #     paper_additional_tax = 0
-                    #
-                    # if paper['value_current'] >= stock_amount_left_to_sell_with_tax:
-                    #     papers[ind_paper]['value_current'] -= stock_amount_left_to_sell_with_tax
-                    #     stock_amount_left_to_sell = 0
-                    #     break
-                    # else:
-                    #     stock_amount_left_to_sell -= paper['value_current']
-                    #     stock_amount_left_to_sell += paper_additional_tax
-                    #     papers[ind_paper]['value_current'] = 0
-                    #     papers[ind_paper]['status'] = 'closed'
-
-                    # if P > 0:
-                    #     paper_additional_tax = P * settings['capital_gains_tax_percents'] / 100.0
-                    # else:
-                    #     paper_additional_tax = 0
-                    #
-                    #
-                    # if paper['value_current'] >= stock_amount_left_to_sell_with_tax:
-                    #     papers[ind_paper]['value_current'] -= stock_amount_left_to_sell_with_tax
-                    #     stock_amount_left_to_sell = 0
-                    #     break
-                    # else:
-                    #     stock_amount_left_to_sell -= paper['value_current']
-                    #     stock_amount_left_to_sell += paper_additional_tax
-                    #     papers[ind_paper]['value_current'] = 0
-                    #     papers[ind_paper]['status'] = 'closed'
-
             papers_dict[stock_name] = papers
 
             # check tax was fully paid for this stock type
-            # if stock_amount_left_to_sell != 0:
             if G != 0:
-                print('PROBLEM in stock ', stock_name)
-                print('ind_date:', ind_date)
-                print('yearly_gains:', data['yearly_gains'])
-                print('total_portfolio_value:', data['total_portfolio_value'][ind_date])
-                print('list of stocks:')
-                for stock_name in ideal_portfolio_fractions.keys():
-                    print('stock_name:', stock_name)
-                    print('G:', G)
-                    print('ideal_portfolio_fraction:', ideal_portfolio_fractions[stock_name])
-                    print('portfolio_fraction:', data['portfolio_fractions'][stock_name][ind_date])
-                # raise ValueError('G should be zero at this point for stock_name: '
-                #                  + str(stock_name) + ', but it equals ' + str(G))
-                # TODO: sometimes this breaks, must fix.
+                error_msg = 'problem with taxes. \n'
+                error_msg += 'stock_name: ' + stock_name + '\n'
+                error_msg += 'ind_date: ' + str(ind_date) + '\n'
+                error_msg += 'yearly_gains: ' + str(data['yearly_gains']) + '\n'
+                error_msg += 'total_portfolio_value: ' + str(data['total_portfolio_value'][ind_date]) + '\n'
+                error_msg += 'G=' + str(G) + ', should be zero. \n'
+                error_msg += 'portfolio_fraction: ' + str(data['portfolio_fractions'][stock_name][ind_date]) + '\n'
+                error_msg += 'ideal_portfolio_fraction: ' + str(ideal_portfolio_fractions[stock_name]) + '\n'
+                raise ValueError(error_msg)
 
         data['papers_dict'] = papers_dict
-
-        # data['total_portfolio_value'][ind_date] -= total_to_sell
 
         # recalculate the portfolio value and fractions
         data = calculate_portfolio_fractions(settings, data, ind_date)
@@ -621,7 +557,7 @@ def sell_papers_for_tax(settings, data, ind_date):
 
 def sort_papers_by_tax_scheme(settings, data, stock_name=None):
     """
-    # TODO write description
+    Sort the papers in different orders according to the tax scheme
     """
 
     # pick a list of papers to sort
@@ -643,31 +579,10 @@ def sort_papers_by_tax_scheme(settings, data, stock_name=None):
         indices_papers = np.argsort(paper_date_indices)[::-1]
     elif settings['tax_scheme'] in ['optimized', 'none']:
         # order the papers from least to most profitable at current date
-        # paper_profits = []
-        # for paper in papers:
-        #     paper_profits += [paper['value_current'] - paper['value_at_buy']]
-        # paper_profits = np.array(paper_profits)
         paper_profits = [paper['value_current'] - paper['value_at_buy'] for paper in papers]
         indices_papers = np.argsort(paper_profits)
     else:
         raise ValueError('invalid tax_scheme: ' + str(settings['tax_scheme']))
-
-    # # sort by the requested method
-    # if settings['tax_scheme'] == 'FIFO':
-    #     # past to future
-    #     indices_papers = [i for i in range(len(papers))]
-    # elif settings['tax_scheme'] == 'LIFO':
-    #     # future to past
-    #     indices_papers = [i for i in range(len(papers))][::-1]
-    # elif settings['tax_scheme'] in ['optimized', 'none']:
-    #     # order the papers from least to most profitable at current date
-    #     paper_profits = []
-    #     for paper in papers:
-    #         paper_profits += [paper['value_current'] - paper['value_at_buy']]
-    #     paper_profits = np.array(paper_profits)
-    #     indices_papers = np.argsort(paper_profits)
-    # else:
-    #     raise ValueError('invalid tax_scheme: ' + str(settings['tax_scheme']))
 
     return indices_papers
 
