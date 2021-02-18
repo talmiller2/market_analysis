@@ -2,6 +2,7 @@ import numpy as np
 from data_functions import load_stock_data, get_libor_rate, define_stock_parameters
 from aux_functions import get_year_labels
 
+
 def simulate_portfolio_evolution(settings):
     """
     Main function for the evolution of a portfolio
@@ -11,7 +12,7 @@ def simulate_portfolio_evolution(settings):
     settings, data = load_data(settings)
 
     # monte-carlo realization of synthetic date with bootstrap
-    data = bootstrap_data(settings, data)
+    data = generate_synthetic_realization(settings, data)
 
     # initialize portfolio
     data = initialize_portfolio(settings, data)
@@ -45,7 +46,6 @@ def simulate_portfolio_evolution(settings):
             # check if tax criterion reached (end of year), sell some to withdraw for tax
             # save cumulative amount of paid tax
             if check_tax_criterion_reached(settings, data):
-
                 # TODO: try doing an extra rebalancing before taxes
                 # data = rebalance_portfolio(settings, data, ind_date)
                 # data = calculate_portfolio_fractions(settings, data, ind_date)
@@ -108,14 +108,15 @@ def load_data(settings):
     return settings, data
 
 
-def bootstrap_data(settings, data):
+def generate_synthetic_realization(settings, data):
     """
-    Irrelevant for back-testing.
     Exploring possible future scenarios we can generate synthetic data by monte-carlo / bootstrap sampling the past data.
     Can also take into account correlation between days by picking several days in a row from the data.
+    Irrelevant for back-testing.
     """
-    if settings['perform_bootstrap']:
+    if settings['generate_synthetic_realization']:
         # generate random indices
+        np.random.seed(settings['seed'])
         num_days_synthetic = settings['synthetic_period_years'] * settings['num_trading_days_in_year']
         high = len(data['dates']) - settings['num_correlation_days']
         size = int(np.ceil(1.0 * num_days_synthetic / settings['num_correlation_days']))
@@ -174,7 +175,8 @@ def initialize_portfolio(settings, data):
     for stock_name in stock_names:
         papers = []
         paper = {}
-        paper['id'] = len(papers)
+        paper['id'] = 0
+        paper['stock_name'] = stock_name
         paper['value_at_buy'] = ideal_portfolio_fractions[stock_name] * settings['initial_investment'] \
                                 * (1 - settings['transaction_fee_percents'] / 100.0) \
                                 * settings['margin_leverage_target']
@@ -299,7 +301,6 @@ def add_cash_to_portfolio(settings, data, ind_date):
     add cash to account, on top of any dividends that were already given
     """
     data['days_since_invest'] = 0
-    data['number_of_buy_days'] += 1
     data['total_investment'][ind_date] += settings['periodic_investment']
     data['cash_in_account'][ind_date] += settings['periodic_investment']
     data = calculate_margin_state(settings, data, ind_date)
@@ -325,6 +326,7 @@ def add_cash_to_portfolio(settings, data, ind_date):
             if cash_portion > 0:
                 paper = {}
                 paper['id'] = len(papers_dict[stock_name]) + 1
+                paper['stock_name'] = stock_name
                 paper['value_at_buy'] = cash_portion
                 paper['value_current'] = paper['value_at_buy']
                 paper['date'] = data['dates'][ind_date]
@@ -334,6 +336,7 @@ def add_cash_to_portfolio(settings, data, ind_date):
         data['papers_dict'] = papers_dict
 
         # cash was used in total
+        data['number_of_buy_days'] += 1
         data['cash_in_account'][ind_date] = 0
 
     return data
@@ -427,14 +430,19 @@ def rebalance_portfolio(settings, data, ind_date):
 
                     # sell papers, but if the current paper is profitable, will be added to this year's gains
                     paper_profit = paper['value_current'] - paper['value_at_buy']
-                    if paper_profit > 0:
-                        data['yearly_gains'] += paper_profit
+                    if paper_profit < 0: paper_profit = 0
+
+                    # TODO: incorrect: only a portion of this will count as yearly gains
+                    # if paper_profit > 0:
+                    #     data['yearly_gains'] += paper_profit
 
                     if paper['value_current'] >= amount_left_to_sell:
+                        data['yearly_gains'] += min(paper_profit, amount_left_to_sell)
                         papers[ind_paper]['value_current'] -= amount_left_to_sell
                         amount_left_to_sell = 0  # finished selling this stock type for rebalancing
                         break
                     else:
+                        data['yearly_gains'] += paper_profit
                         amount_left_to_sell -= papers[ind_paper]['value_current']
                         papers[ind_paper]['value_current'] = 0
                         papers[ind_paper]['status'] = 'closed'
@@ -451,6 +459,7 @@ def rebalance_portfolio(settings, data, ind_date):
             # buy new paper
             paper = {}
             paper['id'] = len(papers_dict[stock_name]) + 1
+            paper['stock_name'] = stock_name
             paper['value_at_buy'] = amount_to_buy
             paper['value_current'] = paper['value_at_buy']
             paper['date'] = data['dates'][ind_date]
@@ -521,13 +530,14 @@ def sell_papers_for_tax(settings, data, ind_date):
                     # sell papers for tax, but if the current paper is profitable, then tax must be paid for it as well.
                     V = paper['value_current']
                     P = paper['value_current'] - paper['value_at_buy']
+                    if P < 0: P = 0
+
                     G_transition = P * (1 - cgt) / cgt
 
                     if G <= G_transition:
                         delta_T = G * cgt / (1 - cgt)
                     else:
                         delta_T = (G + P) * cgt
-
 
                     if V > delta_T:
                         # the paper has enough value to cover the yearly gains
@@ -539,7 +549,6 @@ def sell_papers_for_tax(settings, data, ind_date):
                         G -= V + P
                         papers[ind_paper]['value_current'] = 0
                         papers[ind_paper]['status'] = 'closed'
-
 
                     # if paper_profit > 0:
                     #     stock_amount_left_to_sell_with_tax = stock_amount_left_to_sell \
@@ -575,23 +584,24 @@ def sell_papers_for_tax(settings, data, ind_date):
                     #     papers[ind_paper]['value_current'] = 0
                     #     papers[ind_paper]['status'] = 'closed'
 
-
             papers_dict[stock_name] = papers
 
             # check tax was fully paid for this stock type
             # if stock_amount_left_to_sell != 0:
             if G != 0:
-                print('PROBLEM')
+                print('PROBLEM in stock ', stock_name)
                 print('ind_date:', ind_date)
+                print('yearly_gains:', data['yearly_gains'])
                 print('total_portfolio_value:', data['total_portfolio_value'][ind_date])
-                print('G:', G)
+                print('list of stocks:')
                 for stock_name in ideal_portfolio_fractions.keys():
                     print('stock_name:', stock_name)
+                    print('G:', G)
                     print('ideal_portfolio_fraction:', ideal_portfolio_fractions[stock_name])
                     print('portfolio_fraction:', data['portfolio_fractions'][stock_name][ind_date])
-                raise ValueError('G should be zero at this point for stock_name: '
-                                 + str(stock_name) + ', but it equals ' + str(G))
-            # TODO: sometimes this breaks, must fix.
+                # raise ValueError('G should be zero at this point for stock_name: '
+                #                  + str(stock_name) + ', but it equals ' + str(G))
+                # TODO: sometimes this breaks, must fix.
 
         data['papers_dict'] = papers_dict
 
@@ -609,23 +619,56 @@ def sell_papers_for_tax(settings, data, ind_date):
     return data
 
 
-def sort_papers_by_tax_scheme(settings, data, stock_name):
-    papers = data['papers_dict'][stock_name]
+def sort_papers_by_tax_scheme(settings, data, stock_name=None):
+    """
+    # TODO write description
+    """
+
+    # pick a list of papers to sort
+    if stock_name is not None:
+        papers = data['papers_dict'][stock_name]
+    else:
+        papers = []
+        for stock_name in data['papers_dict'].keys():
+            papers += data['papers_dict'][stock_name]
+
+    # sort by the requested method
     if settings['tax_scheme'] == 'FIFO':
         # past to future
-        indices_papers = [i for i in range(len(papers))]
+        paper_date_indices = [paper['ind_day_at_buy'] for paper in papers]
+        indices_papers = np.argsort(paper_date_indices)
     elif settings['tax_scheme'] == 'LIFO':
         # future to past
-        indices_papers = [i for i in range(len(papers))][::-1]
+        paper_date_indices = [paper['ind_day_at_buy'] for paper in papers]
+        indices_papers = np.argsort(paper_date_indices)[::-1]
     elif settings['tax_scheme'] in ['optimized', 'none']:
         # order the papers from least to most profitable at current date
-        paper_profits = []
-        for paper in papers:
-            paper_profits += [paper['value_current'] - paper['value_at_buy']]
-        paper_profits = np.array(paper_profits)
+        # paper_profits = []
+        # for paper in papers:
+        #     paper_profits += [paper['value_current'] - paper['value_at_buy']]
+        # paper_profits = np.array(paper_profits)
+        paper_profits = [paper['value_current'] - paper['value_at_buy'] for paper in papers]
         indices_papers = np.argsort(paper_profits)
     else:
         raise ValueError('invalid tax_scheme: ' + str(settings['tax_scheme']))
+
+    # # sort by the requested method
+    # if settings['tax_scheme'] == 'FIFO':
+    #     # past to future
+    #     indices_papers = [i for i in range(len(papers))]
+    # elif settings['tax_scheme'] == 'LIFO':
+    #     # future to past
+    #     indices_papers = [i for i in range(len(papers))][::-1]
+    # elif settings['tax_scheme'] in ['optimized', 'none']:
+    #     # order the papers from least to most profitable at current date
+    #     paper_profits = []
+    #     for paper in papers:
+    #         paper_profits += [paper['value_current'] - paper['value_at_buy']]
+    #     paper_profits = np.array(paper_profits)
+    #     indices_papers = np.argsort(paper_profits)
+    # else:
+    #     raise ValueError('invalid tax_scheme: ' + str(settings['tax_scheme']))
+
     return indices_papers
 
 

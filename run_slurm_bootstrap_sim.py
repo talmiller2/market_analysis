@@ -130,7 +130,7 @@ for stock1, stock2, margin_lev in zip(stock1_list, stock2_list, margin_lev_list)
         # settings['tax_scheme'] = 'none'
         # settings['tax_scheme'] = 'none_except_end'
 
-        settings['perform_bootstrap'] = True
+        settings['generate_synthetic_realization'] = True
 
         # settings['synthetic_period_years'] = 20
         # settings['synthetic_period_years'] = 5

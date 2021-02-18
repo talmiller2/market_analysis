@@ -78,9 +78,11 @@ def define_default_settings(settings=None):
         settings['num_trading_days_in_year'] = 252
 
     # monte carlo related settings
+    if 'generate_synthetic_realization' not in settings:
+        settings['generate_synthetic_realization'] = False
 
-    if 'perform_bootstrap' not in settings:
-        settings['perform_bootstrap'] = False
+    if 'seed' not in settings:
+        settings['seed'] = np.random.randint(1e6)
 
     if 'num_correlation_days' not in settings:
         settings['num_correlation_days'] = 5

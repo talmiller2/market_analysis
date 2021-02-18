@@ -47,7 +47,7 @@ stock_name_list = []
 # stock_name_list += ['IVV']
 # stock_name_list += ['UPRO']
 
-# stock_name_list += ['NDX100']
+stock_name_list += ['NDX100']
 # stock_name_list += ['NDX100TR']
 # stock_name_list += ['QQQ']
 # stock_name_list += ['TQQQ']
@@ -64,8 +64,8 @@ stock_name_list += ['VUSTX']
 # stock_name_list += ['F']
 # stock_name_list += ['GM']
 
-# plot_data = False
-plot_data = True
+plot_data = False
+# plot_data = True
 #
 # plot_close_adjusted = False
 plot_close_adjusted = True
@@ -115,7 +115,7 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 1.0}
     # settings['ideal_portfolio_fractions'] = {'QLD': 1.0}
     # settings['ideal_portfolio_fractions'] = {'QQQ': 0.0, 'QLD': 1.0}
-    settings['ideal_portfolio_fractions'] = {'VUSTX': 1.0}
+    # settings['ideal_portfolio_fractions'] = {'VUSTX': 1.0}
     # settings['ideal_portfolio_fractions'] = {'TLT': 1.0}
     # settings['ideal_portfolio_fractions'] = {'TMF': 1.0}
     # settings['ideal_portfolio_fractions'] = {'VUSTX3': 1.0}
@@ -128,7 +128,7 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'VOO': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'SSO': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.5, 'UPRO': 0.5}
-    # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'QQQ': 0.5}
+    settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'QQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.65, 'QQQ': 0.35}
     # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'QLD': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.65, 'QLD': 0.35}
@@ -168,19 +168,19 @@ if plot_sim:
     plt.grid(True)
     plt.tight_layout()
 
-    # plt.figure(2)
-    # for stock_name in data['portfolio_fractions'].keys():
-    #     plt.plot(data['portfolio_fractions'][stock_name], label=stock_name, linewidth=2)
-    # # plt.xticks(inds_years, label_years, rotation='vertical')
-    # plt.title('portfolio fractions')
-    # plt.legend()
-    # plt.grid(True)
-    # plt.tight_layout()
-    #
-    # plt.figure(4)
-    # plt.plot(data['drawdown'], label=label, linewidth=2)
-    # # plt.xticks(inds_years, label_years, rotation='vertical')
-    # plt.title('drawdown')
-    # plt.legend()
-    # plt.grid(True)
-    # plt.tight_layout()
+    plt.figure(2)
+    for stock_name in data['portfolio_fractions'].keys():
+        plt.plot(data['portfolio_fractions'][stock_name], label=stock_name, linewidth=2)
+    # plt.xticks(inds_years, label_years, rotation='vertical')
+    plt.title('portfolio fractions')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+
+    plt.figure(4)
+    plt.plot(data['drawdown'], label=label, linewidth=2)
+    # plt.xticks(inds_years, label_years, rotation='vertical')
+    plt.title('drawdown')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
