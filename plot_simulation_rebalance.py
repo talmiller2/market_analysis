@@ -140,7 +140,7 @@ if plot_sim:
     # settings['initial_investment'] = 1
     # settings['periodic_investment'] = 1
 
-    settings['capital_gains_tax_percents'] = 0
+    # settings['capital_gains_tax_percents'] = 0
     # settings['capital_gains_tax_percents'] = 5
     # settings['transaction_fee_percents'] = 0
     # settings['tax_scheme'] = 'FIFO'
@@ -160,7 +160,9 @@ if plot_sim:
     # plt.scatter(data['papers_buy_days'], data['portfolio_values_at_buy_days'], s=2, color=data['papers_status_colors'], zorder=2)
     # plt.plot(data['total_portfolio_value'] + data['cash_in_account'], label=label + ' + divs not reinvested', linewidth=2)
     # plt.plot(data['cash_in_account'], label='cash_in_account', linewidth=2)
-    plt.yscale('log')
+    plt.plot(data['gains'], label='gains', linewidth=2)
+    plt.plot(data['taxes_paid'], label='taxes_paid', linewidth=2)
+    # plt.yscale('log')
     # plt.xticks(inds_years, label_years, rotation='vertical')
     # plt.ylabel('yield')
     # plt.title('Stock Data')

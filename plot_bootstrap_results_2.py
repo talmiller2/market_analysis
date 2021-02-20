@@ -52,21 +52,24 @@ year2 = 2003
 # tax_scheme = 'FIFO'
 tax_scheme = 'none'
 
-# index_base = 'NDX100'
-index_base = 'SP500'
+index_base = 'NDX100'
+# index_base = 'SP500'
 if index_base == 'NDX100':
     index_stock = 'QQQ'
     index_X2_stock = 'QLD'
+    index_X25_stock = 'QQQ2.5'
     index_X3_stock = 'TQQQ'
     index_X4_stock = 'QQQ4'
 else:
     index_stock = 'VOO'
     index_X2_stock = 'SSO'
+    index_X25_stock = 'VOO2.5'
     index_X3_stock = 'UPRO'
     index_X4_stock = 'VOO4'
 
 bond_stock = 'VUSTX'
 bond_X2_stock = 'VUSTX2'
+bond_X25_stock = 'VUSTX2.5'
 bond_X3_stock = 'VUSTX3'
 bond_X4_stock = 'VUSTX4'
 
@@ -94,8 +97,18 @@ tax_scheme_list += [tax_scheme]
 stock1_list += [bond_X2_stock]
 stock2_list += [index_X2_stock]
 margin_lev_list += [1]
-
-color_list += ['r']
+#
+color_list += ['c']
+year_start_list += [year]
+investing_strategy_list += [invest_strategy]
+correlation_days_list += [num_correlation_days]
+synthetic_period_years_list += [synthetic_period_years]
+tax_scheme_list += [tax_scheme]
+stock1_list += [bond_X25_stock]
+stock2_list += [index_X25_stock]
+margin_lev_list += [1]
+#
+color_list += ['k']
 year_start_list += [year]
 investing_strategy_list += [invest_strategy]
 correlation_days_list += [num_correlation_days]
@@ -115,15 +128,26 @@ margin_lev_list += [1]
 # stock2_list += [index_X4_stock]
 # margin_lev_list += [1]
 #
-color_list += ['c']
-year_start_list += [year]
-investing_strategy_list += [invest_strategy]
-correlation_days_list += [num_correlation_days]
-synthetic_period_years_list += [synthetic_period_years]
-tax_scheme_list += [tax_scheme]
-stock1_list += [bond_stock]
-stock2_list += [index_stock]
-margin_lev_list += [2]
+# color_list += ['r']
+# year_start_list += [year]
+# investing_strategy_list += [invest_strategy]
+# correlation_days_list += [num_correlation_days]
+# synthetic_period_years_list += [synthetic_period_years]
+# tax_scheme_list += [tax_scheme]
+# stock1_list += [bond_X2_stock]
+# stock2_list += [index_X2_stock]
+# margin_lev_list += [1.5]
+#
+# color_list += ['m']
+# year_start_list += [year]
+# investing_strategy_list += [invest_strategy]
+# correlation_days_list += [num_correlation_days]
+# synthetic_period_years_list += [synthetic_period_years]
+# tax_scheme_list += [tax_scheme]
+# stock1_list += [bond_stock]
+# stock2_list += [index_stock]
+# margin_lev_list += [2]
+
 #
 # color_list += ['c']
 # year_start_list += [year]
@@ -184,11 +208,11 @@ for ind_set, color in enumerate(color_list):
     save_dir += 'simulations_slurm_2/'
 
     if investing_strategy == 'single':
-        label_investment = 'investment_initial_1_periodic_0'
+        label_investment = 'investment_ini_1_periodic_0'
     else:
-        label_investment = 'investment_initial_10_periodic_1/'
-    save_dir += label_investment + '/'
-    save_dir += 'period_' + str(synthetic_period_years)
+        label_investment = 'investment_ini_10_periodic_1/'
+    save_dir += label_investment
+    save_dir += '_total_time_' + str(synthetic_period_years)
     save_dir += '_cd_' + str(correlation_days)
     save_dir += '_date_start_' + date_start
     save_dir += '_end_' + date_end

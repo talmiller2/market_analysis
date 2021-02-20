@@ -188,8 +188,13 @@ def initialize_portfolio(settings, data):
     for stock_name in stock_names:
         data['portfolio_fractions'][stock_name] = np.nan * np.zeros(len(data['dates']))
 
-    # initialize the yearly gains that need to be tracked for taxes
-    data['yearly_gains'] = 0
+    # initialize the gains that need to be tracked for taxes
+    data['gains'] = np.nan * np.zeros(len(data['dates']))
+    data['gains'][0] = 0
+
+    # initialize the total taxes paid
+    data['taxes_paid'] = np.nan * np.zeros(len(data['dates']))
+    data['taxes_paid'][0] = 0
 
     # initialize the cash in account (will be accumulated due to dividends and then reinvested)
     data['cash_in_account'] = np.nan * np.zeros(len(data['dates']))
@@ -223,6 +228,8 @@ def evolve_portfolio_single_day(settings, data, ind_date):
 
     data['total_investment'][ind_date] = data['total_investment'][ind_date - 1]
     data['cash_in_account'][ind_date] = data['cash_in_account'][ind_date - 1]
+    data['gains'][ind_date] = data['gains'][ind_date - 1]
+    data['taxes_paid'][ind_date] = data['taxes_paid'][ind_date - 1]
 
     # add margin loan rate that decreases the cash further every day
     if data['cash_in_account'][ind_date] < 0:
@@ -255,7 +262,7 @@ def evolve_portfolio_single_day(settings, data, ind_date):
                 curr_div_yield = dividend_yield[stock_name]
             dividend_fraction = curr_div_yield / 100.0 / settings['num_trading_days_in_year']
             total_dividend_received = papers[ind_paper]['value_current'] * dividend_fraction
-            data['yearly_gains'] += total_dividend_received
+            data['gains'][ind_date] += total_dividend_received
             data['cash_in_account'][ind_date] += total_dividend_received
 
         papers_dict[stock_name] = papers
@@ -416,15 +423,14 @@ def rebalance_portfolio(settings, data, ind_date):
 
                     # sell papers, but if the current paper is profitable, will be added to this year's gains
                     paper_profit = paper['value_current'] - paper['value_at_buy']
-                    if paper_profit < 0: paper_profit = 0
 
                     if paper['value_current'] >= amount_left_to_sell:
-                        data['yearly_gains'] += min(paper_profit, amount_left_to_sell)
+                        data['gains'][ind_date] += np.sign(paper_profit) * min(paper_profit, amount_left_to_sell)
                         papers[ind_paper]['value_current'] -= amount_left_to_sell
                         amount_left_to_sell = 0  # finished selling this stock type for rebalancing
                         break
                     else:
-                        data['yearly_gains'] += paper_profit
+                        data['gains'][ind_date] += paper_profit
                         amount_left_to_sell -= papers[ind_paper]['value_current']
                         papers[ind_paper]['value_current'] = 0
                         papers[ind_paper]['status'] = 'closed'
@@ -479,11 +485,11 @@ def sell_papers_for_tax(settings, data, ind_date):
     sell different stock types according to their fraction of the portfolio.
     different tax schemes are possible.
     """
-    if data['yearly_gains'] > 0:
+    if data['gains'][ind_date] > 0:
         data['number_of_sell_days'] += 1
 
         # globally take the transaction fees into account by effectively increasing the amount that needs to be sold
-        yearly_gains = data['yearly_gains'] / (1 - settings['transaction_fee_percents'] / 100.0)
+        yearly_gains = data['gains'][ind_date] / (1 - settings['transaction_fee_percents'] / 100.0)
         cgt = settings['capital_gains_tax_percents'] / 100.0
 
         papers_dict = data['papers_dict']
@@ -504,26 +510,25 @@ def sell_papers_for_tax(settings, data, ind_date):
                 paper = papers[ind_paper]
                 if papers[ind_paper]['status'] == 'open':
 
-                    # sell papers for tax, but if the current paper is profitable, then tax must be paid for it as well.
                     V = paper['value_current']
                     P = paper['value_current'] - paper['value_at_buy']
-                    if P < 0: P = 0
 
-                    G_transition = P * (1 - cgt) / cgt
-
+                    G_transition = abs(P) * (1 - np.sign(P) * cgt) / cgt
                     if G <= G_transition:
-                        delta_T = G * cgt / (1 - cgt)
+                        delta_T = G * cgt / (1 - np.sign(P) * cgt)
                     else:
                         delta_T = (G + P) * cgt
 
                     if V > delta_T:
                         # the paper has enough value to cover the yearly gains
+                        data['taxes_paid'][ind_date] += delta_T
                         G = 0
                         papers[ind_paper]['value_current'] -= delta_T
                         break
                     else:
                         # this paper does not have enough, so we fully sell it and continue to the next one
-                        G -= V + P
+                        data['taxes_paid'][ind_date] += V
+                        G = (delta_T - V) / cgt
                         papers[ind_paper]['value_current'] = 0
                         papers[ind_paper]['status'] = 'closed'
 
@@ -534,7 +539,7 @@ def sell_papers_for_tax(settings, data, ind_date):
                 error_msg = 'problem with taxes. \n'
                 error_msg += 'stock_name: ' + stock_name + '\n'
                 error_msg += 'ind_date: ' + str(ind_date) + '\n'
-                error_msg += 'yearly_gains: ' + str(data['yearly_gains']) + '\n'
+                error_msg += 'gains: ' + str(data['gains'][ind_date]) + '\n'
                 error_msg += 'total_portfolio_value: ' + str(data['total_portfolio_value'][ind_date]) + '\n'
                 error_msg += 'G=' + str(G) + ', should be zero. \n'
                 error_msg += 'portfolio_fraction: ' + str(data['portfolio_fractions'][stock_name][ind_date]) + '\n'
@@ -549,8 +554,8 @@ def sell_papers_for_tax(settings, data, ind_date):
         # reset margin debt and cash for next year
         data = calculate_margin_state(settings, data, ind_date)
 
-    # tax year over, reset for next year
-    data['yearly_gains'] = 0
+        # tax year over, reset for next year (only for positive gains, losses carries over)
+        data['gains'][ind_date] = 0
 
     return data
 
@@ -666,9 +671,14 @@ def calculate_total_portfolio_yield(settings, data):
         papers = papers_dict[stock_name]
         for paper in papers:
             if paper['status'] == 'open':
-                paper_profit = paper['value_current'] - paper['value_at_buy']
-                if paper_profit > 0:
-                    total_profit += paper_profit
+                total_profit += paper['value_current'] - paper['value_at_buy']
+
+    # use carried over losses from previous years, if they exist
+    if data['gains'][-1] < 0:
+        total_profit += data['gains'][-1]
+
+    # in the final sell, an overall loss will not earn a gain
+    if total_profit < 0: total_profit = 0
 
     total_portfolio_after_sell = data['total_portfolio_value'][-1] * (1 - settings['transaction_fee_percents'] / 100.0)
     total_portfolio_after_sell -= data['margin_debt'][-1]  # cover margin after total sell
