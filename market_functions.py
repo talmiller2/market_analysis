@@ -547,16 +547,20 @@ def sell_papers_for_tax(settings, data, ind_date):
 
             # check tax was fully paid for this stock type
             if G != 0:
-                error_msg = 'problem with taxes. \n'
-                error_msg += 'seed = ' + str(settings['seed']) + '\n'
-                error_msg += 'stock_name: ' + stock_name + '\n'
-                error_msg += 'ind_date: ' + str(ind_date) + '\n'
-                error_msg += 'gains: ' + str(data['gains'][ind_date]) + '\n'
-                error_msg += 'total_portfolio_value: ' + str(data['total_portfolio_value'][ind_date]) + '\n'
-                error_msg += 'G=' + str(G) + ', should be zero. \n'
-                error_msg += 'portfolio_fraction: ' + str(data['portfolio_fractions'][stock_name][ind_date]) + '\n'
-                error_msg += 'ideal_portfolio_fraction: ' + str(ideal_portfolio_fractions[stock_name]) + '\n'
-                raise ValueError(error_msg)
+                print('Not enough value to pay off taxes for ' + stock_name +  '. GAME OVER.')
+                data['simulation_status'] = 'failed'
+                return data
+
+                # error_msg = 'problem with taxes. \n'
+                # error_msg += 'seed = ' + str(settings['seed']) + '\n'
+                # error_msg += 'stock_name: ' + stock_name + '\n'
+                # error_msg += 'ind_date: ' + str(ind_date) + '\n'
+                # error_msg += 'gains: ' + str(data['gains'][ind_date]) + '\n'
+                # error_msg += 'total_portfolio_value: ' + str(data['total_portfolio_value'][ind_date]) + '\n'
+                # error_msg += 'G=' + str(G) + ', should be zero. \n'
+                # error_msg += 'portfolio_fraction: ' + str(data['portfolio_fractions'][stock_name][ind_date]) + '\n'
+                # error_msg += 'ideal_portfolio_fraction: ' + str(ideal_portfolio_fractions[stock_name]) + '\n'
+                # raise ValueError(error_msg)
 
         data['papers_dict'] = papers_dict
 

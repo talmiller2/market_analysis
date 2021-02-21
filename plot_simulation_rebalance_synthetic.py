@@ -75,7 +75,7 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'VOO': 0.5, 'QQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VOO': 0.5, 'TLT': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VOO': 0.3, 'VUSTX': 0.7}
-    settings['ideal_portfolio_fractions'] = {'SSO': 0.3, 'VUSTX2': 0.7}
+    # settings['ideal_portfolio_fractions'] = {'SSO': 0.3, 'VUSTX2': 0.7}
     # settings['ideal_portfolio_fractions'] = {'UPRO': 0.5, 'TQQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'QQQ': 0.5, 'TQQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'UPRO': 0.5, 'TMF': 0.5}
@@ -85,9 +85,10 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'QLD': 0.85, 'VUSTX2': 0.15}
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 0.5, 'VUSTX3': 0.5}
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 0.85, 'VUSTX3': 0.15}
+    settings['ideal_portfolio_fractions'] = {'QQQ4': 0.9, 'VUSTX4': 0.1}
     # settings['ideal_portfolio_fractions'] = {'QLD': 0.25, 'TQQQ': 0.25, 'VUSTX2': 0.25, 'VUSTX3': 0.25}
     # settings['margin_leverage_target'] = 1.1
-    settings['margin_leverage_target'] = 2
+    # settings['margin_leverage_target'] = 2
     # settings['periodic_investment_interval'] = 'yearly'
     # settings['periodic_investment_interval'] = 'quarterly'
     # settings['initial_investment'] = 10
@@ -97,8 +98,8 @@ if plot_sim:
     # settings['transaction_fee_percents'] = 0
     # settings['tax_scheme'] = 'FIFO'
     # settings['tax_scheme'] = 'LIFO'
-    settings['tax_scheme'] = 'optimized'
-    # settings['tax_scheme'] = 'none'
+    # settings['tax_scheme'] = 'optimized'
+    settings['tax_scheme'] = 'none'
     # settings['rebalance_percent_deviation'] = 30
     # settings['rebalance_percent_deviation'] = 1
     settings['generate_synthetic_realization'] = True
@@ -106,7 +107,8 @@ if plot_sim:
     # settings['seed'] = 368397
     # settings['seed'] = 442194
     # settings['seed'] = 218161
-    settings['seed'] = 808792
+    # settings['seed'] = 808792
+    settings['seed'] = 866623
     data = simulate_portfolio_evolution(settings)
 
     # plots
