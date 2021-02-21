@@ -20,7 +20,7 @@ def simulate_portfolio_evolution(settings):
 
     # loop over days of simulation
     for ind_date, date in enumerate(data['dates']):
-        if ind_date > 0:
+        if ind_date > 0 and data['simulation_status'] == 'nominal':
 
             # calculate fractions of the total portfolio components
             data = calculate_portfolio_fractions(settings, data, ind_date)
@@ -151,6 +151,8 @@ def initialize_portfolio(settings, data):
     """
     first purchase of stocks according to the required fractions
     """
+    data['simulation_status'] = 'nominal'
+
     ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
     stock_names = ideal_portfolio_fractions.keys()
 
@@ -469,7 +471,7 @@ def check_tax_criterion_reached(settings, data):
     """
     check if time to pay tax arrived
     """
-    if settings['capital_gains_tax_percents'] > 0:
+    if settings['tax_scheme'] != 'none' and settings['capital_gains_tax_percents'] > 0:
         if data['days_since_start_of_year'] >= settings['num_trading_days_in_year']:
             data['days_since_start_of_year'] = 0
             return True
@@ -489,8 +491,17 @@ def sell_papers_for_tax(settings, data, ind_date):
         data['number_of_sell_days'] += 1
 
         # globally take the transaction fees into account by effectively increasing the amount that needs to be sold
-        yearly_gains = data['gains'][ind_date] / (1 - settings['transaction_fee_percents'] / 100.0)
+        gains = data['gains'][ind_date] / (1 - settings['transaction_fee_percents'] / 100.0)
         cgt = settings['capital_gains_tax_percents'] / 100.0
+
+        # check if we even have enough money in the portfolio to pay the tax, otherwise it is game over since we can't
+        # even pay the tax we are required. treat this edge case as total portfolio zero yield.
+        if gains * cgt > data['total_portfolio_value'][ind_date]:
+            print('gains = ' + str(gains))
+            print('total_portfolio_value = ' + str(data['total_portfolio_value'][ind_date]))
+            print('Taxes are greater than the entire portfolio, GAME OVER.')
+            data['simulation_status'] = 'failed'
+            return data
 
         papers_dict = data['papers_dict']
         ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
@@ -498,7 +509,7 @@ def sell_papers_for_tax(settings, data, ind_date):
         for stock_name in stock_names:
 
             # splitting the tax to pay between the different stock types, for simplicity
-            G = yearly_gains * data['portfolio_fractions'][stock_name][ind_date]
+            G = gains * data['portfolio_fractions'][stock_name][ind_date]
 
             # sort the papers in the order dictated by tax scheme
             papers = papers_dict[stock_name]
@@ -537,6 +548,7 @@ def sell_papers_for_tax(settings, data, ind_date):
             # check tax was fully paid for this stock type
             if G != 0:
                 error_msg = 'problem with taxes. \n'
+                error_msg += 'seed = ' + str(settings['seed']) + '\n'
                 error_msg += 'stock_name: ' + stock_name + '\n'
                 error_msg += 'ind_date: ' + str(ind_date) + '\n'
                 error_msg += 'gains: ' + str(data['gains'][ind_date]) + '\n'
@@ -596,6 +608,8 @@ def calculate_portfolio_fractions(settings, data, ind_date):
     """
     add end of trading day, sum up the current fractions and total value
     """
+    # print(ind_date)
+
     papers_dict = data['papers_dict']
     ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
     stock_names = ideal_portfolio_fractions.keys()
@@ -607,6 +621,11 @@ def calculate_portfolio_fractions(settings, data, ind_date):
         for paper in papers:
             portfolio_fractions[stock_name] += paper['value_current']
         curr_total_portfolio_value += portfolio_fractions[stock_name]
+
+    if curr_total_portfolio_value <= 0:
+        print('portfolio is nulled. GAME OVER')
+        data['simulation_status'] = 'failed'
+        return data
 
     data['total_portfolio_value'][ind_date] = curr_total_portfolio_value
     # normalize portfolio_fractions_current to get fraction that sum up to one
@@ -664,29 +683,36 @@ def calculate_total_portfolio_yield(settings, data):
     """
     at end of simulation, calculate profit if entire portfolio is sold (taking into account taxes and fees)
     """
-    total_profit = 0
 
-    papers_dict = data['papers_dict']
-    for stock_name in papers_dict.keys():
-        papers = papers_dict[stock_name]
-        for paper in papers:
-            if paper['status'] == 'open':
-                total_profit += paper['value_current'] - paper['value_at_buy']
+    if data['simulation_status'] == 'nominal':
+        total_profit = 0
 
-    # use carried over losses from previous years, if they exist
-    if data['gains'][-1] < 0:
-        total_profit += data['gains'][-1]
+        papers_dict = data['papers_dict']
+        for stock_name in papers_dict.keys():
+            papers = papers_dict[stock_name]
+            for paper in papers:
+                if paper['status'] == 'open':
+                    total_profit += paper['value_current'] - paper['value_at_buy']
 
-    # in the final sell, an overall loss will not earn a gain
-    if total_profit < 0: total_profit = 0
+        # use carried over losses from previous years, if they exist
+        if data['gains'][-1] < 0:
+            total_profit += data['gains'][-1]
 
-    total_portfolio_after_sell = data['total_portfolio_value'][-1] * (1 - settings['transaction_fee_percents'] / 100.0)
-    total_portfolio_after_sell -= data['margin_debt'][-1]  # cover margin after total sell
-    capital_gains_tax_to_pay = total_profit * settings['total_sell_capital_gains_tax_percents'] / 100.0
+        # in the final sell, an overall loss will not earn a gain
+        if total_profit < 0: total_profit = 0
 
-    data['total_yield'] = (total_portfolio_after_sell - capital_gains_tax_to_pay) / data['total_investment'][-1]
-    data['total_yield_tax_free'] = total_portfolio_after_sell / data['total_investment'][-1]
-    data['total_sell_tax_loss_percents'] = 100.0 * (1 - data['total_yield'] / data['total_yield_tax_free'])
+        total_portfolio_after_sell = data['total_portfolio_value'][-1] * (1 - settings['transaction_fee_percents'] / 100.0)
+        total_portfolio_after_sell -= data['margin_debt'][-1]  # cover margin after total sell
+        capital_gains_tax_to_pay = total_profit * settings['total_sell_capital_gains_tax_percents'] / 100.0
+
+        data['total_yield'] = (total_portfolio_after_sell - capital_gains_tax_to_pay) / data['total_investment'][-1]
+        data['total_yield_tax_free'] = total_portfolio_after_sell / data['total_investment'][-1]
+        data['total_sell_tax_loss_percents'] = 100.0 * (1 - data['total_yield'] / data['total_yield_tax_free'])
+
+    else:
+        data['total_yield'] = 0
+        data['total_yield_tax_free'] = 0
+        data['total_sell_tax_loss_percents'] = 0
 
     return data
 
@@ -696,17 +722,23 @@ def calculate_risk_metrics(settings, data):
     calculate risk metrics that characterize the volatility of the portfolio which is not important
     in the long run, but can be hard psychologically.
     """
+    if data['simulation_status'] == 'nominal':
 
-    yield_history = (data['total_portfolio_value'] - data['margin_debt']) / data['total_investment']
-    data['yield_min'] = np.min(yield_history)
-    data['yield_max'] = np.max(yield_history)
+        yield_history = (data['total_portfolio_value'] - data['margin_debt']) / data['total_investment']
+        data['yield_min'] = np.nanmin(yield_history)
+        data['yield_max'] = np.nanmax(yield_history)
 
-    yield_relative_to_cum_max = 0 * yield_history
-    curr_max = 0
-    for i, curr_yield in enumerate(yield_history):
-        curr_max = max(curr_max, curr_yield)
-        yield_relative_to_cum_max[i] = curr_yield / curr_max
-    data['drawdown'] = 1 - yield_relative_to_cum_max
-    data['max_drawdown'] = np.max(data['drawdown'])
+        yield_relative_to_cum_max = 0 * yield_history
+        curr_max = 0
+        for i, curr_yield in enumerate(yield_history):
+            curr_max = np.nanmax([curr_max, curr_yield])
+            yield_relative_to_cum_max[i] = curr_yield / curr_max
+        data['drawdown'] = 1 - yield_relative_to_cum_max
+        data['max_drawdown'] = np.max(data['drawdown'])
+
+    else:
+        data['yield_min'] = 0
+        data['yield_max'] = 1
+        data['max_drawdown'] = 1
 
     return data
