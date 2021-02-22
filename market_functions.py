@@ -547,20 +547,9 @@ def sell_papers_for_tax(settings, data, ind_date):
 
             # check tax was fully paid for this stock type
             if G != 0:
-                print('Not enough value to pay off taxes for ' + stock_name +  '. GAME OVER.')
+                print('Not enough value to pay off taxes for ' + stock_name + '. GAME OVER.')
                 data['simulation_status'] = 'failed'
                 return data
-
-                # error_msg = 'problem with taxes. \n'
-                # error_msg += 'seed = ' + str(settings['seed']) + '\n'
-                # error_msg += 'stock_name: ' + stock_name + '\n'
-                # error_msg += 'ind_date: ' + str(ind_date) + '\n'
-                # error_msg += 'gains: ' + str(data['gains'][ind_date]) + '\n'
-                # error_msg += 'total_portfolio_value: ' + str(data['total_portfolio_value'][ind_date]) + '\n'
-                # error_msg += 'G=' + str(G) + ', should be zero. \n'
-                # error_msg += 'portfolio_fraction: ' + str(data['portfolio_fractions'][stock_name][ind_date]) + '\n'
-                # error_msg += 'ideal_portfolio_fraction: ' + str(ideal_portfolio_fractions[stock_name]) + '\n'
-                # raise ValueError(error_msg)
 
         data['papers_dict'] = papers_dict
 
@@ -705,7 +694,8 @@ def calculate_total_portfolio_yield(settings, data):
         # in the final sell, an overall loss will not earn a gain
         if total_profit < 0: total_profit = 0
 
-        total_portfolio_after_sell = data['total_portfolio_value'][-1] * (1 - settings['transaction_fee_percents'] / 100.0)
+        total_portfolio_after_sell = data['total_portfolio_value'][-1] * (
+                    1 - settings['transaction_fee_percents'] / 100.0)
         total_portfolio_after_sell -= data['margin_debt'][-1]  # cover margin after total sell
         capital_gains_tax_to_pay = total_profit * settings['total_sell_capital_gains_tax_percents'] / 100.0
 
@@ -714,8 +704,8 @@ def calculate_total_portfolio_yield(settings, data):
         data['total_sell_tax_loss_percents'] = 100.0 * (1 - data['total_yield'] / data['total_yield_tax_free'])
 
     else:
-        data['total_yield'] = 0
-        data['total_yield_tax_free'] = 0
+        data['total_yield'] = -1.0
+        data['total_yield_tax_free'] = -1.0
         data['total_sell_tax_loss_percents'] = 0
 
     return data
@@ -741,8 +731,8 @@ def calculate_risk_metrics(settings, data):
         data['max_drawdown'] = np.max(data['drawdown'])
 
     else:
-        data['yield_min'] = 0
-        data['yield_max'] = 1
-        data['max_drawdown'] = 1
+        data['yield_min'] = -1.0
+        data['yield_max'] = 1.0
+        data['max_drawdown'] = 2.0
 
     return data

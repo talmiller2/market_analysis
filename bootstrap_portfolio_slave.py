@@ -48,8 +48,9 @@ for ind_real in range(bootstrap_params['num_realizations']):
     monthly_buy_days_list += [data['average_monthly_buy_days']]
     monthly_sell_days_list += [data['average_monthly_sell_days']]
 
-results_mat = np.array([yield_list, yield_tax_free_list, yield_min_list, max_drawdown_list,
-                        monthly_buy_days_list, monthly_sell_days_list]).T
+# results_mat = np.array([yield_list, yield_tax_free_list, yield_min_list, max_drawdown_list,
+#                         monthly_buy_days_list, monthly_sell_days_list]).T
+results_mat = np.array([yield_list, yield_tax_free_list, yield_min_list, max_drawdown_list]).T
 
 # save results to file
 save_file_path = bootstrap_params['save_dir'] + '/' + bootstrap_params['sim_name'] + '.txt'

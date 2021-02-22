@@ -88,6 +88,7 @@ margin_lev_list = []
 # stock1_list += ['VUSTX', 'VUSTX2', 'VUSTX3', 'VUSTX4']
 # stock2_list += [  'QQQ',    'QLD',   'TQQQ',   'QQQ4']
 # margin_lev_list += [1, 1, 1, 1]
+
 stock1_list += ['VUSTX', 'VUSTX2.5', 'VUSTX2', 'VUSTX3', 'VUSTX4']
 stock2_list += [  'VOO',   'VOO2.5',    'SSO',   'UPRO',   'VOO4']
 margin_lev_list += [1, 1, 1, 1, 1]
@@ -97,17 +98,17 @@ margin_lev_list += [1, 1, 1, 1, 1]
 
 stock1_list += ['VUSTX' for _ in range(4)]
 stock2_list += ['VOO' for _ in range(4)]
-margin_lev_list += [1.5, 2, 3, 4]
+margin_lev_list += [1.8, 3, 4]
 stock1_list += ['VUSTX2']
 stock2_list += ['SSO']
-margin_lev_list += [1.5]
+margin_lev_list += [1.8]
 
 stock1_list += ['VUSTX' for _ in range(4)]
 stock2_list += ['QQQ' for _ in range(4)]
-margin_lev_list += [1.5, 2, 3, 4]
+margin_lev_list += [1.8, 3, 4]
 stock1_list += ['VUSTX2']
 stock2_list += ['QLD']
-margin_lev_list += [1.5]
+margin_lev_list += [1.8]
 
 total_number_of_runs = len(frac_list) * len(stock1_list)
 cnt = 0
@@ -131,8 +132,9 @@ for stock1, stock2, margin_lev in zip(stock1_list, stock2_list, margin_lev_list)
 
         settings['generate_synthetic_realization'] = True
 
-        # settings['synthetic_period_years'] = 20
         # settings['synthetic_period_years'] = 5
+        settings['synthetic_period_years'] = 10
+        # settings['synthetic_period_years'] = 20
 
         # settings['initial_investment'] = 10
         # settings['periodic_investment'] = 1
@@ -149,7 +151,7 @@ for stock1, stock2, margin_lev in zip(stock1_list, stock2_list, margin_lev_list)
 
         # save the result to plot later
         save_dir = ''
-        save_dir += 'investment_ini_' + str(settings['initial_investment'])
+        save_dir += 'investment_initial_' + str(settings['initial_investment'])
         save_dir += '_periodic_' + str(settings['periodic_investment'])
         save_dir += '_total_time_' + str(settings['synthetic_period_years'])
         save_dir += '_cd_' + str(settings['num_correlation_days'])

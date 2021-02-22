@@ -47,8 +47,8 @@ def define_default_settings(settings=None):
         settings['margin_leverage_target'] = 1.0
 
     if 'margin_leverage_percent_deviation' not in settings:
-        # settings['margin_leverage_percent_deviation'] = 10.0
-        settings['margin_leverage_percent_deviation'] = 20.0
+        settings['margin_leverage_percent_deviation'] = 10.0
+        # settings['margin_leverage_percent_deviation'] = 20.0
 
     if 'margin_rate_percents' not in settings:
         settings['margin_rate_percents'] = 1.59

@@ -54,6 +54,7 @@ tax_scheme = 'none'
 
 index_base = 'NDX100'
 # index_base = 'SP500'
+
 if index_base == 'NDX100':
     index_stock = 'QQQ'
     index_X2_stock = 'QLD'
@@ -98,16 +99,16 @@ stock1_list += [bond_X2_stock]
 stock2_list += [index_X2_stock]
 margin_lev_list += [1]
 #
-color_list += ['c']
-year_start_list += [year]
-investing_strategy_list += [invest_strategy]
-correlation_days_list += [num_correlation_days]
-synthetic_period_years_list += [synthetic_period_years]
-tax_scheme_list += [tax_scheme]
-stock1_list += [bond_X25_stock]
-stock2_list += [index_X25_stock]
-margin_lev_list += [1]
-#
+# color_list += ['c']
+# year_start_list += [year]
+# investing_strategy_list += [invest_strategy]
+# correlation_days_list += [num_correlation_days]
+# synthetic_period_years_list += [synthetic_period_years]
+# tax_scheme_list += [tax_scheme]
+# stock1_list += [bond_X25_stock]
+# stock2_list += [index_X25_stock]
+# margin_lev_list += [1]
+# #
 color_list += ['k']
 year_start_list += [year]
 investing_strategy_list += [invest_strategy]
@@ -118,16 +119,16 @@ stock1_list += [bond_X3_stock]
 stock2_list += [index_X3_stock]
 margin_lev_list += [1]
 
-# color_list += ['k']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [bond_X4_stock]
-# stock2_list += [index_X4_stock]
-# margin_lev_list += [1]
-#
+color_list += ['k']
+year_start_list += [year]
+investing_strategy_list += [invest_strategy]
+correlation_days_list += [num_correlation_days]
+synthetic_period_years_list += [synthetic_period_years]
+tax_scheme_list += [tax_scheme]
+stock1_list += [bond_X4_stock]
+stock2_list += [index_X4_stock]
+margin_lev_list += [1]
+
 # color_list += ['r']
 # year_start_list += [year]
 # investing_strategy_list += [invest_strategy]
@@ -137,16 +138,16 @@ margin_lev_list += [1]
 # stock1_list += [bond_X2_stock]
 # stock2_list += [index_X2_stock]
 # margin_lev_list += [1.5]
-#
-# color_list += ['m']
-# year_start_list += [year]
-# investing_strategy_list += [invest_strategy]
-# correlation_days_list += [num_correlation_days]
-# synthetic_period_years_list += [synthetic_period_years]
-# tax_scheme_list += [tax_scheme]
-# stock1_list += [bond_stock]
-# stock2_list += [index_stock]
-# margin_lev_list += [2]
+
+color_list += ['m']
+year_start_list += [year]
+investing_strategy_list += [invest_strategy]
+correlation_days_list += [num_correlation_days]
+synthetic_period_years_list += [synthetic_period_years]
+tax_scheme_list += [tax_scheme]
+stock1_list += [bond_stock]
+stock2_list += [index_stock]
+margin_lev_list += [2]
 
 #
 # color_list += ['c']
@@ -260,11 +261,9 @@ for ind_set, color in enumerate(color_list):
         try:
 
             results_mat = np.loadtxt(save_dir + file_name)
-            # [yield_list, yield_min_list, max_drawdown_list] = np.loadtxt(save_dir + file_name, usecols=[0, 1, 2])
-            # results_mat = np.array([yield_list, yield_min_list, max_drawdown_list]).T
             yield_list = results_mat[:, 0]
-            yield_tax_free_list = results_mat[:, 1]
-            # yield_tax_free_list = yield_list
+            # yield_list = results_mat[:, 1]
+            # yield_tax_free_list = results_mat[:, 1]
             min_yield_list = results_mat[:, 2]
             max_drawdown_list = results_mat[:, 3]
 
@@ -272,6 +271,7 @@ for ind_set, color in enumerate(color_list):
             # percentiles = [10, 50, 95]
             # percentiles = [5, 50, 95]
             percentiles = [5, 50]
+            # percentiles = [20, 50]
             # percentiles = [1, 50, 95]
 
             yield_percentiles = []
@@ -365,6 +365,7 @@ for ind_set, color in enumerate(color_list):
                 label_curr = label
 
             plt.figure(1)
+            plt.subplot(1,3,1)
             plt.scatter(yield_percentiles[0], yield_percentiles[1], color=color)
             text_dist = 0.02
             plt.annotate(label_annotate, (yield_percentiles[0] + text_dist, yield_percentiles[1] + text_dist), size=10,
@@ -419,7 +420,8 @@ for ind_set, color in enumerate(color_list):
             #              color=color)
 
 
-            plt.figure(6)
+            # plt.figure(6)
+            plt.subplot(1,3,2)
             plt.scatter(min_yield_percentiles[0], yield_percentiles[1], color=color)
             text_dist = 0.02
             plt.annotate(label_annotate, (min_yield_percentiles[0] + text_dist, yield_percentiles[1] + text_dist), size=10,
@@ -431,7 +433,8 @@ for ind_set, color in enumerate(color_list):
                          color=color)
 
 
-            plt.figure(7)
+            # plt.figure(7)
+            plt.subplot(1,3,3)
             plt.scatter(max_drawdown_percentiles[1], yield_percentiles[1], color=color)
             text_dist = 0.02
             plt.annotate(label_annotate, (max_drawdown_percentiles[1] + text_dist, yield_percentiles[1] + text_dist), size=10,
@@ -453,13 +456,9 @@ for ind_set, color in enumerate(color_list):
     # plt.annotate('BTC', (-3 + text_dist, -10 + text_dist), size=20, color='k')
 
     plt.figure(1)
+    plt.subplot(1, 3, 1)
     plt.xlabel('yield ' + str(percentiles[0]) + '% percentile')
     plt.ylabel('yield ' + str(percentiles[1]) + '% percentile')
-    title = 'yields'
-    title += ' after ' + str(synthetic_period_years) + ' years'
-    title += ' (' + invest_strategy + ' investment)'
-    title += ' ' + tax_scheme
-    plt.title(title)
     plt.grid(True)
     plt.legend()
 
@@ -484,24 +483,23 @@ for ind_set, color in enumerate(color_list):
     # plt.grid(True)
     # plt.legend()
 
-    plt.figure(6)
+    # plt.figure(6)
+    plt.subplot(1, 3, 2)
     plt.xlabel('minimum yield ' + str(percentiles[0]) + '% percentile')
     plt.ylabel('yield ' + str(percentiles[1]) + '% percentile')
-    title = 'yields'
-    title += ' after ' + str(synthetic_period_years) + ' years'
-    title += ' (' + invest_strategy + ' investment)'
-    title += ' ' + tax_scheme
-    plt.title(title)
     plt.grid(True)
     plt.legend()
 
-    plt.figure(7)
-    plt.xlabel('maximum drawdown ' + str(percentiles[1]) + '% percentile')
-    plt.ylabel('yield ' + str(percentiles[1]) + '% percentile')
     title = 'yields'
     title += ' after ' + str(synthetic_period_years) + ' years'
     title += ' (' + invest_strategy + ' investment)'
-    title += ' ' + tax_scheme
+    title += ' (tax ' + tax_scheme + ')'
     plt.title(title)
+
+
+    # plt.figure(7)
+    plt.subplot(1, 3, 3)
+    plt.xlabel('maximum drawdown ' + str(percentiles[1]) + '% percentile')
+    plt.ylabel('yield ' + str(percentiles[1]) + '% percentile')
     plt.grid(True)
     plt.legend()
