@@ -17,18 +17,20 @@ matplotlib.rcParams.update({'axes.prop_cycle': cycler(color='bgrcmyk')})
 # date_start = '1929-01-01'
 # date_start = '1986-01-01'
 # date_start = '1989-01-01'
+# date_start = '1990-01-02'
 # date_start = '2000-01-01'
-date_start = '2003-01-01'
+date_start = '2001-01-23'
+# date_start = '2003-01-01'
 date_end = '2020-09-30'
 
 stock_name_list = []
 # stock_name_list += ['SP500']
-# stock_name_list += ['SP500TR']
+stock_name_list += ['SP500TR']
 # stock_name_list += ['SPY']
-# stock_name_list += ['NDX100']
+stock_name_list += ['NDX100']
 # stock_name_list += ['NDX100TR']
 # stock_name_list += ['QQQ']
-stock_name_list += ['TLT']
+# stock_name_list += ['TLT']
 # stock_name_list += ['VFINX']
 stock_name_list += ['VUSTX']
 
@@ -58,3 +60,5 @@ for stock_name in stock_name_list:
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
+    plt.yscale('log')
+

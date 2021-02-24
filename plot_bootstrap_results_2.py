@@ -37,6 +37,7 @@ synthetic_period_years = 10
 
 num_correlation_days = 5
 # num_correlation_days = 1
+# num_correlation_days = 10
 
 # rebalance_percent = 10
 rebalance_percent = 20
@@ -47,13 +48,13 @@ rebalance_percent = 20
 year1 = 1989
 year2 = 2003
 
-tax_scheme = 'optimized'
+# tax_scheme = 'optimized'
 # tax_scheme = 'LIFO'
 # tax_scheme = 'FIFO'
-# tax_scheme = 'none'
+tax_scheme = 'none'
 
-index_base = 'NDX100'
-# index_base = 'SP500'
+# index_base = 'NDX100'
+index_base = 'SP500'
 
 if index_base == 'NDX100':
     index_stock = 'QQQ'
@@ -142,15 +143,15 @@ stock2_list += [index_stock]
 margin_lev_list += [1.8]
 
 
-color_list += ['k']
-year_start_list += [year]
-investing_strategy_list += [invest_strategy]
-correlation_days_list += [num_correlation_days]
-synthetic_period_years_list += [synthetic_period_years]
-tax_scheme_list += [tax_scheme]
-stock1_list += [bond_X2_stock]
-stock2_list += [index_X2_stock]
-margin_lev_list += [1.8]
+# color_list += ['k']
+# year_start_list += [year]
+# investing_strategy_list += [invest_strategy]
+# correlation_days_list += [num_correlation_days]
+# synthetic_period_years_list += [synthetic_period_years]
+# tax_scheme_list += [tax_scheme]
+# stock1_list += [bond_X2_stock]
+# stock2_list += [index_X2_stock]
+# margin_lev_list += [1.8]
 
 #
 # color_list += ['c']
@@ -214,7 +215,7 @@ for ind_set, color in enumerate(color_list):
     if investing_strategy == 'single':
         label_investment = 'investment_initial_1_periodic_0'
     else:
-        label_investment = 'investment_initial_10_periodic_1/'
+        label_investment = 'investment_initial_10_periodic_1'
     save_dir += label_investment
     save_dir += '_total_time_' + str(synthetic_period_years)
     save_dir += '_cd_' + str(correlation_days)
@@ -495,9 +496,9 @@ for ind_set, color in enumerate(color_list):
     # plt.figure(6)
     plt.subplot(1, 3, 2)
     plt.xlabel('minimal yield ' + str(percentiles[0]) + '% percentile')
-    plt.ylabel('yield ' + str(percentiles[1]) + '% percentile')
+    # plt.ylabel('yield ' + str(percentiles[1]) + '% percentile')
     plt.grid(True)
-    plt.legend()
+    # plt.legend()
     plt.xlim([0, 1.0])
 
     title = str(synthetic_period_years) + ' years ' + invest_strategy + ' investment'
@@ -511,7 +512,9 @@ for ind_set, color in enumerate(color_list):
     # plt.figure(7)
     plt.subplot(1, 3, 3)
     plt.xlabel('maximal drawdown ' + str(percentiles[1]) + '% percentile')
-    plt.ylabel('yield ' + str(percentiles[1]) + '% percentile')
+    # plt.ylabel('yield ' + str(percentiles[1]) + '% percentile')
     plt.grid(True)
-    plt.legend()
+    # plt.legend()
     plt.xlim([0, 1])
+
+    # plt.tight_layout()

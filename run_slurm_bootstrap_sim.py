@@ -125,10 +125,10 @@ for stock1, stock2, margin_lev in zip(stock1_list, stock2_list, margin_lev_list)
         settings['ideal_portfolio_fractions'] = {stock1: 1-frac, stock2: frac}
         settings['margin_leverage_target'] = margin_lev
 
-        settings['tax_scheme'] = 'optimized'
+        # settings['tax_scheme'] = 'optimized'
         # settings['tax_scheme'] = 'FIFO'
         # settings['tax_scheme'] = 'LIFO'
-        # settings['tax_scheme'] = 'none'
+        settings['tax_scheme'] = 'none'
 
         settings['generate_synthetic_realization'] = True
 
@@ -145,7 +145,9 @@ for stock1, stock2, margin_lev in zip(stock1_list, stock2_list, margin_lev_list)
         else:
             settings['capital_gains_tax_percents'] = 25
 
-        # settings['num_correlation_days'] = 1
+        # settings['num_correlation_days'] = 10
+        # settings['num_correlation_days'] = 5
+        settings['num_correlation_days'] = 1
 
         # settings['rebalance_percent_deviation'] = 20
 
