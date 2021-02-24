@@ -306,19 +306,13 @@ def add_cash_to_portfolio(settings, data, ind_date):
     data['cash_in_account'][ind_date] += settings['periodic_investment']
     data = calculate_margin_state(settings, data, ind_date)
 
-    # invest the cash to buy new papers, while trying to rebalance the portfolio as much as possible
+    # invest the cash to buy new papers
     if data['cash_in_account'][ind_date] > 0:
         ideal_portfolio_fractions = settings['ideal_portfolio_fractions']
-        portfolio_fractions = data['portfolio_fractions']
         stock_names = ideal_portfolio_fractions.keys()
-        cash_list = []
-        for stock_name in stock_names:
-            # using imperfect but simple heuristic that adds cash to all stocks,
-            # but with greater weight to those that are under the wanted portfolio fraction.
-            weight = ideal_portfolio_fractions[stock_name] / portfolio_fractions[stock_name][ind_date]
-            cash_list += [weight]
-        cash_list = np.array(cash_list)
-        cash_list *= data['cash_in_account'][ind_date] / sum(cash_list)
+        # split the cash between the stocks according to the ideal fractions
+        cash_list = [ideal_portfolio_fractions[stock_name] for stock_name in stock_names]
+        cash_list = data['cash_in_account'][ind_date] * np.array(cash_list)
         cash_list *= (1 - settings['transaction_fee_percents'] / 100.0)
 
         # buy new papers with the cash
