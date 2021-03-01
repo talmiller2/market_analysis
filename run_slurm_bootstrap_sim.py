@@ -19,7 +19,8 @@ slurm_kwargs = {'partition': 'core'}  # default
 
 
 # main_folder = '/home/talm/code/market_analysis/simulations_slurm/'
-main_folder = '/home/talm/code/market_analysis/simulations_slurm_2/'
+# main_folder = '/home/talm/code/market_analysis/simulations_slurm_2/'
+main_folder = '/home/talm/code/market_analysis/simulations_slurm_3/'
 
 # define the period from which the synthetic realization will be drawn
 
@@ -89,26 +90,34 @@ margin_lev_list = []
 # stock2_list += [  'QQQ',    'QLD',   'TQQQ',   'QQQ4']
 # margin_lev_list += [1, 1, 1, 1]
 
-stock1_list += ['VUSTX', 'VUSTX2.5', 'VUSTX2', 'VUSTX3', 'VUSTX4']
-stock2_list += [  'VOO',   'VOO2.5',    'SSO',   'UPRO',   'VOO4']
-margin_lev_list += [1, 1, 1, 1, 1]
-stock1_list += ['VUSTX', 'VUSTX2.5', 'VUSTX2', 'VUSTX3', 'VUSTX4']
-stock2_list += [  'QQQ',   'QQQ2.5',    'QLD',   'TQQQ',   'QQQ4']
-margin_lev_list += [1, 1, 1, 1, 1]
+# stock1_list += ['VUSTX', 'VUSTX2.5', 'VUSTX2', 'VUSTX3', 'VUSTX4']
+# stock2_list += [  'VOO',   'VOO2.5',    'SSO',   'UPRO',   'VOO4']
+# margin_lev_list += [1, 1, 1, 1, 1]
+# stock1_list += ['VUSTX', 'VUSTX2.5', 'VUSTX2', 'VUSTX3', 'VUSTX4']
+# stock2_list += [  'QQQ',   'QQQ2.5',    'QLD',   'TQQQ',   'QQQ4']
+# margin_lev_list += [1, 1, 1, 1, 1]
+# stock1_list += ['VUSTX' for _ in range(3)]
+# stock2_list += ['VOO' for _ in range(3)]
+# margin_lev_list += [1.8, 3, 4]
+# stock1_list += ['VUSTX2']
+# stock2_list += ['SSO']
+# margin_lev_list += [1.8]
+# stock1_list += ['VUSTX' for _ in range(3)]
+# stock2_list += ['QQQ' for _ in range(3)]
+# margin_lev_list += [1.8, 3, 4]
+# stock1_list += ['VUSTX2']
+# stock2_list += ['QLD']
+# margin_lev_list += [1.8]
 
-stock1_list += ['VUSTX' for _ in range(3)]
-stock2_list += ['VOO' for _ in range(3)]
-margin_lev_list += [1.8, 3, 4]
-stock1_list += ['VUSTX2']
-stock2_list += ['SSO']
-margin_lev_list += [1.8]
-
-stock1_list += ['VUSTX' for _ in range(3)]
-stock2_list += ['QQQ' for _ in range(3)]
-margin_lev_list += [1.8, 3, 4]
-stock1_list += ['VUSTX2']
-stock2_list += ['QLD']
-margin_lev_list += [1.8]
+stock1_list += ['VUSTX', 'VUSTX2', 'VUSTX3']
+stock2_list += [  'VOO',    'SSO',   'UPRO']
+margin_lev_list += [1, 1, 1]
+stock1_list += ['VUSTX', 'VUSTX2', 'VUSTX3']
+stock2_list += [  'QQQ',    'QLD',   'TQQQ']
+margin_lev_list += [1, 1, 1]
+stock1_list += ['VUSTX', 'VUSTX2', 'VUSTX', 'VUSTX2']
+stock2_list += [  'VOO',    'SSO',   'QQQ',    'QLD']
+margin_lev_list += [1.8, 1.8, 1.8, 1.8]
 
 total_number_of_runs = len(frac_list) * len(stock1_list)
 cnt = 0
@@ -146,8 +155,8 @@ for stock1, stock2, margin_lev in zip(stock1_list, stock2_list, margin_lev_list)
             settings['capital_gains_tax_percents'] = 25
 
         # settings['num_correlation_days'] = 10
-        # settings['num_correlation_days'] = 5
-        settings['num_correlation_days'] = 1
+        settings['num_correlation_days'] = 5
+        # settings['num_correlation_days'] = 1
 
         # settings['rebalance_percent_deviation'] = 20
 
