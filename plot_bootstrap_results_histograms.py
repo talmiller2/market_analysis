@@ -92,10 +92,10 @@ tax_scheme_list += [tax_scheme]
 stock1_list += [bond_stock]
 stock2_list += [index_stock]
 margin_lev_list += [1]
-label_list += ['100% VOO']
-fracs_list += [1.0]
-# label_list += ['50%/50% VUSTX/VOO']
-# fracs_list += [0.5]
+# label_list += ['100% VOO']
+# fracs_list += [1.0]
+label_list += ['50%/50% VUSTX/VOO']
+fracs_list += [0.5]
 
 
 color_list += ['b']
@@ -107,10 +107,10 @@ tax_scheme_list += [tax_scheme]
 stock1_list += [bond_X2_stock]
 stock2_list += [index_X2_stock]
 margin_lev_list += [1]
-label_list += ['100% SSO']
-fracs_list += [1.0]
-# label_list += ['50%/50% VUSTX2/SSO']
-# fracs_list += [0.5]
+# label_list += ['100% SSO']
+# fracs_list += [1.0]
+label_list += ['50%/50% VUSTX2/SSO']
+fracs_list += [0.5]
 
 color_list += ['r']
 year_start_list += [year]
@@ -121,10 +121,10 @@ tax_scheme_list += [tax_scheme]
 stock1_list += [bond_X3_stock]
 stock2_list += [index_X3_stock]
 margin_lev_list += [1]
-label_list += ['100% UPRO']
-fracs_list += [1.0]
-# label_list += ['50%/50% VUSTX3/UPRO']
-# fracs_list += [0.5]
+# label_list += ['100% UPRO']
+# fracs_list += [1.0]
+label_list += ['50%/50% VUSTX3/UPRO']
+fracs_list += [0.5]
 
 
 ###########################
@@ -223,7 +223,8 @@ for ind_set, color in enumerate(color_list):
             label = label_list[ind_set]
             # color = None
 
-            plt.figure(1)
+            # plt.figure(1)
+            plt.figure(num=1, figsize=(15, 6))
             plt.subplot(1,3,1)
             # percentile_max_hist = 99
             # bins = np.linspace(0, np.percentile(yield_list, percentile_max_hist), 50)
@@ -233,7 +234,8 @@ for ind_set, color in enumerate(color_list):
             # label_curr = '5%=' + '{:.2f}'.format(yield_risk) + ', 50%=' + '{:.2f}'.format(yield_median)
             label_curr = '{:.2f}'.format(yield_risk) + ' (5%), ' + '{:.2f}'.format(yield_median) + ' (50%)'
             plt.hist(yield_list, bins=bins, density=True, alpha=0.5, label=label_curr, color=color)
-            plt.xlabel('yield')
+            # plt.xlabel('yield')
+            plt.xlabel('final yield')
             # plt.title('yield probability distribution')
             plt.legend()
 
@@ -255,3 +257,5 @@ for ind_set, color in enumerate(color_list):
             print('failed ', file_name)
             pass
 
+plt.figure(1)
+plt.tight_layout()
