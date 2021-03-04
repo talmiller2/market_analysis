@@ -64,7 +64,7 @@ if plot_sim:
     settings['date_start'] = date_start
     settings['date_end'] = date_end
     # settings['ideal_portfolio_fractions'] = {'SP500': 1.0}
-    # settings['ideal_portfolio_fractions'] = {'VOO': 1.0}
+    settings['ideal_portfolio_fractions'] = {'VOO': 1.0}
     # settings['ideal_portfolio_fractions'] = {'UPRO': 1.0}
     # settings['ideal_portfolio_fractions'] = {'QQQ': 1.0}
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 1.0}
@@ -85,7 +85,7 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'QLD': 0.85, 'VUSTX2': 0.15}
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 0.5, 'VUSTX3': 0.5}
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 0.85, 'VUSTX3': 0.15}
-    settings['ideal_portfolio_fractions'] = {'QQQ4': 0.9, 'VUSTX4': 0.1}
+    # settings['ideal_portfolio_fractions'] = {'QQQ4': 0.9, 'VUSTX4': 0.1}
     # settings['ideal_portfolio_fractions'] = {'QLD': 0.25, 'TQQQ': 0.25, 'VUSTX2': 0.25, 'VUSTX3': 0.25}
     # settings['margin_leverage_target'] = 1.1
     # settings['margin_leverage_target'] = 2
@@ -103,60 +103,69 @@ if plot_sim:
     # settings['rebalance_percent_deviation'] = 30
     # settings['rebalance_percent_deviation'] = 1
     settings['generate_synthetic_realization'] = True
-    # settings['seed'] = np.random.randint(1e6)
+    settings['seed'] = np.random.randint(1e6)
     # settings['seed'] = 368397
     # settings['seed'] = 442194
     # settings['seed'] = 218161
     # settings['seed'] = 808792
-    settings['seed'] = 866623
+    # settings['seed'] = 866623
     data = simulate_portfolio_evolution(settings)
 
     # plots
     plt.figure(1)
-    colors_components = ['b', 'g']
-    for stock_name, color in zip(settings['ideal_portfolio_fractions'].keys(), colors_components):
-        plt.plot(data[stock_name], label=data['underlying_index'][stock_name] + ' data', linewidth=1, color=color)
-    label = 'sim'
-    label += ' ' + str(settings['ideal_portfolio_fractions'])
+    # colors_components = ['b', 'g']
+    # for stock_name, color in zip(settings['ideal_portfolio_fractions'].keys(), colors_components):
+    #     plt.plot(data[stock_name], label=data['underlying_index'][stock_name] + ' data', linewidth=1, color=color)
+    label = None
+    # label = 'sim'
+    # label += ' ' + str(settings['ideal_portfolio_fractions'])
     if settings['margin_leverage_target'] > 1:
         label += ' marginX' + str(settings['margin_leverage_target'])
-    label += ' tax ' + settings['tax_scheme']
+    # label += ' tax ' + settings['tax_scheme']
     # label += ', avg days buy ' + '{:.2f}'.format(data['average_monthly_buy_days']) + ' sell ' + '{:.2f}'.format(data['average_monthly_sell_days'])
     # label = 'sim tax ' + settings['tax_scheme'] + ' (total sell tax loss ' + '{:0.2f}'.format(data['total_sell_tax_loss_percents']) + '%)'
-    # color = None
-    color = 'k'
+    color = None
+    # color = 'k'
     # plt.plot(data['total_portfolio_value'] / data['total_investment'], label=label, linewidth=2, color=color, zorder=1)
     plt.plot(data['total_portfolio_value'] - data['margin_debt'], label=label, linewidth=2, color=color, zorder=1)
     # plt.scatter(data['papers_buy_days'], data['portfolio_values_at_buy_days'], s=2, color=data['papers_status_colors'], zorder=2)
     # plt.plot(data['total_portfolio_value'] + data['cash_in_account'], label=label + ' + divs not reinvested', linewidth=2)
     # plt.plot(data['cash_in_account'], label='cash_in_account', linewidth=2)
-    if settings['margin_leverage_target'] > 1:
-        plt.plot(data['margin_debt'], label='margin debt', linewidth=2, color='c')
-    plt.plot(data['gains'], label='gains', linewidth=2, color='m')
-    plt.plot(data['taxes_paid'], label='tax', linewidth=2, color='r')
+    # if settings['margin_leverage_target'] > 1:
+    #     plt.plot(data['margin_debt'], label='margin debt', linewidth=2, color='c')
+    # plt.plot(data['gains'], label='gains', linewidth=2, color='m')
+    # plt.plot(data['taxes_paid'], label='tax', linewidth=2, color='r')
     # plt.yscale('log')
     plt.xticks(data['inds_years'], data['label_years'])
     plt.xlabel('years')
-    # plt.ylabel('yield')
+    plt.ylabel('yield')
     # plt.title('Stock Data')
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
 
-    plt.figure(2)
-    for stock_name, color in zip(settings['ideal_portfolio_fractions'].keys(), colors_components):
-        plt.plot(data['portfolio_fractions'][stock_name], label=stock_name, linewidth=2, color=color)
-        plt.plot(settings['ideal_portfolio_fractions'][stock_name] + np.zeros(len(data['dates'])), '--',
-                 linewidth=2, color=color)
-    plt.xticks(data['inds_years'], data['label_years'])
-    plt.title('portfolio fractions')
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
+    # plt.figure(2)
+    # for stock_name, color in zip(settings['ideal_portfolio_fractions'].keys(), colors_components):
+    #     plt.plot(data['portfolio_fractions'][stock_name], label=stock_name, linewidth=2, color=color)
+    #     plt.plot(settings['ideal_portfolio_fractions'][stock_name] + np.zeros(len(data['dates'])), '--',
+    #              linewidth=2, color=color)
+    # plt.xticks(data['inds_years'], data['label_years'])
+    # plt.title('portfolio fractions')
+    # plt.legend()
+    # plt.grid(True)
+    # plt.tight_layout()
+    #
+    # plt.figure(3)
+    # plt.plot(data['margin_leverage'], linewidth=2)
+    # plt.title('margin leverage')
+    # plt.legend()
+    # plt.grid(True)
+    # plt.tight_layout()
 
-    plt.figure(3)
-    plt.plot(data['margin_leverage'], linewidth=2)
-    plt.title('margin leverage')
-    plt.legend()
+    plt.figure(4)
+    plt.plot(data['drawdown'], color=color, label=label, linewidth=2)
+    plt.xticks(data['inds_years'], data['label_years'])
+    plt.title('drawdown')
+    # plt.legend()
     plt.grid(True)
     plt.tight_layout()

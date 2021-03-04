@@ -109,7 +109,7 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'UPRO': 1.0}
     # settings['ideal_portfolio_fractions'] = {'QQQ': 1.0}
     # settings['ideal_portfolio_fractions'] = {'TQQQ': 1.0}
-    settings['ideal_portfolio_fractions'] = {'QLD': 1.0}
+    # settings['ideal_portfolio_fractions'] = {'QLD': 1.0}
     # settings['ideal_portfolio_fractions'] = {'QQQ': 0.0, 'QLD': 1.0}
     # settings['ideal_portfolio_fractions'] = {'VUSTX': 1.0}
     # settings['ideal_portfolio_fractions'] = {'TLT': 1.0}
@@ -125,7 +125,7 @@ if plot_sim:
     # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'SSO': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.5, 'UPRO': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'QQQ': 0.5}
-    # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'QLD': 0.5}
+    settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'QLD': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.6, 'QLD': 0.4}
     # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.5, 'TQQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX4': 0.5, 'QQQ4': 0.5}
@@ -140,15 +140,15 @@ if plot_sim:
     # settings['tax_scheme'] = 'optimized'
     settings['tax_scheme'] = 'none'
     # settings['rebalance_percent_deviation'] = 10.0
-    settings['rebalance_percent_deviation'] = 20.0
+    # settings['rebalance_percent_deviation'] = 20.0
     data1 = simulate_portfolio_evolution(settings)
     inds_years, label_years = get_year_labels(data1['dates'])
     label1 = 'sim: ' + str(settings['ideal_portfolio_fractions'])
 
     # settings['ideal_portfolio_fractions'] = {'VOO': 1.0}
-    settings['ideal_portfolio_fractions'] = {'QQQ': 1.0}
+    # settings['ideal_portfolio_fractions'] = {'QQQ': 1.0}
     # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'VOO': 0.5}
-    # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'QQQ': 0.5}
+    settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'QQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX': 0.5, 'QQQ': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX2': 0.5, 'QLD': 0.5}
     # settings['ideal_portfolio_fractions'] = {'VUSTX3': 0.5, 'TQQQ': 0.5}
@@ -189,7 +189,8 @@ if plot_sim:
     # plt.plot(data['total_portfolio_value'] - data['margin_debt'], label=label, linewidth=2, color=None)
     # plt.scatter(data['papers_buy_days'], data['portfolio_values_at_buy_days'], s=2, color=data['papers_status_colors'], zorder=2)
     # plt.plot(data['total_portfolio_value'] + data['cash_in_account'], label=label + ' + divs not reinvested', linewidth=2)
-    # plt.plot(data['cash_in_account'], label='cash_in_account', linewidth=2)
+    plt.plot(data2['cash_in_account'], label='cash_in_account', linewidth=2)
+
     # plt.yscale('log')
     plt.xticks(inds_years, label_years, rotation='vertical')
     plt.ylabel('yield')
@@ -198,26 +199,26 @@ if plot_sim:
     plt.grid(True)
     plt.tight_layout()
 
-    plt.figure(2)
-    for stock_name in data1['portfolio_fractions'].keys():
-        plt.plot(data1['portfolio_fractions'][stock_name], label='LETF sim:' + stock_name, linewidth=2)
-    for stock_name in data2['portfolio_fractions'].keys():
-        plt.plot(data2['portfolio_fractions'][stock_name], label='margin sim:' + stock_name, linewidth=2)
-    plt.xticks(inds_years, label_years, rotation='vertical')
-    plt.title('portfolio fractions')
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-
-    plt.figure(3)
-    # plt.figure(1)
-    # plt.subplot(1,2,2)
-    plt.plot(data2['margin_leverage'], linewidth=2, color=color2, label=label2)
-    plt.xticks(inds_years, label_years, rotation='vertical')
-    plt.title('margin leverage')
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
+    # plt.figure(2)
+    # for stock_name in data1['portfolio_fractions'].keys():
+    #     plt.plot(data1['portfolio_fractions'][stock_name], label='LETF sim:' + stock_name, linewidth=2)
+    # for stock_name in data2['portfolio_fractions'].keys():
+    #     plt.plot(data2['portfolio_fractions'][stock_name], label='margin sim:' + stock_name, linewidth=2)
+    # plt.xticks(inds_years, label_years, rotation='vertical')
+    # plt.title('portfolio fractions')
+    # plt.legend()
+    # plt.grid(True)
+    # plt.tight_layout()
+    #
+    # plt.figure(3)
+    # # plt.figure(1)
+    # # plt.subplot(1,2,2)
+    # plt.plot(data2['margin_leverage'], linewidth=2, color=color2, label=label2)
+    # plt.xticks(inds_years, label_years, rotation='vertical')
+    # plt.title('margin leverage')
+    # plt.legend()
+    # plt.grid(True)
+    # plt.tight_layout()
 
     # plt.figure(4)
     # plt.plot(data1['drawdown'], color=color1, label=label1, linewidth=2)

@@ -32,6 +32,7 @@ margin_lev_list = []
 invest_strategy = 'single'
 # invest_strategy = 'monthly'
 
+# synthetic_period_years = 5
 synthetic_period_years = 10
 # synthetic_period_years = 20
 
@@ -210,7 +211,8 @@ for ind_set, color in enumerate(color_list):
     save_dir = ''
     # save_dir += 'simulations/'
     save_dir = '/Users/talmiller/Downloads/'
-    save_dir += 'simulations_slurm_2/'
+    # save_dir += 'simulations_slurm_2/'
+    save_dir += 'simulations_slurm_3/'
 
     if investing_strategy == 'single':
         label_investment = 'investment_initial_1_periodic_0'
@@ -255,7 +257,8 @@ for ind_set, color in enumerate(color_list):
         # prepare label for annotation
         # label_annotate = file_name.split('.txt')[0]
         # label_annotate = file_name.split('.txt')[0].split('_')[-1]
-        label_annotate = file_name.split('.txt')[0].split('_')[1]
+        # label_annotate = file_name.split('.txt')[0].split('_')[1]
+        label_annotate = str(int(100.0 * float(file_name.split('.txt')[0].split('_')[3])))
 
         if not use_single_color:
             if color is not None:
@@ -310,8 +313,8 @@ for ind_set, color in enumerate(color_list):
                 bootstrap_realizations = 300
                 # bootstrap_realizations = 1000
                 # bootstrap_err_CL = 95
-                bootstrap_err_CL = 90
-                # bootstrap_err_CL = 68
+                # bootstrap_err_CL = 90
+                bootstrap_err_CL = 68
                 yield_percentile_err_list = []
                 min_yield_percentiles_err_list = []
                 max_drawdown_percentiles_err_list = []
