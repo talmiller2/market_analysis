@@ -68,8 +68,8 @@ stock_name_list += ['VUSTX-TR']
 # stock_name_list += ['F']
 # stock_name_list += ['GM']
 
-plot_data = False
-# plot_data = True
+# plot_data = False
+plot_data = True
 #
 plot_close_adjusted = False
 # plot_close_adjusted = True
@@ -88,9 +88,9 @@ if plot_data:
 
         # plots
         plt.figure(1)
-        plt.plot(index_values, label=stock_name, linewidth=1, color='k')
+        plt.plot(index_values, label=stock_name, linewidth=1, color=None)
         if plot_close_adjusted and stock_name not in ['SP500', 'SP500TR', 'NDX100', 'NDX100TR']:
-            plt.plot(index_adjusted_values, label=stock_name + ' (TR)', linewidth=1)
+            plt.plot(index_adjusted_values, label=stock_name + ' (TR)', linewidth=1, color=None)
         # plt.yscale('log')
         plt.xticks(inds_years, label_years, rotation='vertical')
         plt.ylabel('yield')
@@ -149,15 +149,15 @@ if plot_sim:
     # settings['rebalance_percent_deviation'] = 20.1
     # settings['rebalance_percent_deviation'] = 19.9
     # settings['rebalance_percent_deviation'] = 19.5
-    settings['rebalance_percent_deviation'] = 20.5
+    # settings['rebalance_percent_deviation'] = 20.5
 
     # settings['capital_gains_tax_percents'] = 0
     # settings['capital_gains_tax_percents'] = 5
     # settings['transaction_fee_percents'] = 0
     # settings['tax_scheme'] = 'FIFO'
     # settings['tax_scheme'] = 'LIFO'
-    # settings['tax_scheme'] = 'optimized'
-    settings['tax_scheme'] = 'none'
+    settings['tax_scheme'] = 'optimized'
+    # settings['tax_scheme'] = 'none'
     data = simulate_portfolio_evolution(settings)
 
     # plots
@@ -166,14 +166,14 @@ if plot_sim:
     # label = 'sim tax ' + settings['tax_scheme'] + ' (total sell tax loss ' + '{:0.2f}'.format(data['total_sell_tax_loss_percents']) + '%)'
     # label = 'sim: ' + str(settings['ideal_portfolio_fractions'])
     label = 'sim tax: ' + settings['tax_scheme']
-    label += ' reb@' + str(settings['rebalance_percent_deviation']) + '%'
+    # label += ' reb@' + str(settings['rebalance_percent_deviation']) + '%'
     # plt.plot(data['total_portfolio_value'], label=label, linewidth=2)
     # plt.plot(data['total_portfolio_value'], label=label, linewidth=2, color='k', zorder=1)
     # plt.plot(data['total_portfolio_value'] / data['total_investment'], label=label, linewidth=2, color='k', zorder=1)
-    # color = 'k'
+    color = 'k'
     # color = 'c'
     # color = 'b'
-    color = 'g'
+    # color = 'g'
     # color = 'r'
     plt.plot(data['total_portfolio_value'] / data['total_investment'], label=label, linewidth=2, color=color)
     # plt.scatter(data['papers_buy_days'], data['portfolio_values_at_buy_days'], marker='o', s=5, color=data['papers_status_colors'], zorder=2)
@@ -191,15 +191,15 @@ if plot_sim:
     plt.grid(True)
     plt.tight_layout()
 
-    # plt.figure(2)
-    # for stock_name in data['portfolio_fractions'].keys():
-    #     plt.plot(data['portfolio_fractions'][stock_name], label=stock_name, linewidth=2)
-    # plt.xticks(inds_years, label_years, rotation='vertical')
-    # plt.title('portfolio fractions')
-    # plt.legend()
-    # plt.grid(True)
-    # plt.tight_layout()
-    #
+    plt.figure(2)
+    for stock_name in data['portfolio_fractions'].keys():
+        plt.plot(data['portfolio_fractions'][stock_name], label=stock_name, linewidth=2)
+    plt.xticks(inds_years, label_years, rotation='vertical')
+    plt.title('portfolio fractions')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+
     plt.figure(4)
     plt.plot(data['drawdown'], label=label, linewidth=2)
     # plt.xticks(inds_years, label_years, rotation='vertical')

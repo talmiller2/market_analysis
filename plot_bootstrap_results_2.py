@@ -9,6 +9,7 @@ from settings_functions import define_default_settings
 from market_functions import simulate_portfolio_evolution
 import os
 import matplotlib.cm as cm
+from matplotlib.ticker import AutoMinorLocator
 
 # matplotlib.use('TkAgg')
 
@@ -33,8 +34,8 @@ invest_strategy = 'single'
 # invest_strategy = 'monthly'
 
 # synthetic_period_years = 5
-synthetic_period_years = 10
-# synthetic_period_years = 20
+# synthetic_period_years = 10
+synthetic_period_years = 20
 
 num_correlation_days = 5
 # num_correlation_days = 1
@@ -44,18 +45,32 @@ num_correlation_days = 5
 rebalance_percent = 20
 # rebalance_percent = 30
 # rebalance_percent = 40
-# rebalance_percent = 50ß
+# rebalance_percent = 50
 
 year1 = 1989
 year2 = 2003
 
-tax_scheme = 'optimized'
+# define the period from which the synthetic realization will be drawn
+
+date_start = '1989-01-01'
+# date_start = '1997-01-01'
+# date_start = '1998-01-01'
+# date_start = '2003-01-01'
+
+# date_end = '2010-01-01'
+# date_end = '2019-01-01'
+# date_end = '2009-01-01'
+# date_end = '2010-01-01'
+# date_end = '2011-01-01'
+date_end = '2020-09-30'
+
+# tax_scheme = 'optimized'
 # tax_scheme = 'LIFO'
 # tax_scheme = 'FIFO'
-# tax_scheme = 'none'
+tax_scheme = 'none'
 
-# index_base = 'NDX100'
-index_base = 'SP500'
+index_base = 'NDX100'
+# index_base = 'SP500'
 
 if index_base == 'NDX100':
     index_stock = 'QQQ'
@@ -78,10 +93,10 @@ bond_X4_stock = 'VUSTX4'
 
 ####  plot dependence on leveraged bond / index portfolios
 
-year = year1
+# year = year
 # year = year2
+year = 1999
 
-# color_list += ['b']
 color_list += ['k']
 year_start_list += [year]
 investing_strategy_list += [invest_strategy]
@@ -112,7 +127,6 @@ margin_lev_list += [1]
 # stock2_list += [index_X25_stock]
 # margin_lev_list += [1]
 # #
-# color_list += ['g']
 color_list += ['r']
 year_start_list += [year]
 investing_strategy_list += [invest_strategy]
@@ -122,7 +136,6 @@ tax_scheme_list += [tax_scheme]
 stock1_list += [bond_X3_stock]
 stock2_list += [index_X3_stock]
 margin_lev_list += [1]
-#
 #
 color_list += ['b']
 year_start_list += [year]
@@ -196,16 +209,6 @@ for ind_set, color in enumerate(color_list):
 
     use_single_color = True
     # use_single_color = False
-
-    # define the period from which the synthetic realization will be drawn
-    if year_start == 1989:
-        date_start = '1989-01-01'
-    else:
-        date_start = '2003-01-01'
-
-    # date_end = '2010-01-01'
-    # date_end = '2019-01-01'
-    date_end = '2020-09-30'
 
     settings = define_default_settings()
 
@@ -375,6 +378,10 @@ for ind_set, color in enumerate(color_list):
             else:
                 label_curr = label
 
+            # catch the negative yield outcomes and do not plot them
+            if yield_percentiles[0] < 0.05:
+                raise ValueError()
+
             # plt.figure(1)
             # plt.figure(num=1, figsize=(8, 20), dpi=80, facecolor='w', edgecolor='k')
             plt.figure(num=1, figsize=(15, 6))
@@ -399,7 +406,7 @@ for ind_set, color in enumerate(color_list):
             # plt.scatter(yield_percentiles[0], yield_percentiles[2], color=color)
             # plt.errorbar(yield_percentiles[0], yield_percentiles[2],
             #              yerr=np.array([[yield_percentiles_err_low[2]], [yield_percentiles_err_high[2]]]),
-            #              xerr=np.array([[yield_percentiles_err_low[0]], [yield_percentiles_err_high[0]]]),
+            #              xerƒr=np.array([[yield_percentiles_err_low[0]], [yield_percentiles_err_high[0]]]),
             #              label=label_curr,
             #              color=color)
 
@@ -470,14 +477,14 @@ for ind_set, color in enumerate(color_list):
     # plt.annotate('BTC', (-3 + text_dist, -10 + text_dist), size=20, color='k')
 
     plt.figure(1)
-    plt.subplot(1, 3, 1)
+    ax = plt.subplot(1, 3, 1)
     plt.xlabel('final yield ' + str(percentiles[0]) + '% percentile')
     plt.ylabel('final yield ' + str(percentiles[1]) + '% percentile')
     # if synthetic_period_years == 10:
     #     plt.xlim([0, 2])
     # else:
     #     plt.xlim([0, 9])
-    plt.xlim([0, 1.9])
+    # plt.xlim([0, 1.9])
     plt.grid(True)
     # plt.legend()
 
@@ -503,12 +510,13 @@ for ind_set, color in enumerate(color_list):
     # plt.legend()
 
     # plt.figure(6)
-    plt.subplot(1, 3, 2)
+    ax = plt.subplot(1, 3, 2)
     plt.xlabel('minimal yield ' + str(percentiles[0]) + '% percentile')
     # plt.ylabel('yield ' + str(percentiles[1]) + '% percentile')
     plt.grid(True)
     # plt.legend()
     plt.xlim([0, 1.0])
+    ax.set_yticklabels([])
 
     title = str(synthetic_period_years) + ' years ' + invest_strategy + ' investment'
     if tax_scheme == 'none':
@@ -518,15 +526,46 @@ for ind_set, color in enumerate(color_list):
     plt.title(title)
 
     # plt.figure(7)
-    plt.subplot(1, 3, 3)
+    ax = plt.subplot(1, 3, 3)
     plt.xlabel('maximal drawdown ' + str(percentiles[1]) + '% percentile')
     # plt.ylabel('yield ' + str(percentiles[1]) + '% percentile')
     plt.grid(True)
     plt.legend()
     plt.xlim([0, 1])
+    ax.set_yticklabels([])
 
+    # secondary y-axis mapping
+    total_to_yearly = lambda y: (abs(y) ** (1.0 / synthetic_period_years) - 1.0) * 100
+    yearly_to_total = lambda y: (1 + y / 100) ** (synthetic_period_years)
+    # def total_to_yearly(y):
+    #     tmp = (abs(y) ** (1.0 / synthetic_period_years) - 1.0) * 100
+    #     # if not np.isfinite(tmp):
+    #     print('total_to_yearly: y=' + str(y))
+    #     return tmp
+    # def yearly_to_total(y):
+    #     tmp = (1 + y / 100) ** (synthetic_period_years)
+    #     # if not np.isfinite(tmp):
+    #     print('yearly_to_total: y=' + str(y))
+    #     return tmp
+    secax_y = ax.secondary_yaxis('right', functions=(total_to_yearly, yearly_to_total))
+    secax_y.yaxis.set_minor_locator(AutoMinorLocator())
+    secax_y.set_ylabel('CAGR %')
 
 plt.figure(1)
 plt.tight_layout()
-plt.subplots_adjust(wspace=0.1, left=0.05)
+# plt.subplots_adjust(wspace=0.1, left=0.05)
 # plt.subplots_adjust(wspace=0.1)
+# plt.subplots_adjust(wspace=0.05, left=0.05)
+plt.subplots_adjust(wspace=0.07, left=0.07)
+
+save_dir = '../texts/work2/pics/'
+
+# file_name = 'MC_sp500_10years_tax_free'
+# file_name = 'MC_sp500_10years_tax_free_bearish'
+file_name = 'MC_'
+file_name += index_base
+file_name += '_' + str(synthetic_period_years) + 'years'
+file_name += '_tax_' + tax_scheme
+# file_name += '_bearish'
+beingsaved = plt.figure(1)
+beingsaved.savefig(save_dir + file_name + '.eps', format='eps')
